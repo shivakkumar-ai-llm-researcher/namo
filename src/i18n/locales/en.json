@@ -1,4 +1,4 @@
-﻿{
+{
   "navigation": {
     "dashboard": "Dashboard",
     "contributions": "Contributions",
@@ -49,8 +49,8 @@
     "editFunction": "Edit Function",
     "functionName": "Function Name",
     "functionType": "Function Type",
-    "annual": "Annual",
-    "fourYear": "Four Year",
+    "annual": "Purattasi Sani Kiyamai (Yearly)",
+    "fourYear": "Gokulaashdami (4-Year)",
     "startYear": "Start Year",
     "endYear": "End Year",
     "description": "Description",
@@ -59,8 +59,8 @@
     "active": "Active",
     "completed": "Completed",
     "archived": "Archived",
-    "annualFunction": "Annual Function",
-    "fourYearFunction": "Four Year Function",
+    "annualFunction": "Purattasi Sani Kiyamai",
+    "fourYearFunction": "Gokulaashdami",
     "closedFunction": "Closed Function",
     "functionCreated": "Function created successfully.",
     "functionUpdated": "Function updated successfully.",

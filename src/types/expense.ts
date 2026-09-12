@@ -1,4 +1,4 @@
-﻿export type ExpenseCategory =
+export type ExpenseCategory =
   | 'food'
   | 'hall'
   | 'decoration'
@@ -28,6 +28,9 @@ export interface Expense {
   function?: {
     id: string;
     name: string;
+    type?: import('./function').FunctionType;
+    start_year?: number;
+    end_year?: number | null;
   };
 }
 

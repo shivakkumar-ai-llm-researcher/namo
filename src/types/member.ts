@@ -1,4 +1,5 @@
-﻿export type MemberStatus = 'active' | 'inactive';
+export type MemberStatus = 'active' | 'inactive';
+export type MemberRole = 'admin' | 'visitor';
 
 export interface Member {
   id: string;
@@ -6,6 +7,7 @@ export interface Member {
   full_name: string;
   phone: string | null;
   email: string | null;
+  role?: MemberRole;
   status: MemberStatus;
   join_date: string;
   created_by: string | null;
@@ -18,6 +20,7 @@ export interface CreateMemberInput {
   full_name: string;
   phone?: string;
   email?: string;
+  role?: MemberRole;
   status?: MemberStatus;
   join_date?: string;
 }

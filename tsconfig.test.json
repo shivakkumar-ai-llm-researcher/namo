@@ -1,0 +1,18 @@
+﻿{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    "types": ["jest"],
+    "esModuleInterop": true,
+    "jsx": "react"
+  },
+  "include": [
+    "__tests__/**/*",
+    "__mocks__/**/*",
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "supabase/functions"
+  ]
+}

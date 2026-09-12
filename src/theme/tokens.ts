@@ -1,4 +1,4 @@
-﻿export const spacing = {
+export const spacing = {
   xs: 4,
   sm: 8,
   md: 16,
@@ -34,120 +34,134 @@ export const fontWeight = {
 
 export const shadow = {
   sm: {
-    shadowColor: '#000',
+    shadowColor: '#78350F',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
+    shadowOpacity: 0.08,
     shadowRadius: 2,
     elevation: 2,
   },
   md: {
-    shadowColor: '#000',
+    shadowColor: '#78350F',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.12,
     shadowRadius: 4,
     elevation: 4,
   },
   lg: {
-    shadowColor: '#000',
+    shadowColor: '#78350F',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.12,
+    shadowOpacity: 0.18,
     shadowRadius: 8,
     elevation: 8,
   },
 };
 
+// Tirupati Balaji Sacred Temple Palette (Light - Srivari Sannidhi)
 export const lightColors = {
-  // Background
-  background: '#F5F7FA',
+  // Background (Sacred Chandanam Sandalwood & Silk Ivory)
+  background: '#FCF8EE',
   surface: '#FFFFFF',
-  surfaceVariant: '#F0F4F8',
+  surfaceVariant: '#F7EFE0',
 
-  // Text
-  textPrimary: '#1A2332',
-  textSecondary: '#6B7A99',
-  textTertiary: '#9BA8C0',
+  // Text (Temple Bronze & Teak)
+  textPrimary: '#29180C',
+  textSecondary: '#6B4E38',
+  textTertiary: '#9E826C',
   textInverse: '#FFFFFF',
 
-  // Brand
-  primary: '#2563EB',
-  primaryLight: '#EFF6FF',
-  primaryDark: '#1D4ED8',
+  // Brand (Auspicious Kalyana Maroon / Kumkum & Swarna Gold)
+  primary: '#851D1D', // Sacred Kumkum Temple Red/Maroon
+  primaryLight: '#FEF3C7', // Sandalwood Gold Glow
+  primaryDark: '#5E1010', // Deep Temple Sanctum Maroon
+
+  // Sacred Balaji Accents
+  gold: '#D97706', // Srivari Swarna Gold
+  goldLight: '#FEF3C7',
+  maroon: '#851D1D',
+  maroonLight: '#FEE2E2',
 
   // Semantic
-  success: '#16A34A',
+  success: '#15803D', // Sacred Tulasi Green
   successLight: '#F0FDF4',
-  warning: '#D97706',
+  warning: '#D97706', // Auspicious Deepam Flame
   warningLight: '#FFFBEB',
-  error: '#DC2626',
+  error: '#DC2626', // Sacred Kumkum
   errorLight: '#FEF2F2',
-  info: '#0891B2',
+  info: '#0369A1', // Shankha Ocean Blue
   infoLight: '#F0F9FF',
 
-  // Financial
-  income: '#16A34A',
+  // Financial (Balaji Offerings & Sacred Ledger)
+  income: '#15803D', // Sacred Tulasi Green (Punya / Offerings)
   incomeLight: '#F0FDF4',
-  expense: '#DC2626',
+  expense: '#DC2626', // Sacred Kumkum Disbursals
   expenseLight: '#FEF2F2',
-  savings: '#2563EB',
-  savingsLight: '#EFF6FF',
-  balance: '#7C3AED',
-  balanceLight: '#F5F3FF',
+  savings: '#B45309', // Srivari Hundi Gold
+  savingsLight: '#FEF3C7',
+  balance: '#9A3412', // Peethambaram Amber
+  balanceLight: '#FFEDD5',
 
-  // Border
-  border: '#E2E8F0',
-  borderFocus: '#2563EB',
+  // Border (Sandalwood Gold)
+  border: '#EADBC8',
+  borderFocus: '#B45309',
 
-  // Tab bar
+  // Tab bar (Temple Silk Ivory & Sacred Maroon)
   tabBarBackground: '#FFFFFF',
-  tabBarActive: '#2563EB',
-  tabBarInactive: '#94A3B8',
+  tabBarActive: '#851D1D',
+  tabBarInactive: '#8A705E',
 };
 
+// Tirupati Balaji Sacred Temple Palette (Dark - Shaligram Vigraha & Ananda Nilayam)
 export const darkColors = {
-  // Background
-  background: '#0F172A',
-  surface: '#1E293B',
-  surfaceVariant: '#334155',
+  // Background (Sacred Shaligram Black Stone)
+  background: '#120D08',
+  surface: '#1E1610',
+  surfaceVariant: '#2E2218',
 
-  // Text
-  textPrimary: '#F1F5F9',
-  textSecondary: '#94A3B8',
-  textTertiary: '#64748B',
-  textInverse: '#0F172A',
+  // Text (Radiant Camphor & Sacred Gold Glow)
+  textPrimary: '#FEF3C7',
+  textSecondary: '#D7C4A5',
+  textTertiary: '#9C8570',
+  textInverse: '#FFFFFF',
 
-  // Brand
-  primary: '#3B82F6',
-  primaryLight: '#1E3A5F',
-  primaryDark: '#2563EB',
+  // Brand (Auspicious Kalyana Maroon / Kumkum - Same Sacred Color as Light Mode)
+  primary: '#851D1D', // Sacred Kumkum Temple Red/Maroon
+  primaryLight: '#3E1010', // Deep Temple Sanctum Maroon Glow
+  primaryDark: '#5E1010', // Deep Temple Sanctum Maroon
+
+  // Sacred Balaji Accents
+  gold: '#D97706',
+  goldLight: '#38250E',
+  maroon: '#851D1D',
+  maroonLight: '#3E1010',
 
   // Semantic
   success: '#22C55E',
   successLight: '#052E16',
   warning: '#F59E0B',
-  warningLight: '#2D1F00',
+  warningLight: '#38250E',
   error: '#EF4444',
-  errorLight: '#2D0808',
-  info: '#06B6D4',
-  infoLight: '#082F49',
+  errorLight: '#3E0A0A',
+  info: '#38BDF8',
+  infoLight: '#0C2E4A',
 
   // Financial
-  income: '#22C55E',
+  income: '#22C55E', // Glowing Tulasi
   incomeLight: '#052E16',
-  expense: '#EF4444',
-  expenseLight: '#2D0808',
-  savings: '#3B82F6',
-  savingsLight: '#1E3A5F',
-  balance: '#A78BFA',
-  balanceLight: '#2D1B69',
+  expense: '#EF4444', // Sacred Kumkum
+  expenseLight: '#3E0A0A',
+  savings: '#F59E0B', // Glowing Srivari Hundi
+  savingsLight: '#38250E',
+  balance: '#FB923C', // Peethambaram
+  balanceLight: '#3A1A05',
 
   // Border
-  border: '#334155',
-  borderFocus: '#3B82F6',
+  border: '#3D2D20',
+  borderFocus: '#F59E0B',
 
   // Tab bar
-  tabBarBackground: '#1E293B',
-  tabBarActive: '#3B82F6',
-  tabBarInactive: '#475569',
+  tabBarBackground: '#1A130C',
+  tabBarActive: '#F59E0B',
+  tabBarInactive: '#7C6755',
 };
 
 export type ThemeColors = typeof lightColors;

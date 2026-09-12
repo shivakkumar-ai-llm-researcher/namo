@@ -1,4 +1,4 @@
-﻿import { z } from 'zod';
+import { z } from 'zod';
 import { PaymentMethod } from '../types/contribution';
 import { ExpenseCategory } from '../types/expense';
 import { FunctionType, FunctionStatus } from '../types/function';
@@ -14,7 +14,7 @@ export const FUNCTION_STATUSES: FunctionStatus[] = ['planning', 'active', 'compl
 export const contributionSchema = z.object({
   function_id: z.string().uuid('Please select a valid function'),
   member_id: z.string().uuid('Please select a valid member'),
-  amount: z.number({ invalid_type_error: 'Amount must be a number' }).positive('Amount must be greater than 0').multipleOf(0.01),
+  amount: z.number({ message: 'Amount must be a number' }).positive('Amount must be greater than 0').multipleOf(0.01),
   payment_method: z.enum(['cash', 'upi', 'bank_transfer', 'other'] as const),
   payment_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
   reference_number: z.string().max(100).optional(),
@@ -25,7 +25,7 @@ export const expenseSchema = z.object({
   function_id: z.string().uuid('Please select a valid function'),
   category: z.enum(['food', 'hall', 'decoration', 'transportation', 'cultural_religious', 'printing', 'sound_system', 'gifts', 'utilities', 'miscellaneous'] as const),
   description: z.string().min(1, 'Description is required').max(200),
-  amount: z.number({ invalid_type_error: 'Amount must be a number' }).positive('Amount must be greater than 0').multipleOf(0.01),
+  amount: z.number({ message: 'Amount must be a number' }).positive('Amount must be greater than 0').multipleOf(0.01),
   payment_method: z.enum(['cash', 'upi', 'bank_transfer', 'other'] as const),
   expense_date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
   reference_number: z.string().max(100).optional(),

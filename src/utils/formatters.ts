@@ -1,4 +1,4 @@
-﻿import { format, parseISO, isValid } from 'date-fns';
+import { format, parseISO, isValid } from 'date-fns';
 import { ExpenseCategory } from '../types/expense';
 import { PaymentMethod } from '../types/contribution';
 import { FunctionType, FunctionStatus } from '../types/function';
@@ -78,7 +78,7 @@ export const formatExpenseCategory = (category: ExpenseCategory): string => {
 };
 
 export const formatFunctionType = (type: FunctionType): string => {
-  return type === 'ANNUAL' ? 'Annual Function' : 'Four-Year Function';
+  return type === 'ANNUAL' ? 'Purattasi Sani Kiyamai' : 'Gokulaashdami';
 };
 
 export const formatFunctionStatus = (status: FunctionStatus): string => {
@@ -93,6 +93,22 @@ export const formatFunctionStatus = (status: FunctionStatus): string => {
 
 export const getCategoryIcon = (category: ExpenseCategory): string => {
   const map: Record<ExpenseCategory, string> = {
+    food: 'restaurant-outline',
+    hall: 'business-outline',
+    decoration: 'sparkles-outline',
+    transportation: 'car-outline',
+    cultural_religious: 'flame-outline',
+    printing: 'print-outline',
+    sound_system: 'volume-high-outline',
+    gifts: 'gift-outline',
+    utilities: 'flash-outline',
+    miscellaneous: 'ellipsis-horizontal-circle-outline',
+  };
+  return map[category] ?? 'receipt-outline';
+};
+
+export const getCategoryEmoji = (category: ExpenseCategory): string => {
+  const map: Record<ExpenseCategory, string> = {
     food: '\uD83C\uDF7D\uFE0F',
     hall: '\uD83C\uDFDB\uFE0F',
     decoration: '\uD83C\uDF8A',
@@ -106,6 +122,7 @@ export const getCategoryIcon = (category: ExpenseCategory): string => {
   };
   return map[category] ?? '\uD83D\uDCB0';
 };
+
 
 export const getInitials = (name: string | null | undefined): string => {
   if (!name) return '?';

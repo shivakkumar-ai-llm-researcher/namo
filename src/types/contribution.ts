@@ -1,4 +1,4 @@
-﻿export type PaymentMethod = 'cash' | 'upi' | 'bank_transfer' | 'other';
+export type PaymentMethod = 'cash' | 'upi' | 'bank_transfer' | 'other';
 
 export interface Contribution {
   id: string;
@@ -21,6 +21,9 @@ export interface Contribution {
   function?: {
     id: string;
     name: string;
+    type?: import('./function').FunctionType;
+    start_year?: number;
+    end_year?: number | null;
   };
 }
 
