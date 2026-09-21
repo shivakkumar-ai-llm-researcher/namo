@@ -4,9 +4,11 @@ import { Search, TrendingUp } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui';
 import { contributionService } from '@/services';
 import { formatCurrency, formatDate } from '@/utils/formatters';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Contribution } from '@/types';
 
 export default function VisitorContributionsPage() {
+  const { language, t, formatMethod } = useLanguage();
   const [items, setItems] = useState<Contribution[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -37,9 +39,11 @@ export default function VisitorContributionsPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Contributions</h1>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          {t('contributions.title')}
+        </h1>
         <p className="text-sm font-semibold" style={{ color: 'var(--income)' }}>
-          Total Community Seva: {formatCurrency(totalAmount)}
+          {t('contributions.totalSeva')}: {formatCurrency(totalAmount)}
         </p>
       </div>
 
@@ -48,7 +52,7 @@ export default function VisitorContributionsPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by member name..."
+          placeholder={t('contributions.searchPlaceholder')}
           className="w-full pl-9 pr-3 py-2.5 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-amber-500"
           style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
         />
@@ -59,7 +63,7 @@ export default function VisitorContributionsPage() {
           <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--income)' }} />
         </div>
       ) : items.length === 0 ? (
-        <EmptyState icon="📈" title="No contributions found" />
+        <EmptyState icon="📈" title={t('contributions.empty')} />
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
@@ -79,11 +83,11 @@ export default function VisitorContributionsPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-sm sm:text-base leading-tight" style={{ color: 'var(--text-primary)' }}>
-                      {item.member?.full_name || 'Devotee Member'}
+                      {item.member?.full_name || t('contributions.member')}
                     </p>
                     {item.member?.member_id && (
                       <p className="text-[11px] font-medium" style={{ color: 'var(--text-tertiary)' }}>
-                        ID: {item.member.member_id}
+                        {t('contributions.memberId')}: {item.member.member_id}
                       </p>
                     )}
                   </div>
@@ -102,7 +106,7 @@ export default function VisitorContributionsPage() {
                   📅 {formatDate(item.payment_date)}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200/60 dark:border-emerald-800/60">
-                  💳 {item.payment_method.toUpperCase()}
+                  💳 {formatMethod(item.payment_method)}
                 </span>
                 {item.function?.name && (
                   <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
@@ -111,7 +115,7 @@ export default function VisitorContributionsPage() {
                 )}
                 {item.reference_number && (
                   <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 text-[11px] font-mono text-stone-600 dark:text-stone-300">
-                    Ref: {item.reference_number}
+                    {t('contributions.ref')}: {item.reference_number}
                   </span>
                 )}
               </div>

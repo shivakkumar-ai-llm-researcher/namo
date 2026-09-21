@@ -20,6 +20,7 @@ import {
 import { useAuth } from '../../src/hooks/useAuth';
 import { getInitials } from '@/utils/formatters';
 import { TirupatiHeaderBanner } from '@/components/layout/TirupatiHeaderBanner';
+import { useLanguage } from '@/context/LanguageContext';
 
 const navItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, tamil: 'டாஷ்போர்ட்' },
@@ -35,6 +36,7 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+  const { language, t } = useLanguage();
   const { user, profile, isLoading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -82,8 +84,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             >
               <Icon size={18} />
               <div>
-                <div className="text-sm font-semibold">{item.label}</div>
-                <div className="text-[10px] opacity-70">{item.tamil}</div>
+                <div className="text-sm font-semibold">{language === 'ta' ? item.tamil : item.label}</div>
+                <div className="text-[10px] opacity-70">{language === 'ta' ? item.label : item.tamil}</div>
               </div>
               {isActive && <ChevronRight size={14} className="ml-auto" />}
             </Link>
@@ -105,7 +107,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               {profile?.full_name || 'Admin'}
             </div>
             <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-              Administrator
+              {language === 'ta' ? 'நிர்வாகி' : 'Administrator'}
             </div>
           </div>
         </div>
@@ -114,7 +116,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           className="flex items-center gap-2 text-sm w-full px-3 py-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
           style={{ color: 'var(--error)' }}
         >
-          <LogOut size={16} /> Sign Out
+          <LogOut size={16} /> {language === 'ta' ? 'வெளியேறு' : 'Sign Out'}
         </button>
       </div>
     </div>
@@ -135,16 +137,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="flex items-center gap-2">
           <TabIcon size={15} style={{ color: 'var(--primary)' }} />
           <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
-            {currentTab.label}
+            {language === 'ta' ? currentTab.tamil : currentTab.label}
           </span>
-          {currentTab.tamil && (
-            <span className="text-[11px] text-stone-500 font-medium">
-              ({currentTab.tamil})
-            </span>
-          )}
+          <span className="text-[11px] text-stone-500 font-medium">
+            ({language === 'ta' ? currentTab.label : currentTab.tamil})
+          </span>
         </div>
         <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/40">
-          👑 Admin Portal • நிர்வாகம்
+          {language === 'ta' ? '👑 நிர்வாக தளம்' : '👑 Admin Portal • நிர்வாகம்'}
         </span>
       </div>
 

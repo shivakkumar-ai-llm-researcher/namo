@@ -3,10 +3,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui';
 import { expenseService } from '@/services';
-import { formatCurrency, formatDate, formatExpenseCategory, getCategoryEmoji } from '@/utils/formatters';
+import { formatCurrency, formatDate, getCategoryEmoji } from '@/utils/formatters';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Expense } from '@/types';
 
 export default function VisitorExpensesPage() {
+  const { language, t, formatCategory, formatMethod } = useLanguage();
   const [items, setItems] = useState<Expense[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -32,9 +34,11 @@ export default function VisitorExpensesPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Expenses</h1>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          {t('expenses.title')}
+        </h1>
         <p className="text-sm font-semibold" style={{ color: 'var(--expense)' }}>
-          Total Community Expenditure: {formatCurrency(totalAmount)}
+          {t('expenses.totalExpenditure')}: {formatCurrency(totalAmount)}
         </p>
       </div>
 
@@ -43,7 +47,7 @@ export default function VisitorExpensesPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search expenses..."
+          placeholder={t('expenses.searchPlaceholder')}
           className="w-full pl-9 pr-3 py-2.5 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-amber-500"
           style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
         />
@@ -54,7 +58,7 @@ export default function VisitorExpensesPage() {
           <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--expense)' }} />
         </div>
       ) : items.length === 0 ? (
-        <EmptyState icon="📉" title="No expenses found" />
+        <EmptyState icon="📉" title={t('expenses.empty')} />
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
@@ -92,7 +96,7 @@ export default function VisitorExpensesPage() {
                   📅 {formatDate(item.expense_date)}
                 </span>
                 <span className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 font-bold text-[11px] border border-rose-200/60 dark:border-rose-800/60">
-                  🏷️ {formatExpenseCategory(item.category)}
+                  🏷️ {formatCategory(item.category)}
                 </span>
                 {item.function?.name && (
                   <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
@@ -101,12 +105,12 @@ export default function VisitorExpensesPage() {
                 )}
                 {item.payment_method && (
                   <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
-                    💳 {item.payment_method.toUpperCase()}
+                    💳 {formatMethod(item.payment_method)}
                   </span>
                 )}
                 {item.reference_number && (
                   <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 text-[11px] font-mono text-stone-600 dark:text-stone-300">
-                    Ref: {item.reference_number}
+                    {t('expenses.ref')}: {item.reference_number}
                   </span>
                 )}
               </div>

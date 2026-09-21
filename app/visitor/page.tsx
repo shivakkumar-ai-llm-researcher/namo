@@ -5,11 +5,13 @@ import { TrendingUp, TrendingDown, Scale, Users, ArrowRight, Wallet } from 'luci
 import { StatCard, Card, Badge } from '@/components/ui';
 import { contributionService, expenseService, functionService } from '@/services';
 import { formatCurrency, formatDate } from '@/utils/formatters';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Contribution, Expense, CommunityFunction, FunctionType } from '@/types';
 
 type FnSummary = { contributions: number; expenses: number; balance: number; contributors: number };
 
 export default function VisitorDashboard() {
+  const { language, t, formatMethod } = useLanguage();
   const [allContributions, setAllContributions] = useState<Contribution[]>([]);
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [annualFn, setAnnualFn] = useState<CommunityFunction | null>(null);
@@ -105,14 +107,14 @@ export default function VisitorDashboard() {
             className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeCard === 0 ? 'text-white border-yellow-500' : 'border-transparent'}`}
             style={activeCard === 0 ? { backgroundColor: '#851D1D' } : { color: 'var(--text-secondary)', backgroundColor: 'var(--surface)' }}
           >
-            Purattasi Sani
+            {t('dashboard.purattasiSani')}
           </button>
           <button
             onClick={() => setActiveCard(1)}
             className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeCard === 1 ? 'text-white border-emerald-400' : 'border-transparent'}`}
             style={activeCard === 1 ? { backgroundColor: '#064E3B' } : { color: 'var(--text-secondary)', backgroundColor: 'var(--surface)' }}
           >
-            Gokulaashdami
+            {t('dashboard.gokulaashdami')}
           </button>
         </div>
 
@@ -120,31 +122,31 @@ export default function VisitorDashboard() {
           <div className="rounded-2xl p-5 text-white relative overflow-hidden" style={{ backgroundColor: '#851D1D', border: '2px solid #F59E0B' }}>
             <div className="absolute top-0 left-0 right-0 h-1 bg-yellow-400" />
             <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-2" style={{ backgroundColor: '#F59E0B', color: '#451A03' }}>
-              YEARLY FESTIVAL • புரட்டாசி
+              {t('dashboard.yearlyFestival')}
             </span>
-            <h3 className="text-lg font-bold">Purattasi Sani Kiyamai</h3>
+            <h3 className="text-lg font-bold">{t('dashboard.purattasiTitle')}</h3>
             <p className="text-xs mb-3" style={{ color: '#FDE68A' }}>
-              புரட்டாசி சனிக்கிழமை • {annualFn?.name || 'Annual Function'}
+              {language === 'ta' ? 'புரட்டாசி சனிக்கிழமை • ஆண்டு விழா' : `Purattasi Sani • ${annualFn?.name || 'Annual Function'}`}
             </p>
             <div className="bg-black/30 rounded-lg p-3 mb-3 border-l-4 border-yellow-400">
-              <p className="text-xs font-bold">⭐ 2nd Saturday of Purattasi (Annual Function)</p>
+              <p className="text-xs font-bold">{t('dashboard.purattasiEventNotice')}</p>
               <p className="text-[10px] mt-1" style={{ color: '#FDE68A' }}>
-                Balaji Thirumanjanam • Maavilakku Deepam • Annadhanam
+                {t('dashboard.purattasiHighlights')}
               </p>
             </div>
             <div className="flex justify-around bg-black/25 rounded-lg py-2">
               <div className="text-center">
-                <div className="text-[10px] opacity-75">Income</div>
+                <div className="text-[10px] opacity-75">{t('dashboard.income')}</div>
                 <div className="text-xs font-bold" style={{ color: '#BBF7D0' }}>+{formatCurrency(annualSummary.contributions)}</div>
               </div>
               <div className="w-px bg-white/20" />
               <div className="text-center">
-                <div className="text-[10px] opacity-75">Expenses</div>
+                <div className="text-[10px] opacity-75">{t('dashboard.expenses')}</div>
                 <div className="text-xs font-bold" style={{ color: '#FECDD3' }}>-{formatCurrency(annualSummary.expenses)}</div>
               </div>
               <div className="w-px bg-white/20" />
               <div className="text-center">
-                <div className="text-[10px] opacity-75">Savings</div>
+                <div className="text-[10px] opacity-75">{t('dashboard.savings')}</div>
                 <div className="text-xs font-bold" style={{ color: '#FDE68A' }}>{formatCurrency(annualSummary.balance)}</div>
               </div>
             </div>
@@ -153,31 +155,31 @@ export default function VisitorDashboard() {
           <div className="rounded-2xl p-5 text-white relative overflow-hidden" style={{ backgroundColor: '#064E3B', border: '2px solid #10B981' }}>
             <div className="absolute top-0 left-0 right-0 h-1 bg-emerald-400" />
             <span className="inline-block px-2 py-0.5 rounded text-[10px] font-bold mb-2" style={{ backgroundColor: '#10B981', color: '#FFFFFF' }}>
-              4-YEAR FESTIVAL • 4 வருட விழா
+              {t('dashboard.fourYearFestival')}
             </span>
-            <h3 className="text-lg font-bold">Gokulaashdami Festival</h3>
+            <h3 className="text-lg font-bold">{t('dashboard.gokulTitle')}</h3>
             <p className="text-xs mb-3" style={{ color: '#A7F3D0' }}>
-              கோகுலாஷ்டமி 4 வருட பெருவிழா • {fourYearFn?.name || '2026-2029'}
+              {language === 'ta' ? 'கோகுலாஷ்டமி 4 வருட பெருவிழா' : `Gokulaashdami 4-Year Festival • ${fourYearFn?.name || '2026-2029'}`}
             </p>
             <div className="bg-black/30 rounded-lg p-3 mb-3 border-l-4 border-emerald-400">
-              <p className="text-xs font-bold">✨ Celebrated 2025 ✓ • Next in 2029</p>
+              <p className="text-xs font-bold">{t('dashboard.gokulEventNotice')}</p>
               <p className="text-[10px] mt-1" style={{ color: '#A7F3D0' }}>
-                Sri Krishna Janmashtami • Uriyadi • Maha Prasad
+                {t('dashboard.gokulHighlights')}
               </p>
             </div>
             <div className="flex justify-around bg-black/25 rounded-lg py-2">
               <div className="text-center">
-                <div className="text-[10px] opacity-75">Total Fund</div>
+                <div className="text-[10px] opacity-75">{t('dashboard.totalFund')}</div>
                 <div className="text-xs font-bold" style={{ color: '#A7F3D0' }}>+{formatCurrency(fourYearSummary.contributions)}</div>
               </div>
               <div className="w-px bg-white/20" />
               <div className="text-center">
-                <div className="text-[10px] opacity-75">Expenses</div>
+                <div className="text-[10px] opacity-75">{t('dashboard.expenses')}</div>
                 <div className="text-xs font-bold" style={{ color: '#FECDD3' }}>-{formatCurrency(fourYearSummary.expenses)}</div>
               </div>
               <div className="w-px bg-white/20" />
               <div className="text-center">
-                <div className="text-[10px] opacity-75">4-Yr Savings</div>
+                <div className="text-[10px] opacity-75">{t('dashboard.fourYrSavings')}</div>
                 <div className="text-xs font-bold" style={{ color: '#FDE68A' }}>{formatCurrency(fourYearSummary.balance)}</div>
               </div>
             </div>
@@ -187,20 +189,24 @@ export default function VisitorDashboard() {
 
       {/* Filter header */}
       <div>
-        <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>Overview</h2>
+        <h2 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>{t('dashboard.overview')}</h2>
         <div className="flex gap-2 mb-4">
-          {(['all', 'ANNUAL', 'FOUR_YEAR'] as const).map((t) => (
+          {(['all', 'ANNUAL', 'FOUR_YEAR'] as const).map((fnKey) => (
             <button
-              key={t}
-              onClick={() => setSelectedType(t)}
+              key={fnKey}
+              onClick={() => setSelectedType(fnKey)}
               className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all"
               style={
-                selectedType === t
+                selectedType === fnKey
                   ? { backgroundColor: 'var(--primary)', color: '#fff', borderColor: '#F59E0B' }
                   : { backgroundColor: 'var(--surface)', color: 'var(--text-secondary)', borderColor: 'var(--border)' }
               }
             >
-              {t === 'all' ? 'All Functions' : t === 'ANNUAL' ? 'Purattasi Sani' : 'Gokulaashdami'}
+              {fnKey === 'all'
+                ? t('dashboard.allFunctions')
+                : fnKey === 'ANNUAL'
+                ? t('dashboard.purattasiSani')
+                : t('dashboard.gokulaashdami')}
             </button>
           ))}
         </div>
@@ -208,23 +214,23 @@ export default function VisitorDashboard() {
 
       {/* Financial Stat Cards Grid */}
       <div className="grid grid-cols-2 gap-3">
-        <StatCard title="Total Contributions" amount={filtered.totalContributions} color="var(--income)" bgColor="var(--income-light)" icon={<TrendingUp size={18} />} compact />
-        <StatCard title="Total Expenses" amount={filtered.totalExpenses} color="var(--expense)" bgColor="var(--expense-light)" icon={<TrendingDown size={18} />} compact />
-        <StatCard title="Srivari Savings" amount={Math.max(0, filtered.balance)} color="var(--savings)" bgColor="var(--savings-light)" compact />
-        <StatCard title="Balance" amount={filtered.balance} color="var(--balance)" bgColor="var(--balance-light)" icon={<Scale size={18} />} compact />
+        <StatCard title={t('dashboard.totalContributions')} amount={filtered.totalContributions} color="var(--income)" bgColor="var(--income-light)" icon={<TrendingUp size={18} />} compact />
+        <StatCard title={t('dashboard.totalExpenses')} amount={filtered.totalExpenses} color="var(--expense)" bgColor="var(--expense-light)" icon={<TrendingDown size={18} />} compact />
+        <StatCard title={t('dashboard.srivariSavings')} amount={Math.max(0, filtered.balance)} color="var(--savings)" bgColor="var(--savings-light)" compact />
+        <StatCard title={t('dashboard.balance')} amount={filtered.balance} color="var(--balance)" bgColor="var(--balance-light)" icon={<Scale size={18} />} compact />
       </div>
 
       {/* Community Services Quick Links */}
       <div>
         <p className="text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: 'var(--text-secondary)' }}>
-          Community Services • விரைவு சேவைகள்
+          {language === 'ta' ? 'சமுதாய விரைவு சேவைகள்' : 'Community Services • விரைவு சேவைகள்'}
         </p>
         <div className="grid grid-cols-4 gap-2 sm:gap-3">
           {[
-            { href: '/visitor/members', icon: '👥', label: 'Members', tamil: 'உறுப்பினர்கள்', bg: '#EFF6FF' },
-            { href: '/visitor/contributions', icon: '📈', label: 'Income', tamil: 'வருமானம்', bg: '#F0FDF4' },
-            { href: '/visitor/expenses', icon: '📉', label: 'Expenses', tamil: 'செலவுகள்', bg: '#FEF2F2' },
-            { href: '/visitor/savings', icon: '💰', label: 'Savings', tamil: 'சேமிப்பு', bg: '#F5F3FF' },
+            { href: '/visitor/members', icon: '👥', label: language === 'ta' ? 'உறுப்பினர்கள்' : 'Members', sub: language === 'ta' ? 'பக்தர்கள்' : 'உறுப்பினர்கள்', bg: '#EFF6FF' },
+            { href: '/visitor/contributions', icon: '📈', label: language === 'ta' ? 'வருமானம்' : 'Income', sub: language === 'ta' ? 'நன்கொடைகள்' : 'வருமானம்', bg: '#F0FDF4' },
+            { href: '/visitor/expenses', icon: '📉', label: language === 'ta' ? 'செலவுகள்' : 'Expenses', sub: language === 'ta' ? 'செலவினம்' : 'செலவுகள்', bg: '#FEF2F2' },
+            { href: '/visitor/savings', icon: '💰', label: language === 'ta' ? 'சேமிப்பு' : 'Savings', sub: language === 'ta' ? 'இருப்பு நிதி' : 'சேமிப்பு', bg: '#F5F3FF' },
           ].map((a) => (
             <Link
               key={a.href}
@@ -236,7 +242,7 @@ export default function VisitorDashboard() {
                 {a.icon}
               </div>
               <span className="text-[11px] sm:text-xs font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
-              <span className="text-[9px] sm:text-[10px] leading-tight" style={{ color: 'var(--text-tertiary)' }}>{a.tamil}</span>
+              <span className="text-[9px] sm:text-[10px] leading-tight" style={{ color: 'var(--text-tertiary)' }}>{a.sub}</span>
             </Link>
           ))}
         </div>
@@ -246,15 +252,15 @@ export default function VisitorDashboard() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-sm sm:text-base" style={{ color: 'var(--text-primary)' }}>
-            Recent Contributions • சமீபத்திய நன்கொடைகள்
+            {language === 'ta' ? 'சமீபத்திய நன்கொடைகள்' : 'Recent Contributions • சமீபத்திய நன்கொடைகள்'}
           </h3>
           <Link href="/visitor/contributions" className="text-xs sm:text-sm font-semibold flex items-center gap-1" style={{ color: 'var(--primary)' }}>
-            View All <ArrowRight size={14} />
+            {t('common.viewAll')} <ArrowRight size={14} />
           </Link>
         </div>
         {recentContributions.length === 0 ? (
           <div className="rounded-2xl border p-6 text-center" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No contributions match</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{t('dashboard.noContributions')}</p>
           </div>
         ) : (
           <div className="space-y-2.5">
@@ -271,7 +277,7 @@ export default function VisitorDashboard() {
                       <TrendingUp size={15} style={{ color: 'var(--income)' }} />
                     </div>
                     <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
-                      {item.member?.full_name || 'Devotee Member'}
+                      {item.member?.full_name || t('contributions.member')}
                     </p>
                   </div>
                   <span className="text-sm sm:text-base font-extrabold px-2.5 py-0.5 rounded-lg shrink-0" style={{ color: 'var(--income)', backgroundColor: 'var(--income-light)' }}>
@@ -285,7 +291,7 @@ export default function VisitorDashboard() {
                     📅 {formatDate(item.payment_date)}
                   </span>
                   <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold border border-amber-200/50 dark:border-amber-800/50">
-                    💳 {item.payment_method.toUpperCase()}
+                    💳 {formatMethod(item.payment_method)}
                   </span>
                   {item.function?.name && (
                     <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium">

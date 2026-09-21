@@ -29,8 +29,11 @@ const navItems = [
   { href: '/visitor/calendar', label: 'Calendar', icon: CalendarDays, tamil: 'நாட்காட்டி' },
 ];
 
+import { useLanguage } from '@/context/LanguageContext';
+
 export default function VisitorLayout({ children }: { children: React.ReactNode }) {
   const { profile, signOut } = useAuth();
+  const { language } = useLanguage();
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -159,17 +162,22 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
         <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
           <TabIcon size={15} className="shrink-0" style={{ color: 'var(--primary)' }} />
           <span className="font-bold truncate" style={{ color: 'var(--text-primary)' }}>
-            {currentTab.label}
+            {language === 'ta' ? (currentTab.tamil || currentTab.label) : currentTab.label}
           </span>
-          {currentTab.tamil && (
+          {language === 'en' && currentTab.tamil && (
             <span className="text-[11px] text-stone-500 font-medium truncate hidden xs:inline">
               ({currentTab.tamil})
+            </span>
+          )}
+          {language === 'ta' && currentTab.label && (
+            <span className="text-[11px] text-stone-500 font-medium truncate hidden xs:inline">
+              ({currentTab.label})
             </span>
           )}
         </div>
         <div className="flex items-center gap-2 shrink-0">
           <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/40 hidden sm:inline-flex">
-            🙏 Devotee Portal • பக்தர் தளம்
+            {language === 'ta' ? '🙏 பக்தர் தளம்' : '🙏 Devotee Portal'}
           </span>
           {profile?.role === 'admin' ? (
             <Link
@@ -178,7 +186,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
               style={{ backgroundColor: 'var(--primary)' }}
             >
               <Shield size={12} />
-              <span>Admin Panel →</span>
+              <span>{language === 'ta' ? 'நிர்வாக பலகை →' : 'Admin Panel →'}</span>
             </Link>
           ) : (
             <Link
@@ -187,7 +195,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
               style={{ backgroundColor: 'var(--primary)' }}
             >
               <Shield size={12} />
-              <span>Admin Login</span>
+              <span>{language === 'ta' ? 'நிர்வாக உள்நுழைவு' : 'Admin Login'}</span>
             </Link>
           )}
         </div>

@@ -1,7 +1,8 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { Menu, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
+import { Menu, Volume2, VolumeX, Sun, Moon, Languages } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface TirupatiHeaderBannerProps {
   onMenuClick?: () => void;
@@ -10,6 +11,7 @@ interface TirupatiHeaderBannerProps {
 
 export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: TirupatiHeaderBannerProps) {
   const { resolvedTheme, setTheme } = useTheme();
+  const { language, toggleLanguage, t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -326,6 +328,21 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
       {/* ── Top-Right Header Action Bar (Cleanly Placed Away From Venkatesaya Text) ── */}
       <div className="absolute top-2 right-2.5 sm:top-2.5 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
+        {/* Language Switcher (EN / தமிழ்) */}
+        <button
+          onClick={toggleLanguage}
+          title={language === 'en' ? 'தமிழில் மாற்றவும் (Switch to Tamil)' : 'Switch to English'}
+          aria-label={language === 'en' ? 'Switch to Tamil' : 'Switch to English'}
+          className={`flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border backdrop-blur-md shadow-md transition-all active:scale-95 cursor-pointer select-none font-bold text-[10px] sm:text-xs ${
+            isDark
+              ? 'bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 border-amber-500/50'
+              : 'bg-white/85 hover:bg-white text-amber-900 border-amber-400/70 shadow-amber-900/10'
+          }`}
+        >
+          <Languages size={12} className="shrink-0 text-amber-500" />
+          <span>{language === 'en' ? 'தமிழ்' : 'English'}</span>
+        </button>
+
         {/* Mobile Compact Fallback Theme Switcher */}
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}

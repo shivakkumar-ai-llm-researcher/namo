@@ -1,12 +1,14 @@
-﻿'use client';
+'use client';
 import { useState, useEffect } from 'react';
 import { PiggyBank } from 'lucide-react';
 import { Card, StatCard } from '@/components/ui';
 import { contributionService, expenseService, functionService } from '@/services';
 import { formatCurrency } from '@/utils/formatters';
+import { useLanguage } from '@/context/LanguageContext';
 import type { CommunityFunction } from '@/types';
 
 export default function VisitorSavingsPage() {
+  const { language, t } = useLanguage();
   const [fns, setFns] = useState<CommunityFunction[]>([]);
   const [savings, setSavings] = useState<Record<string, { contributions: number; expenses: number; balance: number }>>({});
   const [loading, setLoading] = useState(true);
@@ -53,13 +55,19 @@ export default function VisitorSavingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Srivari Savings</h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Community Fund Balance • நிதி இருப்பு</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          {t('savings.title')}
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          {t('savings.subtitle')}
+        </p>
       </div>
 
       <div className="rounded-2xl p-6 text-center text-white" style={{ backgroundColor: '#851D1D', border: '2px solid #F59E0B' }}>
         <PiggyBank size={40} className="mx-auto mb-2" color="#FDE68A" />
-        <p className="text-sm font-semibold" style={{ color: '#FDE68A' }}>Total Community Net Savings</p>
+        <p className="text-sm font-semibold" style={{ color: '#FDE68A' }}>
+          {t('savings.netSavings')}
+        </p>
         <p className="text-4xl font-bold mt-1">{formatCurrency(totalSavings)}</p>
       </div>
 
@@ -72,19 +80,21 @@ export default function VisitorSavingsPage() {
                 <div>
                   <h3 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{fn.name}</h3>
                   <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {fn.type === 'ANNUAL' ? 'Purattasi Sani (Yearly)' : 'Gokulaashdami (4-Year)'}
+                    {fn.type === 'ANNUAL' ? t('savings.purattasiYearly') : t('savings.gokulFourYear')}
                   </p>
                 </div>
                 <div className="text-right">
-                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>Net Balance</p>
+                  <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                    {t('savings.netBalance')}
+                  </p>
                   <p className="text-lg font-bold" style={{ color: s.balance >= 0 ? 'var(--savings)' : 'var(--expense)' }}>
                     {formatCurrency(s.balance)}
                   </p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <StatCard title="Income" amount={s.contributions} color="var(--income)" bgColor="var(--income-light)" compact />
-                <StatCard title="Expenses" amount={s.expenses} color="var(--expense)" bgColor="var(--expense-light)" compact />
+                <StatCard title={t('savings.income')} amount={s.contributions} color="var(--income)" bgColor="var(--income-light)" compact />
+                <StatCard title={t('savings.expenses')} amount={s.expenses} color="var(--expense)" bgColor="var(--expense-light)" compact />
               </div>
             </Card>
           );

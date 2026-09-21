@@ -4,9 +4,11 @@ import { Search } from 'lucide-react';
 import { Card, Badge, EmptyState } from '@/components/ui';
 import { memberService } from '@/services';
 import { getInitials } from '@/utils/formatters';
+import { useLanguage } from '@/context/LanguageContext';
 import type { Member } from '@/types';
 
 export default function VisitorMembersPage() {
+  const { language, t } = useLanguage();
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -32,8 +34,12 @@ export default function VisitorMembersPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Community Members</h1>
-        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>{total} registered devotees • உறுப்பினர்கள்</p>
+        <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+          {t('members.title')}
+        </h1>
+        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          {total} {t('members.registered')}
+        </p>
       </div>
 
       <div className="relative">
@@ -41,7 +47,7 @@ export default function VisitorMembersPage() {
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search members..."
+          placeholder={t('members.searchPlaceholder')}
           className="w-full pl-9 pr-3 py-2.5 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-amber-500"
           style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
         />
@@ -52,7 +58,7 @@ export default function VisitorMembersPage() {
           <div className="w-8 h-8 border-4 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }} />
         </div>
       ) : members.length === 0 ? (
-        <EmptyState icon="👥" title="No members found" />
+        <EmptyState icon="👥" title={t('members.empty')} />
       ) : (
         <div className="space-y-2.5">
           {members.map((m) => (
@@ -73,12 +79,16 @@ export default function VisitorMembersPage() {
                     {m.full_name}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
-                    Member ID: <span className="font-mono font-medium">{m.member_id}</span>
+                    {t('members.id')}: <span className="font-mono font-medium">{m.member_id}</span>
                     {m.phone ? ` • 📞 ${m.phone}` : ''}
                   </p>
                 </div>
               </div>
-              <Badge label={m.status} variant={m.status === 'active' ? 'success' : 'default'} size="sm" />
+              <Badge
+                label={m.status === 'active' ? (language === 'ta' ? 'செயலில்' : 'Active') : (language === 'ta' ? 'செயலற்ற' : 'Inactive')}
+                variant={m.status === 'active' ? 'success' : 'default'}
+                size="sm"
+              />
             </div>
           ))}
         </div>
