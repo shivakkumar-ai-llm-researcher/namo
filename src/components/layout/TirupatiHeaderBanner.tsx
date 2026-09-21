@@ -1,7 +1,7 @@
 'use client';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { Menu, Volume2, Sun, Moon } from 'lucide-react';
+import { Menu, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 
 interface TirupatiHeaderBannerProps {
   onMenuClick?: () => void;
@@ -11,61 +11,237 @@ interface TirupatiHeaderBannerProps {
 export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: TirupatiHeaderBannerProps) {
   const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+
   const audioContextRef = useRef<AudioContext | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
+  const droneOscsRef = useRef<OscillatorNode[]>([]);
+  const chimeTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const bellCycleRef = useRef(0);
+  const isMutedRef = useRef(false);
 
+  // Keep ref in sync
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
 
-  const isDark = mounted && resolvedTheme === 'dark';
-
-  // Sacred Temple Bell Chime using Web Audio API (Bronze bell acoustics)
-  const playSacredChime = () => {
+  // Bronze temple bell chime synthesis
+  const ringTempleBell = useCallback((ctx: AudioContext, destination: AudioNode, pitchMultiplier = 1.0) => {
     try {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!audioContextRef.current) {
-        audioContextRef.current = new AudioCtx();
-      }
-      const ctx = audioContextRef.current;
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-
-      setIsPlaying(true);
-
-      // Multi-harmonic bronze temple bell sound (fundamental 432Hz + overtones)
-      const frequencies = [432, 864, 1296, 1728];
-      const gains = [0.45, 0.28, 0.18, 0.09];
+      const now = ctx.currentTime;
+      const baseFreq = 432 * pitchMultiplier;
+      // Multi-harmonic bronze temple bell overtones (432Hz fundamental + natural metallic harmonics)
+      const frequencies = [baseFreq, baseFreq * 2.0, baseFreq * 2.98, baseFreq * 4.15, baseFreq * 5.8];
+      const gains = [0.35, 0.22, 0.14, 0.08, 0.04];
+      const decays = [3.8, 3.2, 2.6, 1.8, 1.2];
 
       frequencies.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
         const gainNode = ctx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.frequency.setValueAtTime(freq, now);
 
-        // Natural exponential decay of a sacred temple bronze bell
-        gainNode.gain.setValueAtTime(gains[idx], ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.2);
+        gainNode.gain.setValueAtTime(0.0001, now);
+        gainNode.gain.linearRampToValueAtTime(gains[idx], now + 0.015);
+        gainNode.gain.exponentialRampToValueAtTime(0.0001, now + decays[idx]);
 
         osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
+        gainNode.connect(destination);
 
-        osc.start();
-        osc.stop(ctx.currentTime + 3.3);
+        osc.start(now);
+        osc.stop(now + decays[idx] + 0.1);
       });
-
-      setTimeout(() => {
-        setIsPlaying(false);
-      }, 3300);
     } catch (e) {
-      console.warn('Audio chime could not play', e);
+      console.warn('Temple bell chime error:', e);
+    }
+  }, []);
+
+  // Continuous subtle meditative drone (Cosmic Om 136.1Hz & warm harmonics)
+  const startDrone = useCallback((ctx: AudioContext, destination: AudioNode) => {
+    // Stop any existing drone
+    droneOscsRef.current.forEach((node) => {
+      try {
+        node.stop();
+        node.disconnect();
+      } catch {}
+    });
+    droneOscsRef.current = [];
+
+    const now = ctx.currentTime;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(320, now);
+
+    const droneGain = ctx.createGain();
+    droneGain.gain.setValueAtTime(0.035, now); // Serene, tranquil background volume
+    filter.connect(droneGain);
+    droneGain.connect(destination);
+
+    const omHarmonics = [136.1, 272.2, 408.3];
+    const harmonicWeights = [0.6, 0.3, 0.1];
+
+    omHarmonics.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+
+      const oscGain = ctx.createGain();
+      oscGain.gain.setValueAtTime(harmonicWeights[i], now);
+
+      osc.connect(oscGain);
+      oscGain.connect(filter);
+
+      osc.start(now);
+      droneOscsRef.current.push(osc);
+    });
+  }, []);
+
+  // Start continuous sacred soundscape
+  const startContinuousPlay = useCallback(() => {
+    try {
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+
+      if (!audioContextRef.current) {
+        const ctx = new AudioCtx();
+        const master = ctx.createGain();
+        master.gain.setValueAtTime(0.7, ctx.currentTime);
+        master.connect(ctx.destination);
+        audioContextRef.current = ctx;
+        masterGainRef.current = master;
+      }
+
+      const ctx = audioContextRef.current;
+      const master = masterGainRef.current;
+      if (!master) return;
+
+      if (ctx.state === 'suspended') {
+        ctx.resume();
+      }
+
+      master.gain.setTargetAtTime(0.7, ctx.currentTime, 0.1);
+      startDrone(ctx, master);
+
+      // Initial sacred welcome bell chime
+      ringTempleBell(ctx, master, 1.0);
+
+      // Periodic continuous bell chime loop (every 7 seconds with serene cadence)
+      if (chimeTimerRef.current) clearInterval(chimeTimerRef.current);
+      chimeTimerRef.current = setInterval(() => {
+        if (!audioContextRef.current || audioContextRef.current.state === 'suspended' || isMutedRef.current) return;
+        const pitches = [1.0, 0.89, 1.125, 1.0];
+        const pitch = pitches[bellCycleRef.current % pitches.length];
+        bellCycleRef.current += 1;
+        ringTempleBell(audioContextRef.current, masterGainRef.current!, pitch);
+      }, 7000);
+
+      setIsPlaying(true);
+    } catch (e) {
+      console.warn('Continuous audio play failed:', e);
+    }
+  }, [ringTempleBell, startDrone]);
+
+  // Stop continuous sacred soundscape
+  const stopContinuousPlay = useCallback(() => {
+    try {
+      if (chimeTimerRef.current) {
+        clearInterval(chimeTimerRef.current);
+        chimeTimerRef.current = null;
+      }
+      if (masterGainRef.current && audioContextRef.current) {
+        masterGainRef.current.gain.setTargetAtTime(0.0001, audioContextRef.current.currentTime, 0.1);
+      }
+      setTimeout(() => {
+        droneOscsRef.current.forEach((node) => {
+          try {
+            node.stop();
+            node.disconnect();
+          } catch {}
+        });
+        droneOscsRef.current = [];
+        if (audioContextRef.current && audioContextRef.current.state === 'running') {
+          audioContextRef.current.suspend();
+        }
+      }, 200);
       setIsPlaying(false);
+    } catch (e) {
+      console.warn('Continuous audio stop failed:', e);
+    }
+  }, []);
+
+  // Initialize and handle website open / page navigation
+  useEffect(() => {
+    setMounted(true);
+    const savedMuted = localStorage.getItem('namo_audio_muted');
+    const shouldMute = savedMuted === 'true';
+    setIsMuted(shouldMute);
+
+    if (!shouldMute) {
+      startContinuousPlay();
+
+      // Browser Autoplay Policy: if AudioContext suspended before first user gesture, unlock on first touch/click
+      const unlockAudio = () => {
+        if (localStorage.getItem('namo_audio_muted') !== 'true') {
+          if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+            audioContextRef.current.resume().then(() => {
+              setIsPlaying(true);
+            });
+          } else if (!audioContextRef.current) {
+            startContinuousPlay();
+          }
+        }
+      };
+
+      window.addEventListener('click', unlockAudio, { once: true });
+      window.addEventListener('touchstart', unlockAudio, { once: true });
+      window.addEventListener('scroll', unlockAudio, { once: true });
+      window.addEventListener('keydown', unlockAudio, { once: true });
+    }
+
+    // Auto-suspend when user switches tabs; resume when returning
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (audioContextRef.current && audioContextRef.current.state === 'running') {
+          audioContextRef.current.suspend();
+        }
+      } else {
+        if (localStorage.getItem('namo_audio_muted') !== 'true' && audioContextRef.current && audioContextRef.current.state === 'suspended') {
+          audioContextRef.current.resume();
+        }
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (chimeTimerRef.current) clearInterval(chimeTimerRef.current);
+      droneOscsRef.current.forEach((node) => {
+        try {
+          node.stop();
+          node.disconnect();
+        } catch {}
+      });
+    };
+  }, [startContinuousPlay]);
+
+  // User click toggle mute / unmute
+  const toggleMute = () => {
+    if (isMuted) {
+      setIsMuted(false);
+      localStorage.setItem('namo_audio_muted', 'false');
+      startContinuousPlay();
+    } else {
+      setIsMuted(true);
+      localStorage.setItem('namo_audio_muted', 'true');
+      stopContinuousPlay();
     }
   };
+
+  const isDark = mounted && resolvedTheme === 'dark';
 
   return (
     <header className="w-full relative select-none shadow-md overflow-hidden bg-stone-950">
@@ -148,42 +324,59 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
         </button>
       )}
 
-      {/* ── Mobile Compact Fallback Theme Switcher ── */}
-      <div className="sm:hidden absolute right-2.5 top-2 z-30">
+      {/* ── Top-Right Header Action Bar (Cleanly Placed Away From Venkatesaya Text) ── */}
+      <div className="absolute top-2 right-2.5 sm:top-2.5 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
+        {/* Mobile Compact Fallback Theme Switcher */}
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
           title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
-          className={`p-1 rounded-full border backdrop-blur-md shadow-sm transition-transform active:scale-90 cursor-pointer ${
+          className={`sm:hidden p-1 sm:p-1.5 rounded-full border backdrop-blur-md shadow-sm transition-transform active:scale-90 cursor-pointer ${
             isDark
               ? 'bg-stone-950/70 text-amber-300 border-amber-500/40'
               : 'bg-white/70 text-amber-800 border-amber-400/50'
           }`}
         >
-          {isDark ? <Moon size={13} /> : <Sun size={13} />}
+          {isDark ? <Moon size={12} /> : <Sun size={12} />}
         </button>
-      </div>
 
-      {/* ── Interactive Pilgrim Greeting & Temple Bell Chime Hotspot ── */}
-      <button
-        onClick={playSacredChime}
-        style={{ left: '83%', right: '2%', top: '12%', bottom: '12%' }}
-        title="Play Sacred Temple Bell Chime • கோவில் மணி ஒலி"
-        aria-label="Play Sacred Temple Bell Chime"
-        className="absolute cursor-pointer z-20 group rounded-xl flex items-center justify-end pr-2 focus:outline-none transition-all"
-      >
-        {/* Discrete Bell Chime indicator badge */}
-        <span
-          className={`p-1 sm:p-1.5 rounded-full transition-all shadow-md backdrop-blur-md border ${
-            isPlaying
-              ? 'bg-amber-400 text-stone-950 ring-2 ring-amber-300 animate-pulse border-amber-300'
+        {/* Sacred Temple Continuous Sound Toggle (Mute / Unmute) */}
+        <button
+          onClick={toggleMute}
+          title={isMuted ? 'Muted • Click to play continuous sacred temple sound' : 'Continuous sacred sound playing • Click to mute'}
+          aria-label={isMuted ? 'Play continuous sacred temple sound' : 'Mute sacred temple sound'}
+          className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border backdrop-blur-md shadow-md transition-all active:scale-95 cursor-pointer select-none ${
+            !isMuted
+              ? isDark
+                ? 'bg-amber-950/70 hover:bg-amber-900/90 text-amber-300 border-amber-400/60 ring-1 ring-amber-400/40'
+                : 'bg-white/90 hover:bg-white text-amber-950 border-amber-400/80 shadow-amber-900/15'
               : isDark
-              ? 'bg-black/30 hover:bg-black/60 text-amber-300/80 hover:text-amber-200 border-white/20 opacity-40 group-hover:opacity-100'
-              : 'bg-white/40 hover:bg-white/80 text-purple-950/80 hover:text-purple-950 border-purple-300/40 opacity-40 group-hover:opacity-100'
+              ? 'bg-black/60 hover:bg-black/80 text-stone-400 hover:text-stone-200 border-white/20'
+              : 'bg-stone-900/50 hover:bg-stone-900/70 text-white/80 hover:text-white border-white/25'
           }`}
         >
-          <Volume2 size={13} className={isPlaying ? 'animate-bounce text-amber-900' : ''} />
-        </span>
-      </button>
+          {!isMuted ? (
+            <>
+              <Volume2 size={13} className="text-amber-500 dark:text-amber-300 animate-pulse shrink-0" />
+              {/* Mini animated equalizer wave bars */}
+              <span className="flex items-end gap-0.5 h-2.5 shrink-0" aria-hidden="true">
+                <span className="w-0.5 bg-amber-500 dark:bg-amber-300 rounded-full h-full animate-[pulse_0.7s_ease-in-out_infinite]" />
+                <span className="w-0.5 bg-amber-500 dark:bg-amber-300 rounded-full h-1.5 animate-[pulse_1.1s_ease-in-out_infinite]" />
+                <span className="w-0.5 bg-amber-500 dark:bg-amber-300 rounded-full h-2 animate-[pulse_0.9s_ease-in-out_infinite]" />
+              </span>
+              <span className="text-[9px] sm:text-[10px] font-bold tracking-tight uppercase hidden md:inline">
+                Sacred Sound
+              </span>
+            </>
+          ) : (
+            <>
+              <VolumeX size={13} className="text-stone-400 shrink-0" />
+              <span className="text-[9px] sm:text-[10px] font-medium tracking-tight text-stone-400 hidden md:inline">
+                Muted
+              </span>
+            </>
+          )}
+        </button>
+      </div>
     </header>
   );
 }
