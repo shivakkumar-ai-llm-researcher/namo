@@ -1,4 +1,4 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { BalajiNamam } from '@/components/ui';
 
 export default function LandingPage() {
@@ -39,13 +39,13 @@ export default function LandingPage() {
           className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold mb-6"
           style={{ backgroundColor: 'var(--primary-light)', color: 'var(--savings)', border: '1px solid var(--gold)' }}
         >
-          ★ || ஓம் நமோ வேங்கடேசாய || ★
+          ★ || ஓம் நமோ வெங்கடேஸ்வராய || ★
         </div>
         <h1 className="text-5xl md:text-6xl font-bold mb-4 leading-tight" style={{ color: 'var(--text-primary)' }}>
           Srivari Community Fund
         </h1>
         <p className="text-2xl mb-2 font-bold" style={{ color: 'var(--primary)' }}>
-          || ஓம் நமோ வேங்கடேசாய ||
+          || ஓம் நமோ வெங்கடேஸ்வராய ||
         </p>
         <p className="text-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
           Tirupati Balaji Devotees Financial Seva & Accounting • திருப்பதி பாலாஜி பக்தர்கள் ஆன்மீக நிதி சேவை
@@ -136,7 +136,7 @@ export default function LandingPage() {
         </p>
         <p className="text-sm">Srivari Community Fund — Tirupati Balaji Devotees Seva</p>
         <p className="text-xs mt-1 font-semibold" style={{ color: 'var(--primary)' }}>
-          || ஓம் நமோ வேங்கடேசாய ||
+          || ஓம் நமோ வெங்கடேஸ்வராய • ஸ்ரீ வெங்கடேஸ்வர சுவாமி துணை ||
         </p>
       </footer>
     </div>

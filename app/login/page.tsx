@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -98,7 +98,7 @@ export default function LoginPage() {
             <BalajiNamam size={46} />
           </div>
           <p className="text-sm font-bold tracking-wider mb-1" style={{ color: '#FDE68A' }}>
-            || ஓம் நமோ வேங்கடேசாய ||
+            || ஓம் நமோ வெங்கடேஸ்வராய ||
           </p>
           <h1 className="text-2xl font-bold text-white mb-1">Srivari Community Fund</h1>
           <p className="text-xs" style={{ color: 'rgba(254,243,199,0.9)' }}>
