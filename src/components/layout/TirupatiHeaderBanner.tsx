@@ -1,6 +1,7 @@
 'use client';
-import { useState, useRef } from 'react';
-import { Menu, Volume2, VolumeX } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { useTheme } from 'next-themes';
+import { Menu, Volume2 } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface TirupatiHeaderBannerProps {
@@ -9,13 +10,23 @@ interface TirupatiHeaderBannerProps {
 }
 
 export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: TirupatiHeaderBannerProps) {
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const isDark = mounted && resolvedTheme === 'dark';
 
   // Sacred Temple Bell Chime using Web Audio API
   const playSacredChime = () => {
     try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!audioContextRef.current) {
         audioContextRef.current = new AudioCtx();
       }
@@ -26,9 +37,9 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
       setIsPlaying(true);
 
-      // Multi-harmonic temple bell sound (fundamental 432Hz + overtones)
+      // Multi-harmonic bronze temple bell sound (fundamental 432Hz + overtones)
       const frequencies = [432, 864, 1296, 1728];
-      const gains = [0.4, 0.25, 0.15, 0.08];
+      const gains = [0.45, 0.28, 0.18, 0.09];
 
       frequencies.forEach((freq, idx) => {
         const osc = ctx.createOscillator();
@@ -37,7 +48,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
         osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
-        // Natural exponential decay of a bronze temple bell
+        // Natural exponential decay of a sacred temple bronze bell
         gainNode.gain.setValueAtTime(gains[idx], ctx.currentTime);
         gainNode.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.2);
 
@@ -59,56 +70,64 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
   return (
     <header
-      className="sticky top-0 z-40 w-full h-[72px] sm:h-[78px] flex items-center justify-between px-2 sm:px-4 lg:px-6 relative overflow-hidden border-b select-none shadow-md"
+      className="w-full h-[76px] sm:h-[82px] flex items-center justify-between px-3 sm:px-5 lg:px-8 relative overflow-hidden rounded-b-2xl sm:rounded-b-3xl border-b-2 select-none transition-all duration-300 z-40"
       style={{
-        // Majestic sunset sky gradient of Tirumala hills
-        background: 'linear-gradient(90deg, #8E6B88 0%, #A8819E 20%, #BE96B2 50%, #C49CB6 75%, #A87E9D 90%, #8D6684 100%)',
-        borderColor: '#B45309',
-        borderBottomWidth: '2.5px',
+        // Dynamic background design:
+        // Light: Ethereal dusk sky mauve-rose gradient
+        // Dark: Sacred midnight cosmos & deep temple indigo-purple gradient
+        background: isDark
+          ? 'linear-gradient(90deg, #180D21 0%, #2A1338 25%, #3B1B4A 50%, #2E133B 75%, #1B0C25 100%)'
+          : 'linear-gradient(90deg, #8E6B88 0%, #A8819E 20%, #BE96B2 50%, #C49CB6 75%, #A87E9D 90%, #8D6684 100%)',
+        borderColor: isDark ? '#D97706' : '#B45309',
+        boxShadow: isDark
+          ? '0 6px 20px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(217, 119, 6, 0.25)'
+          : '0 4px 14px rgba(74, 37, 56, 0.25)',
       }}
     >
       {/* ── Sacred Hills Silhouette: Left Side ── */}
-      <div className="absolute left-0 bottom-0 top-0 w-28 sm:w-44 pointer-events-none opacity-40 z-0">
+      <div
+        className={`absolute left-0 bottom-0 top-0 w-32 sm:w-48 pointer-events-none z-0 transition-opacity duration-300 ${
+          isDark ? 'opacity-30' : 'opacity-40'
+        }`}
+      >
         <svg viewBox="0 0 160 80" preserveAspectRatio="none" className="w-full h-full">
           <defs>
             <linearGradient id="leftHillGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#4A2538" />
-              <stop offset="100%" stopColor="#2D1220" />
+              <stop offset="0%" stopColor={isDark ? '#2D1432' : '#4A2538'} />
+              <stop offset="100%" stopColor={isDark ? '#140718' : '#2D1220'} />
             </linearGradient>
           </defs>
           <path
             d="M0,80 L0,35 Q20,38 35,28 Q55,15 75,25 Q95,35 110,48 Q130,62 160,70 L160,80 Z"
             fill="url(#leftHillGrad)"
           />
-          {/* Jagged rocky crags */}
           <path
             d="M0,80 L0,50 Q15,45 30,42 Q45,38 60,48 Q85,60 110,72 L110,80 Z"
-            fill="#230E19"
+            fill={isDark ? '#0F0513' : '#230E19'}
             opacity="0.6"
           />
         </svg>
       </div>
 
       {/* ── Sacred Hills Silhouette & Glowing Sun: Right Side ── */}
-      <div className="absolute right-0 bottom-0 top-0 w-36 sm:w-56 pointer-events-none z-0">
+      <div className="absolute right-0 bottom-0 top-0 w-40 sm:w-60 pointer-events-none z-0">
         <svg viewBox="0 0 200 80" preserveAspectRatio="none" className="w-full h-full">
           <defs>
-            {/* Radiant Golden Sun Gradient */}
             <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#FEF08A" stopOpacity="1" />
-              <stop offset="40%" stopColor="#F59E0B" stopOpacity="0.9" />
-              <stop offset="70%" stopColor="#D97706" stopOpacity="0.5" />
+              <stop offset="0%" stopColor={isDark ? '#FEF08A' : '#FEF08A'} stopOpacity="1" />
+              <stop offset="35%" stopColor="#F59E0B" stopOpacity={isDark ? '0.95' : '0.9'} />
+              <stop offset="70%" stopColor="#D97706" stopOpacity={isDark ? '0.6' : '0.5'} />
               <stop offset="100%" stopColor="#B45309" stopOpacity="0" />
             </radialGradient>
             <linearGradient id="rightHillGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#603423" />
-              <stop offset="50%" stopColor="#451A10" />
-              <stop offset="100%" stopColor="#250B08" />
+              <stop offset="0%" stopColor={isDark ? '#3D1C2E' : '#603423'} />
+              <stop offset="50%" stopColor={isDark ? '#250F1D' : '#451A10'} />
+              <stop offset="100%" stopColor={isDark ? '#12050E' : '#250B08'} />
             </linearGradient>
           </defs>
 
-          {/* Golden Sun rising/setting behind the sacred cliff */}
-          <circle cx="165" cy="40" r="32" fill="url(#sunGlow)" />
+          {/* Glowing Sun behind the sacred cliff */}
+          <circle cx="165" cy="40" r="34" fill="url(#sunGlow)" />
           <circle cx="165" cy="40" r="16" fill="#FDE047" opacity="0.95" />
 
           {/* Rocky mountain crags of Tirumala Hills */}
@@ -116,49 +135,44 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
             d="M130,80 Q138,55 145,45 Q152,32 160,35 Q168,38 175,22 Q182,10 188,18 Q194,26 200,32 L200,80 Z"
             fill="url(#rightHillGrad)"
           />
-          {/* Detailed crags & foliage textures */}
           <path
             d="M142,80 L148,58 Q155,42 165,48 Q172,30 182,38 Q190,28 200,38 L200,80 Z"
-            fill="#1E0705"
-            opacity="0.8"
+            fill={isDark ? '#0C0309' : '#1E0705'}
+            opacity="0.85"
           />
           <path
             d="M158,80 L165,65 Q175,50 185,55 L200,62 L200,80 Z"
-            fill="#120403"
+            fill={isDark ? '#060105' : '#120403'}
             opacity="0.9"
           />
         </svg>
       </div>
 
-      {/* ── Left Content: Menu Button + TTD Emblem & Organization Name ── */}
-      <div className="flex items-center gap-2 sm:gap-3 z-10 min-w-0">
+      {/* ── Left Section: Menu Button + TTD Emblem & Organization Title ── */}
+      <div className="flex items-center gap-2 sm:gap-3.5 z-10 min-w-0">
         {showMenuButton && (
           <button
             onClick={onMenuClick}
-            className="lg:hidden p-1.5 rounded-xl bg-black/20 hover:bg-black/35 text-white transition-colors flex-shrink-0 border border-white/25"
+            className="lg:hidden p-2 rounded-xl bg-black/25 hover:bg-black/40 text-white transition-colors flex-shrink-0 border border-white/20 shadow-xs"
             aria-label="Toggle navigation menu"
           >
             <Menu size={20} />
           </button>
         )}
 
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
           {/* TTD Circular Temple Gopuram Crest */}
-          <div className="relative flex-shrink-0 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white/95 p-0.5 shadow-md border-2 border-emerald-700 flex items-center justify-center overflow-hidden">
+          <div className="relative flex-shrink-0 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-white p-0.5 shadow-md border-2 border-emerald-700 flex items-center justify-center overflow-hidden">
             <svg viewBox="0 0 100 100" className="w-full h-full">
               {/* Outer green ring */}
               <circle cx="50" cy="50" r="48" fill="#FFFFFF" stroke="#047857" strokeWidth="3.5" />
               <circle cx="50" cy="50" r="44" fill="none" stroke="#D97706" strokeWidth="1" strokeDasharray="2,2" />
 
-              {/* Circular inscription simulation */}
+              {/* Inscription simulation */}
               <circle cx="50" cy="50" r="39" fill="#047857" opacity="0.08" />
 
-              {/* Sacred Temple Gopuram (Anandhanilayam Vimanam) in golden orange */}
-              <path
-                d="M50,14 L53,20 L47,20 Z"
-                fill="#D97706"
-              />
-              {/* Kalasam finial */}
+              {/* Temple Gopuram (Anandhanilayam Vimanam) in gold */}
+              <path d="M50,14 L53,20 L47,20 Z" fill="#D97706" />
               <circle cx="50" cy="13" r="2.2" fill="#F59E0B" />
               <circle cx="46.5" cy="15" r="1.5" fill="#F59E0B" />
               <circle cx="53.5" cy="15" r="1.5" fill="#F59E0B" />
@@ -170,11 +184,9 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
               <path d="M33,44 L67,44 L70,56 L30,56 Z" fill="#F59E0B" stroke="#92400E" strokeWidth="0.8" />
               <path d="M29,56 L71,56 L74,68 L26,68 Z" fill="#D97706" stroke="#92400E" strokeWidth="0.8" />
 
-              {/* Pillars & Base */}
+              {/* Base */}
               <rect x="25" y="68" width="50" height="12" fill="#92400E" rx="1" />
-              {/* Temple Doorway Arch */}
               <path d="M43,80 L43,72 Q50,68 57,72 L57,80 Z" fill="#451A03" />
-              {/* Sacred Base Lotus */}
               <path d="M20,80 Q50,86 80,80 L82,86 Q50,91 18,86 Z" fill="#047857" />
             </svg>
           </div>
@@ -182,34 +194,46 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
           {/* Titles in Telugu/Tamil & English */}
           <div className="flex flex-col justify-center min-w-0">
             <span
-              className="text-xs sm:text-sm font-extrabold tracking-tight truncate leading-tight text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]"
+              className={`text-xs sm:text-sm font-extrabold tracking-tight truncate leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] ${
+                isDark ? 'text-amber-100' : 'text-white'
+              }`}
               style={{ fontFamily: 'system-ui, sans-serif' }}
             >
               తిరుమల తిరుపతి దేవస్థానములు
             </span>
             <span
-              className="text-[10px] sm:text-xs font-bold truncate leading-tight text-yellow-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)]"
+              className={`text-[10px] sm:text-xs font-bold truncate leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] ${
+                isDark ? 'text-amber-300' : 'text-yellow-100'
+              }`}
             >
               Tirumala Tirupati Devasthanams<sup className="text-[8px] ml-0.5">®</sup>
             </span>
-            <span className="text-[9px] font-semibold text-amber-200/90 truncate hidden sm:block">
+            <span
+              className={`text-[9px] font-semibold truncate hidden sm:block ${
+                isDark ? 'text-amber-200/80' : 'text-amber-200/90'
+              }`}
+            >
               Srivari Community Fund • திருமலை திருப்பதி தேவஸ்தானம்
             </span>
           </div>
         </div>
       </div>
 
-      {/* ── Center Content: The Sacred Trinity (Shankha - Thiruman/Namam - Chakra) ── */}
-      <div className="flex items-center justify-center gap-1.5 sm:gap-3 z-10 flex-shrink-0 px-2">
+      {/* ── Center Section: The Sacred Trinity (Shankha - Thiruman/Namam - Chakra) ── */}
+      <div className="flex items-center justify-center gap-1.5 sm:gap-3.5 z-10 flex-shrink-0 px-2">
         {/* Sacred Shankha (Holy Conch) */}
-        <div className="w-6 sm:w-8 h-6 sm:h-8 flex items-center justify-center filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]">
+        <div
+          className={`w-6 sm:w-8 h-6 sm:h-8 flex items-center justify-center filter transition-all ${
+            isDark
+              ? 'drop-shadow-[0_0_8px_rgba(254,240,138,0.5)]'
+              : 'drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]'
+          }`}
+        >
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            {/* Shanku spiral in pure white with subtle grey shading */}
             <path
               d="M50,12 C40,12 30,22 28,38 C26,52 32,65 42,75 C47,80 50,88 52,94 C53,88 56,80 60,75 C68,66 74,54 72,38 C70,22 60,12 50,12 Z"
               fill="#FFFFFF"
             />
-            {/* Inner spiral coils */}
             <path
               d="M48,22 C42,24 38,32 38,42 C38,55 45,66 52,72 C50,62 48,52 50,40 C52,28 58,24 48,22 Z"
               fill="#E5E7EB"
@@ -218,52 +242,50 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
               d="M52,32 C48,34 46,42 47,50 C48,58 52,65 55,68 C54,60 52,52 54,44 C55,36 58,33 52,32 Z"
               fill="#D1D5DB"
             />
-            {/* Crown of Conch */}
             <path d="M46,12 Q50,4 54,12 Z" fill="#FFFFFF" />
             <circle cx="50" cy="7" r="2.5" fill="#F59E0B" />
           </svg>
         </div>
 
-        {/* Sacred Thiruman / Balaji Namam (The Divine Mark) */}
-        <div className="w-8 sm:w-11 h-9 sm:h-12 flex items-center justify-center filter drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">
+        {/* Sacred Thiruman / Balaji Namam */}
+        <div
+          className={`w-8 sm:w-11 h-9 sm:h-12 flex items-center justify-center filter transition-all ${
+            isDark
+              ? 'drop-shadow-[0_0_12px_rgba(254,240,138,0.6)]'
+              : 'drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]'
+          }`}
+        >
           <svg viewBox="0 0 80 100" className="w-full h-full">
-            {/* Pure White U-shaped Namam (Thiruman) */}
+            {/* Pure White U-shaped Namam */}
             <path
               d="M14,14 L29,14 C29,14 30,55 40,68 C50,55 51,14 51,14 L66,14 C66,14 65,65 40,82 C15,65 14,14 14,14 Z"
               fill="#FFFFFF"
             />
-            {/* Left upright top wing */}
             <path d="M14,14 L29,14 L26,8 L11,8 Z" fill="#FFFFFF" />
-            {/* Right upright top wing */}
             <path d="M51,14 L66,14 L69,8 L54,8 Z" fill="#FFFFFF" />
 
-            {/* Central Srichoornam / Red Vermillion Tilakam (Sri Mahalakshmi's grace) */}
-            <path
-              d="M36,6 L44,6 L43,58 Q40,62 37,58 Z"
-              fill="#DC2626"
-            />
-            <path
-              d="M38,6 L42,6 L41.5,56 Q40,59 38.5,56 Z"
-              fill="#B91C1C"
-            />
+            {/* Central Srichoornam / Red Vermillion Tilakam */}
+            <path d="M36,6 L44,6 L43,58 Q40,62 37,58 Z" fill="#DC2626" />
+            <path d="M38,6 L42,6 L41.5,56 Q40,59 38.5,56 Z" fill="#B91C1C" />
 
-            {/* White round base dot underneath the Namam */}
+            {/* White round base dot */}
             <circle cx="40" cy="90" r="5" fill="#FFFFFF" />
           </svg>
         </div>
 
-        {/* Sacred Sudarshana Chakra (Holy Discus) */}
-        <div className="w-6 sm:w-8 h-6 sm:h-8 flex items-center justify-center filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]">
+        {/* Sacred Sudarshana Chakra */}
+        <div
+          className={`w-6 sm:w-8 h-6 sm:h-8 flex items-center justify-center filter transition-all ${
+            isDark
+              ? 'drop-shadow-[0_0_8px_rgba(254,240,138,0.5)]'
+              : 'drop-shadow-[0_2px_4px_rgba(0,0,0,0.35)]'
+          }`}
+        >
           <svg viewBox="0 0 100 100" className="w-full h-full">
-            {/* Outer golden flame rim */}
             <circle cx="50" cy="50" r="42" fill="none" stroke="#F59E0B" strokeWidth="2" strokeDasharray="3,2" />
-            {/* Main white discus body */}
             <circle cx="50" cy="50" r="38" fill="#FFFFFF" />
-            {/* Central hub */}
             <circle cx="50" cy="50" r="16" fill="#E5E7EB" stroke="#DC2626" strokeWidth="1.5" />
             <circle cx="50" cy="50" r="7" fill="#F59E0B" />
-
-            {/* Spokes / Flames of Chakra */}
             {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
               <line
                 key={angle}
@@ -280,19 +302,21 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
         </div>
       </div>
 
-      {/* ── Right Content: "Namaskaram Pilgrim" & "Om Namo Venkatesaya" + Chime & Theme ── */}
+      {/* ── Right Section: "Namaskaram Pilgrim" & "Om Namo Venkatesaya" + Chime + Theme ── */}
       <div className="flex items-center gap-2 sm:gap-3 z-10 flex-shrink-0">
         <div className="flex flex-col text-right hidden sm:flex">
           <span
-            className="text-[11px] sm:text-xs font-semibold leading-tight drop-shadow-[0_1px_1px_rgba(255,255,255,0.4)]"
-            style={{ color: '#3B0764' }}
+            className={`text-[11px] sm:text-xs font-semibold leading-tight drop-shadow-[0_1px_1px_rgba(0,0,0,0.2)] ${
+              isDark ? 'text-purple-200' : 'text-purple-950'
+            }`}
           >
             Namaskaram Pilgrim
           </span>
           <div className="flex items-center justify-end gap-1.5">
             <span
-              className="text-xs sm:text-sm font-black leading-tight tracking-tight drop-shadow-[0_1px_2px_rgba(255,255,255,0.5)]"
-              style={{ color: '#4A0E4E' }}
+              className={`text-xs sm:text-sm font-black leading-tight tracking-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)] ${
+                isDark ? 'text-amber-300' : 'text-purple-950'
+              }`}
             >
               Om Namo Venkatesaya
             </span>
@@ -300,14 +324,16 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
             {/* Interactive Sacred Temple Bell Chime Speaker */}
             <button
               onClick={playSacredChime}
-              title="Play Temple Bell Chime • கோவில் மணி ஒலி"
+              title="Play Sacred Temple Bell Chime • கோவில் மணி ஒலி"
               className={`p-1 rounded-full transition-all cursor-pointer shadow-sm ${
                 isPlaying
                   ? 'bg-amber-400 text-stone-950 ring-2 ring-amber-300 animate-pulse'
+                  : isDark
+                  ? 'bg-stone-900/80 hover:bg-stone-800 text-amber-300 border border-amber-500/50 hover:scale-105'
                   : 'bg-white/80 hover:bg-white text-purple-900 border border-purple-300 hover:scale-105'
               }`}
             >
-              {isPlaying ? <Volume2 size={13} className="text-stone-900" /> : <Volume2 size={13} />}
+              <Volume2 size={13} className={isPlaying ? 'animate-bounce' : ''} />
             </button>
           </div>
         </div>
@@ -316,16 +342,21 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
         <div className="sm:hidden flex flex-col items-end">
           <button
             onClick={playSacredChime}
-            className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-white/85 text-[10px] font-black shadow-sm"
-            style={{ color: '#4A0E4E' }}
+            className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black shadow-sm ${
+              isDark ? 'bg-stone-900/90 text-amber-300 border border-amber-500/40' : 'bg-white/90 text-purple-950'
+            }`}
           >
             <span>Om Namo</span>
-            <Volume2 size={11} className={isPlaying ? 'animate-bounce text-amber-600' : ''} />
+            <Volume2 size={11} className={isPlaying ? 'animate-bounce text-amber-500' : ''} />
           </button>
         </div>
 
-        {/* Theme Toggle Button */}
-        <div className="rounded-xl p-0.5 bg-black/15 border border-white/30 backdrop-blur-xs flex items-center shadow-xs">
+        {/* Theme Toggle */}
+        <div
+          className={`rounded-xl p-0.5 border backdrop-blur-xs flex items-center shadow-xs ${
+            isDark ? 'bg-black/40 border-amber-500/40' : 'bg-black/15 border-white/30'
+          }`}
+        >
           <ThemeToggle />
         </div>
       </div>
