@@ -123,7 +123,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--background)' }}>
       {/* ── 100% Full-Width Tirupati Header Banner with Rounded-B Corners ── */}
-      <div className="w-full flex-shrink-0">
+      <div className="w-full flex-shrink-0" style={{ backgroundColor: 'var(--surface-variant)' }}>
         <TirupatiHeaderBanner onMenuClick={() => setSidebarOpen(true)} />
       </div>
 

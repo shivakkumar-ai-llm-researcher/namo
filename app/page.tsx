@@ -6,7 +6,9 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
       {/* Majestic Tirupati Devasthanams Sacred Header Banner */}
-      <TirupatiHeaderBanner showMenuButton={false} />
+      <div className="w-full flex-shrink-0" style={{ backgroundColor: 'var(--surface)' }}>
+        <TirupatiHeaderBanner showMenuButton={false} />
+      </div>
 
       {/* Sub-bar Quick Access */}
       <div className="border-b" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>

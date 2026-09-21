@@ -244,7 +244,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
   const isDark = mounted && resolvedTheme === 'dark';
 
   return (
-    <header className="w-full relative select-none shadow-md overflow-hidden bg-stone-950">
+    <header className="w-full relative select-none shadow-md overflow-hidden bg-transparent">
       {/* ── Clean Panoramic Banner Artwork ── */}
       <img
         src={isDark ? '/images/banner-dark.png' : '/images/banner-light.png'}
