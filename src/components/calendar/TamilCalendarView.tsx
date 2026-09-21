@@ -58,9 +58,9 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
   const pathname = usePathname();
   const { isAdmin: authIsAdmin, profile } = useAuth();
 
-  // Show manual 'Sync Now' only for Admin logins; hide for visitor portal and devotee logins
+  // Show Auto-Sync status bar and manual 'Sync Now' only for Admin logins; hide completely for visitor portal and devotee logins
   const isVisitor = propIsAdmin === false || (pathname ? pathname.startsWith('/visitor') : false) || profile?.role === 'visitor';
-  const showSyncButton = propIsAdmin === true || (!isVisitor && authIsAdmin);
+  const showAdminSyncBar = propIsAdmin === true || (!isVisitor && authIsAdmin);
 
   const today = useMemo(() => {
     const d = new Date();
@@ -322,30 +322,30 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Automated 8-Hour Sync Status Bar (SrirangamInfo & TamilCalendarz) */}
-      <div
-        className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all"
-        style={{
-          backgroundColor: 'var(--surface)',
-          borderColor: 'var(--border)',
-        }}
-      >
-        <div className="flex items-center gap-2.5">
-          <span className="relative flex h-2.5 w-2.5">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-          </span>
-          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-            <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
-              SrirangamInfo & TamilCalendarz Auto-Sync
+      {/* Automated 8-Hour Sync Status Bar (SrirangamInfo & TamilCalendarz) - Admin Only */}
+      {showAdminSyncBar && (
+        <div
+          className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span className="text-[11px] text-stone-500 dark:text-stone-400">
-              {syncStatusMsg || 'Automated background sync every 8 hours'}
-            </span>
+            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+              <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+                SrirangamInfo & TamilCalendarz Auto-Sync
+              </span>
+              <span className="text-[11px] text-stone-500 dark:text-stone-400">
+                {syncStatusMsg || 'Automated background sync every 8 hours'}
+              </span>
+            </div>
           </div>
-        </div>
 
-        {showSyncButton && (
           <button
             onClick={() => loadSyncData(true)}
             disabled={isSyncing}
@@ -360,8 +360,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
             <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
             <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Perumal Sacred Days Live Notification Alert Card */}
       {activeVishnuDay && (
