@@ -21,7 +21,6 @@ import {
   Sparkles,
   Layers,
   CheckCircle2,
-  CreditCard,
   Building2,
   Users,
 } from 'lucide-react';
@@ -292,21 +291,6 @@ export function AnalyticsView({ portalType = 'admin' }: AnalyticsViewProps) {
       }));
   }, [filteredData]);
 
-  // Payment methods breakdown
-  const paymentMethodData = useMemo(() => {
-    const pMap: Record<string, { count: number; total: number }> = {};
-    filteredData.contributions.forEach((c) => {
-      const m = c.payment_method || 'other';
-      if (!pMap[m]) pMap[m] = { count: 0, total: 0 };
-      pMap[m].count += 1;
-      pMap[m].total += Number(c.amount);
-    });
-    return Object.entries(pMap).map(([method, val]) => ({
-      method,
-      label: method === 'upi' ? 'UPI' : method === 'bank_transfer' ? 'Bank Transfer' : method === 'cash' ? 'Cash' : 'Other',
-      ...val,
-    }));
-  }, [filteredData]);
 
   if (loading) {
     return (
@@ -857,117 +841,66 @@ export function AnalyticsView({ portalType = 'admin' }: AnalyticsViewProps) {
         </div>
       </Card>
 
-      {/* ── Category Breakdown & Payment Methods ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Category Breakdown (2 Cols) */}
-        <div className="lg:col-span-2">
-          <Card>
-            <h3 className="font-bold text-base sm:text-lg mb-1" style={{ color: 'var(--text-primary)' }}>
-              Expense Breakdown by Category • செலவு வகைப்பாடு
-            </h3>
-            <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Expenditure distribution across catering, hall rental, decoration, nadaswaram, etc.
-            </p>
+      {/* ── Category Breakdown ── */}
+      <Card>
+        <h3 className="font-bold text-base sm:text-lg mb-1" style={{ color: 'var(--text-primary)' }}>
+          Expense Breakdown by Category • செலவு வகைப்பாடு
+        </h3>
+        <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
+          Expenditure distribution across catering, hall rental, decoration, nadaswaram, etc.
+        </p>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
-              {/* Donut Chart */}
-              <div className="h-64 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={85}
-                      paddingAngle={2}
-                      dataKey="value"
-                    >
-                      {categoryData.map((_, i) => (
-                        <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <Tooltip formatter={(v) => formatCurrency(Number(v))} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Category List */}
-              <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                {categoryData.map((cat, i) => (
-                  <div
-                    key={cat.name}
-                    className="flex justify-between items-center text-xs py-1.5 px-2 rounded-lg border"
-                    style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface-variant)' }}
-                  >
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div
-                        className="w-3 h-3 rounded-full flex-shrink-0"
-                        style={{ backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }}
-                      />
-                      <span className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-                        {getCategoryEmoji(cat.category)} {cat.name}
-                      </span>
-                    </div>
-                    <div className="text-right flex-shrink-0">
-                      <span className="font-bold ml-2" style={{ color: 'var(--text-primary)' }}>
-                        {formatCurrency(cat.value)}
-                      </span>
-                      <span className="text-[10px] text-stone-500 ml-1">({cat.percentage}%)</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Payment Methods (1 Col) */}
-        <div>
-          <Card>
-            <div className="flex items-center gap-2 mb-1">
-              <CreditCard size={18} style={{ color: 'var(--gold)' }} />
-              <h3 className="font-bold text-base sm:text-lg" style={{ color: 'var(--text-primary)' }}>
-                Payment Channels
-              </h3>
-            </div>
-            <p className="text-xs mb-4" style={{ color: 'var(--text-secondary)' }}>
-              Devotee contribution payment methods • செலுத்துகை வழிகள்
-            </p>
-
-            <div className="space-y-3">
-              {paymentMethodData.map((pm) => (
-                <div
-                  key={pm.method}
-                  className="p-3 rounded-xl border flex items-center justify-between"
-                  style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+          {/* Donut Chart */}
+          <div className="h-64 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={categoryData}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={85}
+                  paddingAngle={2}
+                  dataKey="value"
                 >
-                  <div>
-                    <div className="font-bold text-xs" style={{ color: 'var(--text-primary)' }}>
-                      {pm.label}
-                    </div>
-                    <div className="text-[10px] text-stone-500">{pm.count} transactions</div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-black text-sm text-emerald-700 dark:text-emerald-400">
-                      {formatCurrency(pm.total)}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  {categoryData.map((_, i) => (
+                    <Cell key={i} fill={CATEGORY_COLORS[i % CATEGORY_COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(v) => formatCurrency(Number(v))} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
-            <div className="mt-5 p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-xs">
-              <p className="font-bold text-amber-900 dark:text-amber-300">
-                ✨ Transparency & Seva
-              </p>
-              <p className="text-[11px] text-amber-800 dark:text-amber-400 mt-0.5">
-                All community funds are 100% transparently maintained for temple poojas, annadhanam, and cultural functions.
-              </p>
-            </div>
-          </Card>
+          {/* Category List */}
+          <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+            {categoryData.map((cat, i) => (
+              <div
+                key={cat.name}
+                className="flex justify-between items-center text-xs py-1.5 px-2 rounded-lg border"
+                style={{ borderColor: 'var(--border)', backgroundColor: 'var(--surface-variant)' }}
+              >
+                <div className="flex items-center gap-2 min-w-0">
+                  <div
+                    className="w-3 h-3 rounded-full flex-shrink-0"
+                    style={{ backgroundColor: CATEGORY_COLORS[i % CATEGORY_COLORS.length] }}
+                  />
+                  <span className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                    {getCategoryEmoji(cat.category)} {cat.name}
+                  </span>
+                </div>
+                <div className="text-right flex-shrink-0">
+                  <span className="font-bold ml-2" style={{ color: 'var(--text-primary)' }}>
+                    {formatCurrency(cat.value)}
+                  </span>
+                  <span className="text-[10px] text-stone-500 ml-1">({cat.percentage}%)</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 }
