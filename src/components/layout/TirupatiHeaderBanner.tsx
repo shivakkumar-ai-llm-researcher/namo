@@ -20,7 +20,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
   const isDark = mounted && resolvedTheme === 'dark';
 
-  // Sacred Temple Bell Chime using Web Audio API (Bronze bell harmonics)
+  // Sacred Temple Bell Chime using Web Audio API (Bronze bell acoustics)
   const playSacredChime = () => {
     try {
       const AudioCtx =
@@ -69,12 +69,42 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
   return (
     <header className="w-full relative select-none shadow-md overflow-hidden bg-stone-950">
-      {/* ── Natural Responsive Banner Image (Zero Cropping, 100% Fit) ── */}
+      {/* ── Clean Panoramic Banner Artwork ── */}
       <img
         src={isDark ? '/images/banner-dark.png' : '/images/banner-light.png'}
         alt="Arulmigu Shridevi Poodevi Shri Varatharaja Perumal Alayam"
         className="w-full h-auto block select-none pointer-events-none transition-opacity duration-300"
       />
+
+      {/* ── Temple Name in Tamil & English (Sharp Crisp Vector Typography) ── */}
+      <div className="absolute left-[8.5%] top-1/2 -translate-y-1/2 flex flex-col justify-center min-w-0 z-20 pointer-events-none max-w-[38%]">
+        <h1
+          className="text-[10px] sm:text-sm md:text-base lg:text-[18px] font-black tracking-tight leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate sm:whitespace-normal"
+          style={{
+            fontFamily: 'system-ui, -apple-system, sans-serif',
+            textShadow: '0 2px 6px rgba(0, 0, 0, 0.95), 0 0 12px rgba(0, 0, 0, 0.85)',
+          }}
+          title="அருள்மிகு ஸ்ரீதேவி பூதேவி ஸ்ரீ வரதராஜ பெருமாள் ஆலயம்"
+        >
+          அருள்மிகு ஸ்ரீதேவி பூதேவி ஸ்ரீ வரதராஜ பெருமாள் ஆலயம்
+        </h1>
+        <span
+          className="text-[8px] sm:text-[10.5px] md:text-xs lg:text-[13px] font-bold text-amber-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight mt-0.5 truncate"
+          style={{
+            textShadow: '0 1px 4px rgba(0, 0, 0, 0.95)',
+          }}
+        >
+          Arulmigu Shridevi Poodevi Shri Varatharaja Perumal Alayam
+        </span>
+        <span
+          className="text-[7px] sm:text-[9px] md:text-[10px] lg:text-[11px] font-semibold text-amber-100/90 leading-tight mt-0.5 hidden sm:block truncate"
+          style={{
+            textShadow: '0 1px 3px rgba(0, 0, 0, 0.95)',
+          }}
+        >
+          திருக்கோயில் அறக்கட்டளை • Community Seva & Devotees Fund
+        </span>
+      </div>
 
       {/* ── Mobile Sidebar Menu Button ── */}
       {showMenuButton && (
