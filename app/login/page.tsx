@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Eye, EyeOff, AlertCircle, ShieldCheck, UserCheck, KeyRound } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { BalajiNamam } from '@/components/ui';
 import { authService } from '@/services';
@@ -22,9 +22,9 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPass, setShowPass] = useState(false);
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginForm>({
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: 'murugan.admin@communityfund.in', password: 'Admin@1234' },
+    defaultValues: { email: '', password: '' },
   });
 
   const onSubmit = async (data: LoginForm) => {
@@ -69,12 +69,6 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleQuickAdminLogin = () => {
-    setValue('email', 'murugan.admin@communityfund.in');
-    setValue('password', 'Admin@1234');
-    onSubmit({ email: 'murugan.admin@communityfund.in', password: 'Admin@1234' });
   };
 
   return (
@@ -123,29 +117,6 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          {/* Admin Credentials Helper */}
-          <div className="rounded-xl p-3 border space-y-2" style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: 'var(--gold)' }}>
-                <KeyRound size={14} /> Admin Credentials • நிர்வாகி விவரம்
-              </div>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300">
-                Admin Only
-              </span>
-            </div>
-            <div className="text-xs font-mono text-stone-700 dark:text-stone-300 bg-white/70 dark:bg-black/20 p-2 rounded-lg border flex flex-col sm:flex-row justify-between sm:items-center gap-1" style={{ borderColor: 'var(--border)' }}>
-              <span className="truncate font-semibold">murugan.admin@communityfund.in</span>
-              <span className="text-[11px] text-stone-500 font-sans">Pass: Admin@1234</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleQuickAdminLogin}
-              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-white font-bold text-xs shadow-sm hover:opacity-90 transition-opacity w-full cursor-pointer"
-              style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
-            >
-              <ShieldCheck size={14} /> 1-Click Admin Login • உடனடி நிர்வாகி உள்நுழைவு
-            </button>
-          </div>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl border" style={{ backgroundColor: 'var(--error-light)', borderColor: 'var(--error)' }}>
