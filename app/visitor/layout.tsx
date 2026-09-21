@@ -58,6 +58,13 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
     router.replace('/login');
   };
 
+  const currentTab = navItems.find((item) =>
+    item.href === '/visitor'
+      ? pathname === '/visitor'
+      : pathname === item.href || pathname.startsWith(item.href + '/')
+  ) || { label: 'Devotee Portal', tamil: 'பக்தர் தளம்', icon: LayoutDashboard };
+  const TabIcon = currentTab.icon;
+
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Brand Header */}
@@ -191,7 +198,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header Bar for Mobile & Tablet (and Theme Toggle for Desktop) */}
+        {/* Top Header Bar with Tab Name */}
         <header
           className="sticky top-0 z-40 h-[70px] flex items-center justify-between px-4 lg:px-6 border-b flex-shrink-0"
           style={{
@@ -199,30 +206,50 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
             borderBottom: '2px solid #D97706',
           }}
         >
-          {/* Mobile / Tablet Menu Button */}
-          <div className="flex items-center gap-3">
+          {/* Mobile / Tablet Menu Button + Tab Title */}
+          <div className="flex items-center gap-3 min-w-0">
             <button
-              className="lg:hidden p-2 rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+              className="lg:hidden p-2 rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex-shrink-0"
               style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               onClick={() => setSidebarOpen(true)}
               aria-label="Open navigation sidebar"
             >
               <Menu size={20} />
             </button>
-            <div className="lg:hidden flex items-center gap-2">
+
+            {/* Tab Name & Icon Badge */}
+            <div className="flex items-center gap-2.5 min-w-0">
               <div
-                className="w-7 h-7 rounded-lg flex items-center justify-center"
-                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                style={{
+                  backgroundColor: 'var(--surface-variant)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--primary)',
+                }}
               >
-                <BalajiNamam size={18} />
+                <TabIcon size={19} />
               </div>
-              <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
-                Srivari Devotee
-              </span>
+              <div className="flex items-baseline gap-2 min-w-0">
+                <h1 className="text-base lg:text-lg font-bold truncate tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                  {currentTab.label}
+                </h1>
+                {currentTab.tamil && (
+                  <span
+                    className="text-[11px] font-medium px-2 py-0.5 rounded-full hidden sm:inline-block flex-shrink-0"
+                    style={{
+                      backgroundColor: 'var(--surface-variant)',
+                      color: 'var(--gold)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    {currentTab.tamil}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-shrink-0">
             <ThemeToggle />
           </div>
         </header>

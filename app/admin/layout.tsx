@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, TrendingUp, TrendingDown, PiggyBank, BarChart3, FileText, ClipboardList, CalendarDays, LogOut, Menu, X, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Users, TrendingUp, TrendingDown, PiggyBank, BarChart3, FileText, ClipboardList, CalendarDays, Sparkles, LogOut, Menu, X, ChevronRight } from 'lucide-react';
 import { useAuth } from '../../src/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { BalajiNamam } from '@/components/ui';
@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/contributions', label: 'Contributions', icon: TrendingUp, tamil: 'வருமானம்' },
   { href: '/admin/expenses', label: 'Expenses', icon: TrendingDown, tamil: 'செலவுகள்' },
   { href: '/admin/savings', label: 'Savings', icon: PiggyBank, tamil: 'சேமிப்பு' },
+  { href: '/admin/functions', label: 'Functions', icon: Sparkles, tamil: 'நிகழ்வுகள்' },
   { href: '/admin/analytics', label: 'Analytics', icon: BarChart3, tamil: 'பகுப்பாய்வு' },
   { href: '/admin/calendar', label: 'Calendar', icon: CalendarDays, tamil: 'நாட்காட்டி' },
   { href: '/admin/reports', label: 'Reports', icon: FileText, tamil: 'அறிக்கைகள்' },
@@ -49,6 +50,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     await signOut();
     router.replace('/login');
   };
+
+  const currentTab = navItems.find((item) =>
+    item.href === '/admin'
+      ? pathname === '/admin'
+      : pathname === item.href || pathname.startsWith(item.href + '/')
+  ) || { label: 'Admin Portal', tamil: 'நிர்வாகம்', icon: LayoutDashboard };
+  const TabIcon = currentTab.icon;
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
@@ -132,13 +140,60 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        <header className="sticky top-0 z-40 h-[70px] flex items-center gap-3 px-4 lg:px-6 border-b flex-shrink-0" style={{ backgroundColor: 'var(--surface)', borderBottom: '2px solid #D97706' }}>
-          <button className="lg:hidden p-2 rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 transition-colors" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} onClick={() => setSidebarOpen(true)}>
-            <Menu size={20} />
-          </button>
-          <div className="flex-1" />
-          <ThemeToggle />
+        {/* Top Header with Tab Name */}
+        <header
+          className="sticky top-0 z-40 h-[70px] flex items-center justify-between gap-3 px-4 lg:px-6 border-b flex-shrink-0"
+          style={{
+            backgroundColor: 'var(--surface)',
+            borderBottom: '2px solid #D97706',
+          }}
+        >
+          {/* Left: Mobile hamburger + Active Tab Title */}
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              className="lg:hidden p-2 rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex-shrink-0"
+              style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open admin navigation menu"
+            >
+              <Menu size={20} />
+            </button>
+
+            {/* Tab Name & Icon Badge */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
+                style={{
+                  backgroundColor: 'var(--surface-variant)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--primary)',
+                }}
+              >
+                <TabIcon size={19} />
+              </div>
+              <div className="flex items-baseline gap-2 min-w-0">
+                <h1 className="text-base lg:text-lg font-bold truncate tracking-tight" style={{ color: 'var(--text-primary)' }}>
+                  {currentTab.label}
+                </h1>
+                {currentTab.tamil && (
+                  <span
+                    className="text-[11px] font-medium px-2 py-0.5 rounded-full hidden sm:inline-block flex-shrink-0"
+                    style={{
+                      backgroundColor: 'var(--surface-variant)',
+                      color: 'var(--gold)',
+                      border: '1px solid var(--border)',
+                    }}
+                  >
+                    {currentTab.tamil}
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <ThemeToggle />
+          </div>
         </header>
 
         <main className="flex-1 p-4 lg:p-6">{children}</main>
