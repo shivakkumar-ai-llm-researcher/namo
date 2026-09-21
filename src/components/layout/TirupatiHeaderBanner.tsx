@@ -1,7 +1,7 @@
 'use client';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useTheme } from 'next-themes';
-import { Menu, Volume2, VolumeX, Sun, Moon, Languages } from 'lucide-react';
+import { Menu, Volume2, VolumeX, Sun, Moon } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 interface TirupatiHeaderBannerProps {
@@ -11,7 +11,7 @@ interface TirupatiHeaderBannerProps {
 
 export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: TirupatiHeaderBannerProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const { language, setLanguage, toggleLanguage, t } = useLanguage();
+  const { language, toggleLanguage, t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -328,34 +328,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
       {/* ── Top-Right Header Action Bar (Cleanly Placed Away From Venkatesaya Text) ── */}
       <div className="absolute top-2 right-2.5 sm:top-2.5 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
-        {/* Explicit Bilingual Segmented Language Selector (தமிழ் | English) */}
-        <div className="flex items-center bg-black/60 backdrop-blur-md rounded-full p-0.5 border border-amber-400/60 shadow-lg select-none">
-          <button
-            onClick={() => setLanguage('ta')}
-            title="தமிழ் மொழிக்கு மாற்றுக"
-            aria-label="Switch to Tamil"
-            className={`flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer ${
-              language === 'ta'
-                ? 'bg-amber-400 text-amber-950 font-black shadow-xs ring-1 ring-amber-300'
-                : 'text-amber-200 hover:text-white'
-            }`}
-          >
-            <Languages size={11} className={language === 'ta' ? 'text-amber-950' : 'text-amber-300'} />
-            <span>தமிழ்</span>
-          </button>
-          <button
-            onClick={() => setLanguage('en')}
-            title="Switch to English"
-            aria-label="Switch to English"
-            className={`flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer ${
-              language === 'en'
-                ? 'bg-amber-400 text-amber-950 font-black shadow-xs ring-1 ring-amber-300'
-                : 'text-amber-200 hover:text-white'
-            }`}
-          >
-            <span>English</span>
-          </button>
-        </div>
+
 
         {/* Mobile Compact Fallback Theme Switcher */}
         <button

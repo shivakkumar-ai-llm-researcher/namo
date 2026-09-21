@@ -16,6 +16,7 @@ import {
   LogOut,
   X,
   ChevronRight,
+  Languages,
 } from 'lucide-react';
 import { useAuth } from '../../src/hooks/useAuth';
 import { getInitials } from '@/utils/formatters';
@@ -36,7 +37,7 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { language, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { user, profile, isLoading, signOut } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -63,6 +64,50 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
+      {/* ── Bilingual Language Switcher in Left Sidebar ── */}
+      <div className="p-3 border-b" style={{ borderColor: 'var(--border)' }}>
+        <div className="text-[11px] font-bold mb-2 px-1 flex items-center justify-between" style={{ color: 'var(--text-secondary)' }}>
+          <span className="flex items-center gap-1.5">
+            <Languages size={13} className="text-amber-500" />
+            <span>{language === 'ta' ? 'மொழி தேர்வு' : 'Language'}</span>
+          </span>
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+            {language === 'ta' ? 'தமிழ்' : 'English'}
+          </span>
+        </div>
+        <div
+          className="flex items-center rounded-xl p-1 border shadow-xs"
+          style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}
+        >
+          <button
+            type="button"
+            onClick={() => setLanguage('ta')}
+            aria-label="தமிழ் மொழிக்கு மாற்றுக"
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              language === 'ta'
+                ? 'bg-amber-500 text-stone-950 font-black shadow-sm ring-1 ring-amber-400'
+                : 'hover:text-amber-600'
+            }`}
+            style={language !== 'ta' ? { color: 'var(--text-secondary)' } : undefined}
+          >
+            <span>தமிழ்</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setLanguage('en')}
+            aria-label="Switch to English"
+            className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              language === 'en'
+                ? 'bg-amber-500 text-stone-950 font-black shadow-sm ring-1 ring-amber-400'
+                : 'hover:text-amber-600'
+            }`}
+            style={language !== 'en' ? { color: 'var(--text-secondary)' } : undefined}
+          >
+            <span>English</span>
+          </button>
+        </div>
+      </div>
+
       {/* Nav Items */}
       <nav className="flex-1 overflow-y-auto py-3 px-2">
         {navItems.map((item) => {
