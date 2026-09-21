@@ -285,15 +285,24 @@ export default function VisitorDashboard() {
                 </div>
 
                 {/* Bottom Row: Badges (Full text visible, no truncation) */}
-                <div className="flex flex-wrap items-center gap-1.5 text-[11px] pt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium">
+                <div className="flex flex-wrap items-center gap-1.5 text-[11px] pt-0.5">
+                  <span
+                    className="px-2 py-0.5 rounded-md font-medium"
+                    style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-secondary)' }}
+                  >
                     📅 {formatDate(item.payment_date)}
                   </span>
-                  <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold border border-amber-200/50 dark:border-amber-800/50">
+                  <span
+                    className="px-2 py-0.5 rounded-md font-semibold border"
+                    style={{ backgroundColor: 'var(--savings-light)', color: 'var(--savings)', borderColor: 'var(--savings-light)' }}
+                  >
                     💳 {formatMethod(item.payment_method)}
                   </span>
                   {item.function?.name && (
-                    <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium">
+                    <span
+                      className="px-2 py-0.5 rounded-md font-medium"
+                      style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-secondary)' }}
+                    >
                       🛕 {translateFunction(item.function.name)}
                     </span>
                   )}

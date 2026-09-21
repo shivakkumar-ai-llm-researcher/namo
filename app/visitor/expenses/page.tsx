@@ -92,24 +92,39 @@ export default function VisitorExpensesPage() {
 
               {/* Badges / Metadata Tags (Full text visible, cleanly wrapped) */}
               <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1 border-t border-dashed" style={{ borderColor: 'var(--border)' }}>
-                <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
+                <span
+                  className="px-2 py-0.5 rounded-md font-medium text-[11px]"
+                  style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-secondary)' }}
+                >
                   📅 {formatDate(item.expense_date)}
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 font-bold text-[11px] border border-rose-200/60 dark:border-rose-800/60">
+                <span
+                  className="px-2 py-0.5 rounded-md font-bold text-[11px] border"
+                  style={{ backgroundColor: 'var(--expense-light)', color: 'var(--expense)', borderColor: 'var(--expense-light)' }}
+                >
                   🏷️ {formatCategory(item.category)}
                 </span>
                 {item.function?.name && (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
+                  <span
+                    className="px-2 py-0.5 rounded-md font-semibold text-[11px] border"
+                    style={{ backgroundColor: 'var(--savings-light)', color: 'var(--savings)', borderColor: 'var(--savings-light)' }}
+                  >
                     🛕 {translateFunction(item.function.name)}
                   </span>
                 )}
                 {item.payment_method && (
-                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
+                  <span
+                    className="px-2 py-0.5 rounded-md font-medium text-[11px]"
+                    style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-secondary)' }}
+                  >
                     💳 {formatMethod(item.payment_method)}
                   </span>
                 )}
                 {item.reference_number && (
-                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 text-[11px] font-mono text-stone-600 dark:text-stone-300">
+                  <span
+                    className="px-2 py-0.5 rounded-md text-[11px] font-mono"
+                    style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-tertiary)' }}
+                  >
                     {t('expenses.ref')}: {item.reference_number}
                   </span>
                 )}
@@ -117,7 +132,7 @@ export default function VisitorExpensesPage() {
 
               {/* Optional Notes */}
               {item.notes && (
-                <p className="text-xs text-stone-500 dark:text-stone-400 italic pt-0.5">
+                <p className="text-xs italic pt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                   &ldquo;{translateText(item.notes)}&rdquo;
                 </p>
               )}
@@ -128,3 +143,4 @@ export default function VisitorExpensesPage() {
     </div>
   );
 }
+

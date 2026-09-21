@@ -102,19 +102,31 @@ export default function VisitorContributionsPage() {
 
               {/* Badges / Metadata Tags (Full text visible, cleanly wrapped) */}
               <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1 border-t border-dashed" style={{ borderColor: 'var(--border)' }}>
-                <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
+                <span
+                  className="px-2 py-0.5 rounded-md font-medium text-[11px]"
+                  style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-secondary)' }}
+                >
                   📅 {formatDate(item.payment_date)}
                 </span>
-                <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200/60 dark:border-emerald-800/60">
+                <span
+                  className="px-2 py-0.5 rounded-md font-bold text-[11px] border"
+                  style={{ backgroundColor: 'var(--income-light)', color: 'var(--income)', borderColor: 'var(--income-light)' }}
+                >
                   💳 {formatMethod(item.payment_method)}
                 </span>
                 {item.function?.name && (
-                  <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
+                  <span
+                    className="px-2 py-0.5 rounded-md font-semibold text-[11px] border"
+                    style={{ backgroundColor: 'var(--savings-light)', color: 'var(--savings)', borderColor: 'var(--savings-light)' }}
+                  >
                     🛕 {translateFunction(item.function.name)}
                   </span>
                 )}
                 {item.reference_number && (
-                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 text-[11px] font-mono text-stone-600 dark:text-stone-300">
+                  <span
+                    className="px-2 py-0.5 rounded-md text-[11px] font-mono"
+                    style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-tertiary)' }}
+                  >
                     {t('contributions.ref')}: {item.reference_number}
                   </span>
                 )}
@@ -122,7 +134,7 @@ export default function VisitorContributionsPage() {
 
               {/* Optional Notes */}
               {item.notes && (
-                <p className="text-xs text-stone-500 dark:text-stone-400 italic pt-0.5">
+                <p className="text-xs italic pt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                   &ldquo;{translateText(item.notes)}&rdquo;
                 </p>
               )}
@@ -133,3 +145,4 @@ export default function VisitorContributionsPage() {
     </div>
   );
 }
+
