@@ -260,29 +260,29 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
             </svg>
           </div>
 
-          {/* Titles in Telugu/Tamil & English */}
+          {/* Temple Title in Tamil & English */}
           <div className="flex flex-col justify-center min-w-0">
             <span
-              className={`text-xs sm:text-sm font-extrabold tracking-tight truncate leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)] ${
-                isDark ? 'text-amber-100' : 'text-white'
+              className={`text-xs sm:text-sm md:text-[15px] font-black tracking-tight truncate leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] ${
+                isDark ? 'text-amber-200' : 'text-white'
               }`}
-              style={{ fontFamily: 'system-ui, sans-serif' }}
+              title="அருள்மிகு ஸ்ரீதேவி பூதேவி ஸ்ரீ வரதராஜ பெருமாள் ஆலயம்"
             >
-              తిరుమల తిరుపతి దేవస్థానములు
+              அருள்மிகு ஸ்ரீதேவி பூதேவி ஸ்ரீ வரதராஜ பெருமாள் ஆலயம்
             </span>
             <span
-              className={`text-[10px] sm:text-xs font-bold truncate leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] ${
+              className={`text-[9.5px] sm:text-xs font-bold truncate leading-tight drop-shadow-[0_1px_2px_rgba(0,0,0,0.4)] ${
                 isDark ? 'text-amber-300' : 'text-yellow-100'
               }`}
             >
-              Tirumala Tirupati Devasthanams<sup className="text-[8px] ml-0.5">®</sup>
+              Arulmigu Shridevi Poodevi Shri Varatharaja Perumal Alayam
             </span>
             <span
-              className={`text-[9px] font-semibold truncate hidden sm:block ${
-                isDark ? 'text-amber-200/80' : 'text-amber-200/90'
+              className={`text-[8.5px] sm:text-[9.5px] font-semibold truncate hidden sm:block ${
+                isDark ? 'text-amber-200/80' : 'text-amber-100/90'
               }`}
             >
-              Srivari Community Fund • திருமலை திருப்பதி தேவஸ்தானம்
+              திருக்கோயில் அறக்கட்டளை • Community Seva & Devotees Fund
             </span>
           </div>
         </div>
