@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useCallback } from 'react';
 import type { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
@@ -11,16 +11,20 @@ export function useAuth() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Check for demo user in local storage
+    // Check for demo user in local storage (Admin only)
     if (typeof window !== 'undefined') {
       const demoStr = localStorage.getItem('namo_demo_user');
       if (demoStr) {
         try {
           const parsed = JSON.parse(demoStr);
-          setUser({ id: parsed.id, email: parsed.email } as User);
-          setProfile(parsed.profile);
-          setIsLoading(false);
-          return;
+          if (parsed.profile?.role === 'visitor' || parsed.profile?.full_name?.includes('Anbu')) {
+            localStorage.removeItem('namo_demo_user');
+          } else {
+            setUser({ id: parsed.id, email: parsed.email } as User);
+            setProfile(parsed.profile);
+            setIsLoading(false);
+            return;
+          }
         } catch (e) {
           localStorage.removeItem('namo_demo_user');
         }

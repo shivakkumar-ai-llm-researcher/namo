@@ -25,13 +25,12 @@ import { getInitials } from '@/utils/formatters';
 
 const navItems = [
   { href: '/visitor', label: 'Dashboard', icon: LayoutDashboard, tamil: 'டாஷ்போர்ட்' },
-  { href: '/visitor/contributions', label: 'Contributions', icon: TrendingUp, tamil: 'என் பங்களிப்பு' },
+  { href: '/visitor/contributions', label: 'Contributions', icon: TrendingUp, tamil: 'பங்களிப்புகள்' },
   { href: '/visitor/expenses', label: 'Expenses', icon: TrendingDown, tamil: 'செலவுகள்' },
   { href: '/visitor/savings', label: 'Savings', icon: PiggyBank, tamil: 'சேமிப்பு' },
   { href: '/visitor/members', label: 'Members', icon: Users, tamil: 'உறுப்பினர்கள்' },
   { href: '/visitor/analytics', label: 'Analytics', icon: BarChart3, tamil: 'பகுப்பாய்வு' },
   { href: '/visitor/calendar', label: 'Calendar', icon: CalendarDays, tamil: 'நாட்காட்டி' },
-  { href: '/visitor/profile', label: 'Profile', icon: UserCircle, tamil: 'சுயவிவரம்' },
 ];
 
 export default function VisitorLayout({ children }: { children: React.ReactNode }) {
@@ -40,8 +39,20 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Visitors & devotees can directly open the dashboard without login credentials!
-  // No redirect to /login for visitor layout.
+  // Clear any stale demo visitor user on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const demoStr = localStorage.getItem('namo_demo_user');
+      if (demoStr) {
+        try {
+          const parsed = JSON.parse(demoStr);
+          if (parsed.profile?.role === 'visitor' || parsed.profile?.full_name?.includes('Anbu')) {
+            localStorage.removeItem('namo_demo_user');
+          }
+        } catch {}
+      }
+    }
+  }, []);
 
   const handleSignOut = async () => {
     await signOut();
@@ -68,9 +79,9 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
           </div>
           <div className="min-w-0">
             <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>
-              {profile?.full_name || 'Srivari Devotee'}
+              Srivari Community Fund
             </div>
-            <div className="text-[11px] font-medium truncate" style={{ color: 'var(--text-tertiary)' }}>
+            <div className="text-[11px] font-medium truncate" style={{ color: 'var(--gold)' }}>
               Devotee Portal • பக்தர் தளம்
             </div>
           </div>
@@ -105,39 +116,42 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
         })}
       </nav>
 
-      {/* Devotee Info & Admin Login / Sign Out */}
+      {/* Footer: Admin Login or Sign Out */}
       <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0"
-            style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
-          >
-            {getInitials(profile?.full_name || 'Devotee')}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
-              {profile?.full_name || 'Srivari Devotee'}
+        {profile?.role === 'admin' ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0"
+                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+              >
+                {getInitials(profile?.full_name || 'Admin')}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
+                  {profile?.full_name || 'Admin'}
+                </div>
+                <div className="text-[10px]" style={{ color: 'var(--gold)' }}>
+                  Administrator • நிர்வாகி
+                </div>
+              </div>
             </div>
-            <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-              {user ? (profile?.role === 'admin' ? 'Administrator • நிர்வாகி' : 'Member • பக்தர்') : 'Guest Devotee • நேரடி பார்வை'}
-            </div>
+            <button
+              onClick={handleSignOut}
+              className="flex items-center justify-center gap-2 text-xs font-bold w-full px-3 py-2 rounded-xl transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
+              style={{ color: 'var(--error)', border: '1px solid var(--border)' }}
+            >
+              <LogOut size={15} /> Sign Out • வெளியேறு
+            </button>
           </div>
-        </div>
-        {user ? (
-          <button
-            onClick={handleSignOut}
-            className="flex items-center justify-center gap-2 text-xs font-bold w-full px-3 py-2 rounded-xl transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
-            style={{ color: 'var(--error)', border: '1px solid var(--border)' }}
-          >
-            <LogOut size={15} /> Sign Out • வெளியேறு
-          </button>
         ) : (
           <Link
             href="/login"
-            className="flex items-center justify-center gap-1.5 text-xs font-bold w-full px-3 py-2 rounded-xl text-white transition-opacity hover:opacity-90 shadow-sm"
+            className="flex items-center justify-center gap-2 text-xs font-bold w-full px-3 py-2.5 rounded-xl text-white transition-opacity hover:opacity-90 shadow-sm cursor-pointer"
             style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
           >
-            <Shield size={14} /> Admin Login • நிர்வாகி உள்நுழைவு
+            <Shield size={14} />
+            <span>Admin Login • நிர்வாகி உள்நுழைவு</span>
           </Link>
         )}
       </div>
