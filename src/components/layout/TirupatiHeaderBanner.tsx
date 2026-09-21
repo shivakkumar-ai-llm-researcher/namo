@@ -20,7 +20,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
   const isDark = mounted && resolvedTheme === 'dark';
 
-  // Sacred Temple Bell Chime using Web Audio API (Bronze bell acoustics)
+  // Sacred Temple Bell Chime using Web Audio API (Bronze bell harmonics)
   const playSacredChime = () => {
     try {
       const AudioCtx =
@@ -68,98 +68,92 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
   };
 
   return (
-    <header
-      className="w-full h-[84px] sm:h-[98px] md:h-[110px] lg:h-[120px] relative overflow-hidden rounded-b-2xl sm:rounded-b-3xl border-b-2 select-none transition-all duration-300 z-40 shadow-lg"
-      style={{
-        borderColor: isDark ? '#D97706' : '#B45309',
-        boxShadow: isDark
-          ? '0 8px 24px rgba(0, 0, 0, 0.7), 0 2px 10px rgba(217, 119, 6, 0.3)'
-          : '0 6px 18px rgba(74, 37, 56, 0.25)',
-      }}
-    >
-      {/* ── User-Uploaded Custom Temple Banner Image ── */}
+    <header className="w-full relative select-none shadow-md overflow-hidden bg-stone-950">
+      {/* ── Natural Responsive Banner Image (Zero Cropping, 100% Fit) ── */}
       <img
         src={isDark ? '/images/banner-dark.png' : '/images/banner-light.png'}
         alt="Arulmigu Shridevi Poodevi Shri Varatharaja Perumal Alayam"
-        className="absolute inset-0 w-full h-full object-cover object-center pointer-events-none transition-opacity duration-500"
+        className="w-full h-auto block select-none pointer-events-none transition-opacity duration-300"
       />
 
       {/* ── Mobile Sidebar Menu Button ── */}
       {showMenuButton && (
-        <div className="absolute left-3 top-1/2 -translate-y-1/2 z-30 lg:hidden">
+        <div className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 lg:hidden">
           <button
             onClick={onMenuClick}
-            className="p-2 rounded-xl bg-black/45 hover:bg-black/65 text-white transition-colors flex-shrink-0 border border-white/30 backdrop-blur-md shadow-md cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full bg-black/45 hover:bg-black/70 text-white transition-colors flex-shrink-0 border border-white/30 backdrop-blur-md shadow-md cursor-pointer"
             aria-label="Toggle navigation menu"
           >
-            <Menu size={20} />
+            <Menu size={18} />
           </button>
         </div>
       )}
 
-      {/* ── Desktop/Tablet: Direct In-Artwork Celestial Hotspots ── */}
+      {/* ── In-Artwork Interactive Celestial Hotspot (Moon in Dark / Sun in Light) ── */}
       {isDark ? (
-        /* ── Moon Hotspot in Dark Theme (Moon Center: x ≈ 73.4%, y ≈ 25.8%) ── */
+        /* ── Moon Hotspot in Dark Theme (Center: 73.37% x, 30.49% y) ── */
         <button
           onClick={() => setTheme('light')}
+          style={{ left: '73.37%', top: '30.49%' }}
           title="சந்திர தரிசனம் (Moon) • Press to change to Light Theme"
           aria-label="Moon image point. Press to change into Light Theme."
-          className="hidden sm:block absolute left-[73.4%] top-[25.8%] -translate-x-1/2 -translate-y-1/2 w-14 h-14 md:w-18 md:h-18 rounded-full cursor-pointer z-20 group focus:outline-none"
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-[5.5vw] h-[5.5vw] max-w-16 max-h-16 min-w-8 min-h-8 rounded-full cursor-pointer z-20 group focus:outline-none"
         >
-          {/* Pulsing lunar halo on hover */}
-          <span className="absolute inset-0 rounded-full bg-indigo-300/10 group-hover:bg-indigo-300/35 group-hover:scale-125 transition-all duration-300 ring-2 ring-indigo-300/30 group-hover:ring-indigo-200 shadow-[0_0_20px_rgba(165,180,252,0.4)]" />
+          {/* Subtle glowing lunar aura on hover */}
+          <span className="absolute inset-0 rounded-full bg-indigo-300/10 group-hover:bg-indigo-300/35 group-hover:scale-125 transition-all duration-300 ring-1 sm:ring-2 ring-indigo-300/40 group-hover:ring-indigo-200 shadow-[0_0_16px_rgba(165,180,252,0.45)]" />
           <span className="sr-only">Switch to Light Theme</span>
         </button>
       ) : (
-        /* ── Sun Hotspot in Light Theme (Sun Center: x ≈ 75.9%, y ≈ 55.0%) ── */
+        /* ── Sun Hotspot in Light Theme (Center: 75.92% x, 56.49% y) ── */
         <button
           onClick={() => setTheme('dark')}
+          style={{ left: '75.92%', top: '56.49%' }}
           title="சூரிய தரிசனம் (Sun) • Press to change to Dark Theme"
           aria-label="Sun image point. Press to change into Dark Theme."
-          className="hidden sm:block absolute left-[75.9%] top-[55.0%] -translate-x-1/2 -translate-y-1/2 w-14 h-14 md:w-18 md:h-18 rounded-full cursor-pointer z-20 group focus:outline-none"
+          className="absolute -translate-x-1/2 -translate-y-1/2 w-[5.5vw] h-[5.5vw] max-w-16 max-h-16 min-w-8 min-h-8 rounded-full cursor-pointer z-20 group focus:outline-none"
         >
-          {/* Pulsing solar corona on hover */}
-          <span className="absolute inset-0 rounded-full bg-amber-400/10 group-hover:bg-amber-400/40 group-hover:scale-125 transition-all duration-300 ring-2 ring-amber-300/40 group-hover:ring-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.5)] animate-pulse" />
+          {/* Subtle glowing solar corona on hover */}
+          <span className="absolute inset-0 rounded-full bg-amber-400/10 group-hover:bg-amber-400/40 group-hover:scale-125 transition-all duration-300 ring-1 sm:ring-2 ring-amber-300/40 group-hover:ring-amber-300 shadow-[0_0_16px_rgba(245,158,11,0.5)] animate-pulse" />
           <span className="sr-only">Switch to Dark Theme</span>
         </button>
       )}
 
-      {/* ── Mobile-Only Interactive Celestial Button ── */}
-      <div className="sm:hidden absolute right-12 top-1/2 -translate-y-1/2 z-30">
+      {/* ── Mobile Compact Fallback Theme Switcher ── */}
+      <div className="sm:hidden absolute right-2.5 top-2 z-30">
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
-          title={
+          title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          className={`p-1 rounded-full border backdrop-blur-md shadow-sm transition-transform active:scale-90 cursor-pointer ${
             isDark
-              ? 'சந்திர தரிசனம் (Moon) • Press to change to Light Theme'
-              : 'சூரிய தரிசனம் (Sun) • Press to change to Dark Theme'
-          }
-          className={`p-1.5 rounded-full border backdrop-blur-md shadow-md transition-transform active:scale-90 cursor-pointer ${
-            isDark
-              ? 'bg-stone-950/80 text-amber-300 border-amber-500/50 shadow-[0_0_8px_rgba(147,197,253,0.3)]'
-              : 'bg-white/80 text-amber-700 border-amber-400/60 shadow-[0_0_8px_rgba(245,158,11,0.3)]'
+              ? 'bg-stone-950/70 text-amber-300 border-amber-500/40'
+              : 'bg-white/70 text-amber-800 border-amber-400/50'
           }`}
         >
-          {isDark ? <Moon size={16} /> : <Sun size={16} />}
+          {isDark ? <Moon size={13} /> : <Sun size={13} />}
         </button>
       </div>
 
-      {/* ── Right Edge: Interactive Sacred Temple Bell Chime Button ── */}
-      <div className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 flex items-center">
-        <button
-          onClick={playSacredChime}
-          title="Play Sacred Temple Bell Chime • கோவில் மணி ஒலி"
-          aria-label="Play Sacred Temple Bell Chime"
-          className={`p-1.5 sm:p-2 rounded-full transition-all cursor-pointer shadow-md backdrop-blur-md border ${
+      {/* ── Interactive Pilgrim Greeting & Temple Bell Chime Hotspot ── */}
+      <button
+        onClick={playSacredChime}
+        style={{ left: '83%', right: '2%', top: '12%', bottom: '12%' }}
+        title="Play Sacred Temple Bell Chime • கோவில் மணி ஒலி"
+        aria-label="Play Sacred Temple Bell Chime"
+        className="absolute cursor-pointer z-20 group rounded-xl flex items-center justify-end pr-2 focus:outline-none transition-all"
+      >
+        {/* Discrete Bell Chime indicator badge */}
+        <span
+          className={`p-1 sm:p-1.5 rounded-full transition-all shadow-md backdrop-blur-md border ${
             isPlaying
               ? 'bg-amber-400 text-stone-950 ring-2 ring-amber-300 animate-pulse border-amber-300'
               : isDark
-              ? 'bg-stone-900/80 hover:bg-stone-800 text-amber-300 border-amber-500/50 hover:scale-105 shadow-[0_0_10px_rgba(217,119,6,0.3)]'
-              : 'bg-white/85 hover:bg-white text-purple-950 border-purple-300 hover:scale-105 shadow-[0_0_10px_rgba(120,53,15,0.2)]'
+              ? 'bg-black/30 hover:bg-black/60 text-amber-300/80 hover:text-amber-200 border-white/20 opacity-40 group-hover:opacity-100'
+              : 'bg-white/40 hover:bg-white/80 text-purple-950/80 hover:text-purple-950 border-purple-300/40 opacity-40 group-hover:opacity-100'
           }`}
         >
-          <Volume2 size={15} className={isPlaying ? 'animate-bounce text-amber-900' : ''} />
-        </button>
-      </div>
+          <Volume2 size={13} className={isPlaying ? 'animate-bounce text-amber-900' : ''} />
+        </span>
+      </button>
     </header>
   );
 }
