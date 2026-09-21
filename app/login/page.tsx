@@ -71,16 +71,10 @@ export default function LoginPage() {
     }
   };
 
-  const handleQuickLogin = (role: 'admin' | 'visitor') => {
-    if (role === 'admin') {
-      setValue('email', 'murugan.admin@communityfund.in');
-      setValue('password', 'Admin@1234');
-      onSubmit({ email: 'murugan.admin@communityfund.in', password: 'Admin@1234' });
-    } else {
-      setValue('email', 'anbu.durai@gmail.com');
-      setValue('password', 'Visitor@1234');
-      onSubmit({ email: 'anbu.durai@gmail.com', password: 'Visitor@1234' });
-    }
+  const handleQuickAdminLogin = () => {
+    setValue('email', 'murugan.admin@communityfund.in');
+    setValue('password', 'Admin@1234');
+    onSubmit({ email: 'murugan.admin@communityfund.in', password: 'Admin@1234' });
   };
 
   return (
@@ -100,52 +94,57 @@ export default function LoginPage() {
           <p className="text-sm font-bold tracking-wider mb-1" style={{ color: '#FDE68A' }}>
             || ஓம் நமோ வெங்கடேஸ்வராய ||
           </p>
-          <h1 className="text-2xl font-bold text-white mb-1">Srivari Community Fund</h1>
+          <h1 className="text-2xl font-bold text-white mb-1">Admin Portal Login</h1>
           <p className="text-xs" style={{ color: 'rgba(254,243,199,0.9)' }}>
-            Tirupati Balaji Devotees Seva & Accounting • ஆன்மீக நிதி சேவை
+            நிர்வாகி உள்நுழைவு • Srivari Administration & Management
           </p>
         </div>
 
         <div className="p-6 space-y-5">
-          {/* Quick Credentials Card */}
-          <div className="rounded-xl p-3.5 border space-y-2.5" style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}>
-            <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--gold)' }}>
-              <KeyRound size={14} /> Available Login Credentials • உள்நுழைவு விவரங்கள்
+          {/* Direct Public Dashboard Card for Devotees (No Credentials Needed) */}
+          <div
+            className="rounded-xl p-3.5 border flex items-center justify-between gap-3 shadow-sm"
+            style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}
+          >
+            <div className="min-w-0">
+              <p className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+                Devotee Dashboard • பக்தர் தளம்
+              </p>
+              <p className="text-[11px]" style={{ color: 'var(--text-secondary)' }}>
+                No login credentials needed for public dashboard.
+              </p>
             </div>
-            
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <div className="p-2 rounded-lg bg-white/70 dark:bg-black/20 border" style={{ borderColor: 'var(--border)' }}>
-                <p className="font-bold text-amber-900 dark:text-amber-300">👑 Admin (நிர்வாகி)</p>
-                <p className="font-mono text-[11px] text-gray-700 dark:text-gray-300 truncate">murugan.admin@communityfund.in</p>
-                <p className="font-mono text-[11px] text-gray-500">Pass: Admin@1234</p>
-              </div>
+            <Link
+              href="/visitor"
+              className="px-3.5 py-2 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-opacity flex-shrink-0 flex items-center gap-1.5"
+              style={{ backgroundColor: '#064E3B', border: '1px solid #10B981' }}
+            >
+              <span>Direct Open →</span>
+            </Link>
+          </div>
 
-              <div className="p-2 rounded-lg bg-white/70 dark:bg-black/20 border" style={{ borderColor: 'var(--border)' }}>
-                <p className="font-bold text-emerald-900 dark:text-emerald-300">🙏 Devotee (பக்தர்)</p>
-                <p className="font-mono text-[11px] text-gray-700 dark:text-gray-300 truncate">anbu.durai@gmail.com</p>
-                <p className="font-mono text-[11px] text-gray-500">Pass: Visitor@1234</p>
+          {/* Admin Credentials Helper */}
+          <div className="rounded-xl p-3 border space-y-2" style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: 'var(--gold)' }}>
+                <KeyRound size={14} /> Admin Credentials • நிர்வாகி விவரம்
               </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300">
+                Admin Only
+              </span>
             </div>
-
-            {/* Quick 1-Click login buttons */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('admin')}
-                className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-white font-bold text-xs shadow-sm hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
-              >
-                <ShieldCheck size={14} /> 1-Click Admin
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickLogin('visitor')}
-                className="flex items-center justify-center gap-1.5 py-2 px-2 rounded-lg text-white font-bold text-xs shadow-sm hover:opacity-90 transition-opacity"
-                style={{ backgroundColor: '#064E3B', border: '1px solid #10B981' }}
-              >
-                <UserCheck size={14} /> 1-Click Devotee
-              </button>
+            <div className="text-xs font-mono text-stone-700 dark:text-stone-300 bg-white/70 dark:bg-black/20 p-2 rounded-lg border flex flex-col sm:flex-row justify-between sm:items-center gap-1" style={{ borderColor: 'var(--border)' }}>
+              <span className="truncate font-semibold">murugan.admin@communityfund.in</span>
+              <span className="text-[11px] text-stone-500 font-sans">Pass: Admin@1234</span>
             </div>
+            <button
+              type="button"
+              onClick={handleQuickAdminLogin}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-white font-bold text-xs shadow-sm hover:opacity-90 transition-opacity w-full cursor-pointer"
+              style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+            >
+              <ShieldCheck size={14} /> 1-Click Admin Login • உடனடி நிர்வாகி உள்நுழைவு
+            </button>
           </div>
 
           {error && (
@@ -202,16 +201,23 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 rounded-xl text-white font-bold text-sm transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 shadow-md"
+              className="w-full py-3 rounded-xl text-white font-bold text-sm transition-opacity hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2 shadow-md cursor-pointer"
               style={{ backgroundColor: '#851D1D', border: '1px solid #F59E0B' }}
             >
               {isLoading && <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />}
-              {isLoading ? 'Signing in...' : 'Sign In • உள்நுழை'}
+              {isLoading ? 'Signing in as Admin...' : 'Sign In as Admin • நிர்வாகியாக உள்நுழை'}
             </button>
           </form>
 
-          <div className="text-center pt-1">
-            <Link href="/forgot-password" className="text-xs font-semibold hover:underline" style={{ color: 'var(--primary)' }}>
+          <div className="text-center pt-2 flex flex-col items-center gap-2">
+            <Link
+              href="/visitor"
+              className="text-xs font-bold hover:underline flex items-center gap-1"
+              style={{ color: 'var(--primary)' }}
+            >
+              ← Directly Open Public Devotee Dashboard • நேரடி தளம்
+            </Link>
+            <Link href="/forgot-password" className="text-[11px] font-semibold hover:underline" style={{ color: 'var(--text-tertiary)' }}>
               Forgot Password? • கடவுச்சொல் மறந்துவிட்டதா?
             </Link>
           </div>

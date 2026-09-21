@@ -23,13 +23,22 @@ export default function LandingPage() {
               </div>
             </div>
           </div>
-          <Link
-            href="/login"
-            className="px-6 py-2 rounded-full text-white font-bold text-sm transition-opacity hover:opacity-90 shadow-sm"
-            style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
-          >
-            Sign In • உள்நுழை
-          </Link>
+          <div className="flex items-center gap-2.5">
+            <Link
+              href="/visitor"
+              className="px-5 py-2 rounded-full text-white font-bold text-xs sm:text-sm transition-opacity hover:opacity-90 shadow-sm"
+              style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+            >
+              Open Dashboard • டாஷ்போர்ட்
+            </Link>
+            <Link
+              href="/login"
+              className="px-3.5 py-2 rounded-full font-bold text-xs transition-opacity hover:opacity-90 border"
+              style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
+            >
+              Admin • நிர்வாகி
+            </Link>
+          </div>
         </div>
       </nav>
 
@@ -50,13 +59,21 @@ export default function LandingPage() {
         <p className="text-lg mb-10" style={{ color: 'var(--text-secondary)' }}>
           Tirupati Balaji Devotees Financial Seva & Accounting • திருப்பதி பாலாஜி பக்தர்கள் ஆன்மீக நிதி சேவை
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-3.5 justify-center items-center">
           <Link
-            href="/login"
-            className="px-8 py-4 rounded-xl text-white font-bold text-lg transition-opacity hover:opacity-90 shadow-lg"
+            href="/visitor"
+            className="w-full sm:w-auto px-8 py-4 rounded-xl text-white font-bold text-lg transition-all hover:opacity-90 shadow-lg flex items-center justify-center gap-2"
             style={{ backgroundColor: 'var(--primary)', border: '2px solid #F59E0B' }}
           >
-            Sign In to Dashboard • டாஷ்போர்ட் செல்ல
+            <span>Directly Open Dashboard • நேரடி டாஷ்போர்ட்</span>
+            <span>→</span>
+          </Link>
+          <Link
+            href="/login"
+            className="w-full sm:w-auto px-6 py-4 rounded-xl font-bold text-base transition-all hover:bg-black/5 dark:hover:bg-white/5 border flex items-center justify-center gap-2"
+            style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
+          >
+            <span>👑 Admin Login • நிர்வாகி உள்நுழைவு</span>
           </Link>
         </div>
       </section>

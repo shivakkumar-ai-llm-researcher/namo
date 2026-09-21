@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 import { LogOut, User, Shield, Phone, Mail } from 'lucide-react';
 import { Card, Button } from '@/components/ui';
@@ -11,7 +11,7 @@ export default function ProfilePage() {
 
   const handleSignOut = async () => {
     await signOut();
-    router.replace('/login');
+    router.replace('/visitor');
   };
 
   return (
@@ -62,14 +62,25 @@ export default function ProfilePage() {
         </div>
       </Card>
 
-      <Button
-        variant="danger"
-        fullWidth
-        onClick={handleSignOut}
-        leftIcon={<LogOut size={16} />}
-      >
-        Sign Out from Srivari Fund
-      </Button>
+      {user ? (
+        <Button
+          variant="danger"
+          fullWidth
+          onClick={handleSignOut}
+          leftIcon={<LogOut size={16} />}
+        >
+          Sign Out • வெளியேறு
+        </Button>
+      ) : (
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={() => router.push('/login')}
+          leftIcon={<Shield size={16} />}
+        >
+          Admin Login • நிர்வாகி உள்நுழைவு
+        </Button>
+      )}
     </div>
   );
 }

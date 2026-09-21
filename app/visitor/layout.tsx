@@ -15,6 +15,8 @@ import {
   Menu,
   X,
   ChevronRight,
+  Shield,
+  KeyRound,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
@@ -38,24 +40,12 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  useEffect(() => {
-    if (!isLoading && !user) router.replace('/login');
-  }, [user, isLoading, router]);
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--background)' }}>
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 border-4 rounded-full animate-spin" style={{ borderColor: 'var(--border)', borderTopColor: 'var(--primary)' }} />
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading Devotee Portal...</p>
-        </div>
-      </div>
-    );
-  }
+  // Visitors & devotees can directly open the dashboard without login credentials!
+  // No redirect to /login for visitor layout.
 
   const handleSignOut = async () => {
     await signOut();
-    router.replace('/login');
+    router.replace('/visitor');
   };
 
   const currentTab = navItems.find((item) =>
@@ -115,31 +105,41 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
         })}
       </nav>
 
-      {/* Devotee Info & Sign Out */}
+      {/* Devotee Info & Admin Login / Sign Out */}
       <div className="p-4 border-t" style={{ borderColor: 'var(--border)' }}>
         <div className="flex items-center gap-3 mb-3">
           <div
             className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm flex-shrink-0"
             style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
           >
-            {getInitials(profile?.full_name)}
+            {getInitials(profile?.full_name || 'Devotee')}
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold truncate" style={{ color: 'var(--text-primary)' }}>
               {profile?.full_name || 'Srivari Devotee'}
             </div>
             <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>
-              Member • பக்தர்
+              {user ? (profile?.role === 'admin' ? 'Administrator • நிர்வாகி' : 'Member • பக்தர்') : 'Guest Devotee • நேரடி பார்வை'}
             </div>
           </div>
         </div>
-        <button
-          onClick={handleSignOut}
-          className="flex items-center gap-2 text-sm w-full px-3 py-2 rounded-xl transition-colors hover:bg-red-50 dark:hover:bg-red-950/30"
-          style={{ color: 'var(--error)' }}
-        >
-          <LogOut size={16} /> Sign Out • வெளியேறு
-        </button>
+        {user ? (
+          <button
+            onClick={handleSignOut}
+            className="flex items-center justify-center gap-2 text-xs font-bold w-full px-3 py-2 rounded-xl transition-colors hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
+            style={{ color: 'var(--error)', border: '1px solid var(--border)' }}
+          >
+            <LogOut size={15} /> Sign Out • வெளியேறு
+          </button>
+        ) : (
+          <Link
+            href="/login"
+            className="flex items-center justify-center gap-1.5 text-xs font-bold w-full px-3 py-2 rounded-xl text-white transition-opacity hover:opacity-90 shadow-sm"
+            style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+          >
+            <Shield size={14} /> Admin Login • நிர்வாகி உள்நுழைவு
+          </Link>
+        )}
       </div>
     </div>
   );
@@ -249,7 +249,28 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
             </div>
           </div>
 
-          <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+            {profile?.role === 'admin' ? (
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-all"
+                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+              >
+                <Shield size={13} />
+                <span>Admin Panel →</span>
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-all"
+                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+                title="Administrator Login"
+              >
+                <Shield size={13} />
+                <span className="hidden sm:inline">Admin Login • நிர்வாகி</span>
+                <span className="sm:hidden">Admin</span>
+              </Link>
+            )}
             <ThemeToggle />
           </div>
         </header>
