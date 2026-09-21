@@ -1,75 +1,30 @@
-import React from 'react';
-import { View, Text, ViewStyle } from 'react-native';
-import { useTheme } from '../../theme';
+﻿import { ReactNode } from 'react';
 import { formatCurrency } from '../../utils/formatters';
 
 interface StatCardProps {
   title: string;
   amount: number;
-  subtitle?: string;
-  color?: string;
-  bgColor?: string;
-  icon?: React.ReactNode;
-  style?: ViewStyle;
+  color: string;
+  bgColor: string;
+  icon?: ReactNode;
   compact?: boolean;
+  className?: string;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
-  title,
-  amount,
-  subtitle,
-  color,
-  bgColor,
-  icon,
-  style,
-  compact = false,
-}) => {
-  const { colors, spacing, borderRadius, fontSize, fontWeight, shadow } = useTheme();
-
-  const cardColor = color ?? colors.primary;
-  const cardBg = bgColor ?? colors.primaryLight;
-
+export function StatCard({ title, amount, color, bgColor, icon, compact = false, className = '' }: StatCardProps) {
   return (
-    <View
-      style={[
-        {
-          backgroundColor: colors.surface,
-          borderRadius: borderRadius.lg,
-          padding: compact ? spacing.md : spacing.lg,
-          ...shadow.md,
-          borderLeftWidth: 4,
-          borderLeftColor: cardColor,
-        },
-        style,
-      ]}
-    >
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: colors.textSecondary, fontSize: compact ? fontSize.xs : fontSize.sm, fontWeight: fontWeight.medium, marginBottom: spacing.xs }}>
-            {title}
-          </Text>
-          <Text style={{ color: cardColor, fontSize: compact ? fontSize.xl : fontSize.xxl, fontWeight: fontWeight.bold }}>
-            {formatCurrency(amount)}
-          </Text>
-          {subtitle && (
-            <Text style={{ color: colors.textTertiary, fontSize: fontSize.xs, marginTop: spacing.xs }}>
-              {subtitle}
-            </Text>
-          )}
-        </View>
-        {icon && (
-          <View
-            style={{
-              backgroundColor: cardBg,
-              borderRadius: borderRadius.md,
-              padding: spacing.sm,
-              marginLeft: spacing.sm,
-            }}
-          >
-            {icon}
-          </View>
-        )}
-      </View>
-    </View>
+    <div className={`rounded-xl border p-4 flex items-start gap-3 ${className}`} style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+      {icon && (
+        <div className="rounded-lg p-2 flex-shrink-0" style={{ backgroundColor: bgColor }}>
+          <span style={{ color }}>{icon}</span>
+        </div>
+      )}
+      <div className="min-w-0">
+        <p className="text-xs font-medium truncate" style={{ color: 'var(--text-secondary)' }}>{title}</p>
+        <p className={`font-bold truncate ${compact ? 'text-base' : 'text-xl'}`} style={{ color }}>
+          {formatCurrency(amount)}
+        </p>
+      </div>
+    </div>
   );
-};
+}

@@ -1,25 +1,14 @@
 /**
- * Dynamic Tamil Calendar & Panchangam Calculation Service
+ * Dynamic Tamil Calendar & Panchangam Calculation Service for Web
  * Powered by @ishubhamx/panchangam-js (Swiss Ephemeris astronomical calculations)
- * with AsyncStorage caching for 60fps instant monthly lookups.
- *
- * Features:
- * - Dynamic Tithi, Nakshatra, Paksha, Yoga, Karana, Rahu Kalam
- * - Automatic detection of Ekadashi (twice a month) with sacred names (Vaikunta, Nirjala, etc.)
- * - Automatic detection of Thiruvonam (Shravanam - Perumal Janma Nakshatra)
- * - Automatic detection of Rama Navami, Narasimha Jayanti, Gokulashtami
- * - Special highlight for Purattasi Sani Kiyamai (specifically 2nd Saturday)
- * - 4-Year Gokulaashdami cycle tracking (2025 celebrated, next in 2029)
+ * with localStorage caching for instant monthly lookups.
+ * English & Tamil only.
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  getPanchangam,
-  Observer,
-  tithiNames,
-  nakshatraNames,
-  getEkadashiName,
-} from '@ishubhamx/panchangam-js';
+import { Observer } from 'astronomy-engine';
+import { getPanchangam } from '@ishubhamx/panchangam-js/dist/core/panchangam.js';
+import { tithiNames, nakshatraNames } from '@ishubhamx/panchangam-js/dist/core/constants.js';
+import { getEkadashiName } from '@ishubhamx/panchangam-js/dist/core/festivals.js';
 
 // Tamil Nadu Coordinates (Neyveli / Chennai region: 11.7480 N, 79.4970 E)
 export const TAMIL_NADU_OBSERVER = new Observer(11.7480, 79.4970, 0);
@@ -80,7 +69,7 @@ export const TAMIL_MONTHS = [
   { name: 'Panguni', nameTamil: 'பங்குனி', startMonth: 2, startDay: 14 },
 ];
 
-const CACHE_PREFIX = '@namo_panchangam_v1_';
+const CACHE_PREFIX = 'namo_panchangam_v1_';
 
 export const tamilCalendarService = {
   /**
@@ -132,7 +121,7 @@ export const tamilCalendarService = {
     if (currentYear === 2025) {
       cycleStatusText = 'Celebrated in 2025 (Completed)';
     } else if (currentYear === 2029) {
-      cycleStatusText = '🌟 Grand 4-Year Celebration Year (2029)!';
+      cycleStatusText = 'Grand 4-Year Celebration Year (2029)!';
     } else {
       cycleStatusText = `Celebrated in 2025. Next Grand Celebration is coming in ${nextCelebrationYear} (${yearsRemaining} year${yearsRemaining > 1 ? 's' : ''} to go)`;
     }
@@ -161,7 +150,7 @@ export const tamilCalendarService = {
       {
         year: 2029,
         status: 'next_grand_celebration',
-        description: '⭐ NEXT GRAND CELEBRATION! Quadrennial Gokulaashdami Maha Utsavam.',
+        description: 'NEXT GRAND CELEBRATION! Quadrennial Gokulaashdami Maha Utsavam.',
       },
       {
         year: 2033,
@@ -214,13 +203,13 @@ export const tamilCalendarService = {
           index: saturdayIndex,
           isSecond,
           title: isSecond
-            ? '⭐ 2nd Purattasi Saturday - Annual Community Function'
+            ? '2nd Purattasi Saturday - Annual Community Function'
             : `Purattasi Saturday ${saturdayIndex}`,
           titleTamil: isSecond
-            ? '⭐ புரட்டாசி 2-வது சனிக்கிழமை (ஆண்டு பெருவிழா)'
+            ? 'புரட்டாசி 2-வது சனிக்கிழமை (ஆண்டு பெருவிழா)'
             : `புரட்டாசி ${saturdayIndex}-வது சனிக்கிழமை`,
           description: isSecond
-            ? '🌟 OUR ANNUAL COMMUNITY FUNCTION: Grand Tirupati Balaji Thaligai, Thirumanjanam, Deepam Aradhana & Annadhanam feast. Most auspicious day for Lord Venkateswara!'
+            ? 'OUR ANNUAL COMMUNITY FUNCTION: Grand Tirupati Balaji Thaligai, Thirumanjanam, Deepam Aradhana & Annadhanam feast. Most auspicious day for Lord Venkateswara!'
             : `Purattasi Sani Kizhamai ${saturdayIndex}: Auspicious fasting, Maavilakku Deepam offering, and Perumal pooja.`,
         });
 
@@ -285,7 +274,6 @@ export const tamilCalendarService = {
     }
 
     // 5. Detect Gokulashtami / Sri Krishna Jayanthi
-    // (Ashtami tithi in Avani / Bhadrapada, or detected by library festivals)
     const hasGokulaFestival = raw.festivals?.some(
       (f: any) =>
         f.name?.toLowerCase().includes('krishna') ||
@@ -318,20 +306,20 @@ export const tamilCalendarService = {
     let specialEventDescription: string | undefined;
 
     if (isPurattasiSecondSaturday) {
-      specialEventTitle = '⭐ 2nd Purattasi Saturday - Annual Community Function';
-      specialEventTitleTamil = '⭐ புரட்டாசி 2-வது சனிக்கிழமை (ஆண்டு பெருவிழா)';
+      specialEventTitle = '2nd Purattasi Saturday - Annual Community Function';
+      specialEventTitleTamil = 'புரட்டாசி 2-வது சனிக்கிழமை (ஆண்டு பெருவிழா)';
       specialEventDescription = 'OUR ANNUAL COMMUNITY FUNCTION: Grand Tirupati Balaji Thaligai, Thirumanjanam, Deepam Aradhana & Annadhanam feast. Most auspicious day for Lord Venkateswara!';
     } else if (isPurattasiSaturday) {
       specialEventTitle = `Purattasi Saturday ${purattasiSaturdayIndex ?? ''}`;
       specialEventTitleTamil = `புரட்டாசி ${purattasiSaturdayIndex ?? ''}-வது சனிக்கிழமை`;
       specialEventDescription = 'Auspicious Purattasi Sani Kizhamai: Special Venkateswara fasting, Maavilakku Deepam offering, and Perumal pooja.';
     } else if (isGokulashtami) {
-      specialEventTitle = '🌟 Gokulaashdami (4-Year Cycle Function)';
-      specialEventTitleTamil = '🌟 கோகுலாஷ்டமி (4 ஆண்டு சுழற்சி திருவிழா)';
+      specialEventTitle = 'Gokulaashdami (4-Year Cycle Function)';
+      specialEventTitleTamil = 'கோகுலாஷ்டமி (4 ஆண்டு சுழற்சி திருவிழா)';
       specialEventDescription = 'Celebrated in 2025 • Next Grand Celebration is coming in 2029! Sri Krishna Jayanthi pooja and uri-yadi utsavam.';
     } else if (isVaikuntaEkadashi) {
-      specialEventTitle = '🌟 Vaikunta Ekadashi (Paramapada Vaasal)';
-      specialEventTitleTamil = '🌟 வைகுண்ட ஏகாதசி (சொர்க்கவாசல் திறப்பு)';
+      specialEventTitle = 'Vaikunta Ekadashi (Paramapada Vaasal)';
+      specialEventTitleTamil = 'வைகுண்ட ஏகாதசி (சொர்க்கவாசல் திறப்பு)';
       specialEventDescription = 'The crown jewel festival of Lord Venkateswara. Paramapada Vaasal opens in Tirumala and all Vishnu temples.';
     } else if (isEkadashi) {
       specialEventTitle = `${ekadashiName ?? 'Ekadashi'} Fasting`;
@@ -390,19 +378,21 @@ export const tamilCalendarService = {
 
   /**
    * Compute and cache all days of a month dynamically.
-   * Checks AsyncStorage first; if found, returns instantly.
+   * Checks localStorage first; if found, returns instantly.
    */
   async getMonthPanchangam(yearMonth: string, observer = TAMIL_NADU_OBSERVER): Promise<Record<string, DailyPanchangamData>> {
     const cacheKey = `${CACHE_PREFIX}${yearMonth}`;
 
-    // 1. Try reading from AsyncStorage cache
-    try {
-      const cached = await AsyncStorage.getItem(cacheKey);
-      if (cached) {
-        return JSON.parse(cached);
+    // 1. Try reading from localStorage cache
+    if (typeof window !== 'undefined') {
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          return JSON.parse(cached);
+        }
+      } catch (e) {
+        console.warn('Panchangam cache read failed:', e);
       }
-    } catch (e) {
-      console.warn('Panchangam cache read failed:', e);
     }
 
     // 2. Compute dynamically for each day of the month
@@ -419,11 +409,13 @@ export const tamilCalendarService = {
       monthMap[dayData.date] = dayData;
     }
 
-    // 3. Cache to AsyncStorage for instant subsequent loads
-    try {
-      await AsyncStorage.setItem(cacheKey, JSON.stringify(monthMap));
-    } catch (e) {
-      console.warn('Panchangam cache write failed:', e);
+    // 3. Cache to localStorage for instant subsequent loads
+    if (typeof window !== 'undefined') {
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(monthMap));
+      } catch (e) {
+        console.warn('Panchangam cache write failed:', e);
+      }
     }
 
     return monthMap;

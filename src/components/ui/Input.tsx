@@ -1,98 +1,31 @@
-﻿import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  TextInputProps,
-  ViewStyle,
-  StyleSheet,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTheme } from '../../theme';
+﻿'use client';
+import { InputHTMLAttributes, ReactNode, forwardRef } from 'react';
 
-interface InputProps extends TextInputProps {
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  hint?: string;
-  leftIcon?: React.ReactNode;
-  rightIcon?: React.ReactNode;
-  containerStyle?: ViewStyle;
+  leftIcon?: ReactNode;
   required?: boolean;
-  isPassword?: boolean;
 }
 
-export const Input: React.FC<InputProps> = ({
-  label,
-  error,
-  hint,
-  leftIcon,
-  rightIcon,
-  containerStyle,
-  required,
-  isPassword,
-  style,
-  ...props
-}) => {
-  const { colors, spacing, borderRadius, fontSize, fontWeight } = useTheme();
-  const [focused, setFocused] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-
-  const borderColor = error ? colors.error : focused ? colors.borderFocus : colors.border;
-
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ label, error, leftIcon, required, className = '', ...props }, ref) {
   return (
-    <View style={[{ marginBottom: spacing.md }, containerStyle]}>
+    <div className="flex flex-col gap-1 mb-4">
       {label && (
-        <Text style={{ color: colors.textSecondary, fontSize: fontSize.sm, fontWeight: fontWeight.medium, marginBottom: spacing.xs }}>
-          {label}{required && <Text style={{ color: colors.error }}> *</Text>}
-        </Text>
+        <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+          {label}{required && <span className="text-red-500 ml-0.5">*</span>}
+        </label>
       )}
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: colors.surface,
-          borderRadius: borderRadius.md,
-          borderWidth: 1.5,
-          borderColor,
-          paddingHorizontal: spacing.md,
-          minHeight: 48,
-        }}
-      >
-        {leftIcon && <View style={{ marginRight: spacing.sm }}>{leftIcon}</View>}
-        <TextInput
+      <div className="relative">
+        {leftIcon && <span className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }}>{leftIcon}</span>}
+        <input
+          ref={ref}
           {...props}
-          secureTextEntry={isPassword && !showPassword}
-          onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
-          onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
-          style={[
-            {
-              flex: 1,
-              color: colors.textPrimary,
-              fontSize: fontSize.md,
-              paddingVertical: spacing.sm,
-            },
-            style,
-          ]}
-          placeholderTextColor={colors.textTertiary}
+          style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)', borderColor: error ? 'var(--error)' : 'var(--border)', borderRadius: 10, ...props.style }}
+          className={`w-full border px-3 py-2.5 text-sm outline-none focus:ring-2 focus:ring-amber-500 ${leftIcon ? 'pl-10' : ''} ${className}`}
         />
-        {isPassword && (
-          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-            <Ionicons
-              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
-              size={20}
-              color={colors.textTertiary}
-            />
-          </TouchableOpacity>
-        )}
-        {!isPassword && rightIcon && <View style={{ marginLeft: spacing.sm }}>{rightIcon}</View>}
-      </View>
-      {error && (
-        <Text style={{ color: colors.error, fontSize: fontSize.xs, marginTop: spacing.xs }}>{error}</Text>
-      )}
-      {hint && !error && (
-        <Text style={{ color: colors.textTertiary, fontSize: fontSize.xs, marginTop: spacing.xs }}>{hint}</Text>
-      )}
-    </View>
+      </div>
+      {error && <span className="text-xs" style={{ color: 'var(--error)' }}>{error}</span>}
+    </div>
   );
-};
+});

@@ -1,46 +1,23 @@
-﻿import React from 'react';
-import { View, Text, ViewStyle } from 'react-native';
-import { useTheme } from '../../theme';
-
-type BadgeVariant = 'success' | 'warning' | 'error' | 'info' | 'default' | 'primary';
-
-interface BadgeProps {
+﻿interface BadgeProps {
   label: string;
-  variant?: BadgeVariant;
-  style?: ViewStyle;
+  variant?: 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info' | 'gold';
   size?: 'sm' | 'md';
 }
 
-export const Badge: React.FC<BadgeProps> = ({ label, variant = 'default', style, size = 'md' }) => {
-  const { colors, spacing, borderRadius, fontSize } = useTheme();
-
-  const variantColors: Record<BadgeVariant, { bg: string; text: string }> = {
-    success: { bg: colors.successLight, text: colors.success },
-    warning: { bg: colors.warningLight, text: colors.warning },
-    error: { bg: colors.errorLight, text: colors.error },
-    info: { bg: colors.infoLight, text: colors.info },
-    primary: { bg: colors.primaryLight, text: colors.primary },
-    default: { bg: colors.surfaceVariant, text: colors.textSecondary },
+export function Badge({ label, variant = 'default', size = 'md' }: BadgeProps) {
+  const styles = {
+    default: { backgroundColor: 'var(--surface-variant)', color: 'var(--text-secondary)' },
+    primary: { backgroundColor: 'var(--primary-light)', color: 'var(--primary)' },
+    success: { backgroundColor: 'var(--success-light)', color: 'var(--success)' },
+    warning: { backgroundColor: 'var(--warning-light)', color: 'var(--savings)' },
+    error: { backgroundColor: 'var(--error-light)', color: 'var(--error)' },
+    info: { backgroundColor: '#F0F9FF', color: '#0369A1' },
+    gold: { backgroundColor: '#FEF3C7', color: '#B45309' },
   };
-
-  const vc = variantColors[variant];
-
+  const sizes = { sm: 'text-[10px] px-2 py-0.5', md: 'text-xs px-2.5 py-1' };
   return (
-    <View
-      style={[
-        {
-          backgroundColor: vc.bg,
-          borderRadius: borderRadius.full,
-          paddingHorizontal: size === 'sm' ? spacing.sm : spacing.md,
-          paddingVertical: size === 'sm' ? 2 : spacing.xs,
-          alignSelf: 'flex-start',
-        },
-        style,
-      ]}
-    >
-      <Text style={{ color: vc.text, fontSize: size === 'sm' ? fontSize.xs : fontSize.sm, fontWeight: '600' }}>
-        {label}
-      </Text>
-    </View>
+    <span className={`inline-flex items-center rounded-full font-semibold ${sizes[size]}`} style={styles[variant]}>
+      {label}
+    </span>
   );
-};
+}

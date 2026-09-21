@@ -1,15 +1,16 @@
+'use client';
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '../../theme';
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+  Gift,
+  CheckCircle2,
+  CalendarDays,
+  Star,
+  Clock,
+  Flame,
+} from 'lucide-react';
 import { Card, Badge } from '../ui';
 import { BalajiNamam } from '../ui/BalajiNamam';
 import {
@@ -42,9 +43,6 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
   functions = [],
   onSelectFunction,
 }) => {
-  const { t } = useTranslation();
-  const { colors, spacing, borderRadius, fontSize, fontWeight, isDark } = useTheme();
-
   const today = useMemo(() => {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -84,7 +82,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     setSelectedDate(today);
   };
 
-  // 1. Fetch dynamic panchangam data for visible month (with AsyncStorage caching)
+  // 1. Fetch dynamic panchangam data for visible month (with localStorage caching)
   useEffect(() => {
     let isMounted = true;
     async function loadMonth() {
@@ -111,12 +109,20 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
 
   // 2. 4-Year Gokulaashdami cycle information
   const gokulashtamiCycle = useMemo(() => {
-    return tamilCalendarService.getGokulashtamiCycleInfo(selectedYear);
+    try {
+      return tamilCalendarService.getGokulashtamiCycleInfo(selectedYear);
+    } catch {
+      return null;
+    }
   }, [selectedYear]);
 
   // 3. Purattasi Saturdays for the year
   const purattasiSaturdays = useMemo(() => {
-    return tamilCalendarService.getPurattasiSaturdays(selectedYear);
+    try {
+      return tamilCalendarService.getPurattasiSaturdays(selectedYear);
+    } catch {
+      return [];
+    }
   }, [selectedYear]);
 
   // 4. Identify the 2nd Saturday of Purattasi
@@ -129,9 +135,14 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     if (monthData[selectedDate]) {
       return monthData[selectedDate];
     }
-    const d = new Date(selectedDate);
-    if (isNaN(d.getTime())) return null;
-    return tamilCalendarService.computeDayPanchangam(d);
+    try {
+      const d = new Date(selectedDate);
+      if (isNaN(d.getTime())) return null;
+      return tamilCalendarService.computeDayPanchangam(d);
+    } catch (e) {
+      console.warn('Failed to compute selected day panchangam:', e);
+      return null;
+    }
   }, [monthData, selectedDate]);
 
   // 6. Special days list for the visible month
@@ -228,511 +239,487 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
 
   // Current primary Tamil month active
   const primaryTamilMonth = useMemo(() => {
-    const midDate = `${currentYearMonth}-15`;
-    if (monthData[midDate]) {
-      return `${monthData[midDate].tamilMonthTamil} மாதம் (${monthData[midDate].tamilMonth})`;
+    try {
+      const midDate = `${currentYearMonth}-15`;
+      if (monthData[midDate]) {
+        return `${monthData[midDate].tamilMonthTamil} மாதம் (${monthData[midDate].tamilMonth})`;
+      }
+      const tDate = tamilCalendarService.getTamilDate(new Date(selectedYear, selectedMonthNum - 1, 15));
+      return `${tDate.tamilMonthTamil} மாதம் (${tDate.tamilMonth})`;
+    } catch {
+      return '';
     }
-    const tDate = tamilCalendarService.getTamilDate(new Date(selectedYear, selectedMonthNum - 1, 15));
-    return `${tDate.tamilMonthTamil} மாதம் (${tDate.tamilMonth})`;
   }, [currentYearMonth, monthData, selectedYear, selectedMonthNum]);
 
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 60 }} showsVerticalScrollIndicator={false}>
+    <div className="space-y-6">
       {/* 1. Sacred Purattasi 2nd Saturday Special Feature Banner */}
-      <View style={{ marginHorizontal: spacing.lg, marginTop: spacing.md }}>
-        <Card
-          variant="default"
-          style={{
-            backgroundColor: colors.primary,
-            borderColor: '#F59E0B',
-            borderWidth: 2,
-            padding: spacing.md,
-            overflow: 'hidden',
-          }}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: 6 }}>
-            <BalajiNamam size={26} variant="colored" />
-            <View style={{ flex: 1 }}>
-              <Badge
-                label="ANNUAL COMMUNITY FUNCTION • ஆண்டு பெருவிழா"
-                variant="warning"
-                size="sm"
-                style={{ alignSelf: 'flex-start', backgroundColor: '#F59E0B' }}
-              />
-            </View>
-          </View>
-
-          <Text style={{ color: '#FFFFFF', fontSize: fontSize.lg, fontWeight: fontWeight.bold, marginTop: 2 }}>
-            Purattasi Sani Kiyamai (2nd Saturday)
-          </Text>
-          <Text style={{ color: '#FDE68A', fontSize: fontSize.xs, fontWeight: fontWeight.semibold, marginTop: 2 }}>
-            புரட்டாசி 2-வது சனிக்கிழமை ஆண்டு பெருவிழா
-          </Text>
-
-          <View
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.25)',
-              padding: spacing.sm,
-              borderRadius: borderRadius.sm,
-              marginTop: spacing.sm,
-              borderLeftWidth: 3,
-              borderLeftColor: '#F59E0B',
-            }}
+      <div
+        className="rounded-2xl p-5 text-white relative overflow-hidden shadow-lg border-2"
+        style={{
+          backgroundColor: '#851D1D',
+          borderColor: '#F59E0B',
+        }}
+      >
+        <div className="flex flex-wrap items-center gap-3 mb-3">
+          <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-black/20 border border-yellow-400">
+            <BalajiNamam size={26} />
+          </div>
+          <span
+            className="inline-flex items-center rounded-full text-xs font-bold px-3 py-1 text-stone-900"
+            style={{ backgroundColor: '#F59E0B' }}
           >
-            <Text style={{ color: '#FFFFFF', fontSize: fontSize.sm, fontWeight: fontWeight.bold }}>
-              {secondSaturday
-                ? `📅 ${new Date(secondSaturday.date).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}`
-                : `📅 2nd Saturday of Purattasi Month`}
-            </Text>
-            <Text style={{ color: '#FEF3C7', fontSize: fontSize.xs, marginTop: 2 }}>
-              Tamil Date: புரட்டாசி சனிக்கிழமை • Sri Venkateswara Perumal Maha Utsavam
-            </Text>
-          </View>
+            ANNUAL COMMUNITY FUNCTION • ஆண்டு பெருவிழா
+          </span>
+        </div>
 
-          <Text style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: fontSize.xs, marginTop: spacing.sm, lineHeight: 18 }}>
-            Special Thirumanjanam, Thaligai, Maavilakku Deepam, and Grand Annadhanam will be celebrated by our community.
-          </Text>
-        </Card>
-      </View>
+        <h2 className="text-xl font-bold text-white">
+          Purattasi Sani Kiyamai (2nd Saturday)
+        </h2>
+        <p className="text-xs font-semibold text-amber-200 mt-0.5">
+          புரட்டாசி 2-வது சனிக்கிழமை ஆண்டு பெருவிழா
+        </p>
+
+        <div className="bg-black/30 rounded-xl p-3.5 mt-3 border-l-4 border-amber-500">
+          <p className="text-sm font-bold text-white flex items-center gap-2">
+            <CalendarDays className="w-4 h-4 text-amber-400" />
+            {secondSaturday
+              ? new Date(secondSaturday.date).toLocaleDateString('en-IN', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })
+              : '2nd Saturday of Purattasi Month'}
+          </p>
+          <p className="text-xs text-amber-100 mt-1">
+            Tamil Date: புரட்டாசி சனிக்கிழமை • Sri Venkateswara Perumal Maha Utsavam
+          </p>
+        </div>
+
+        <p className="text-xs text-white/90 mt-3 leading-relaxed">
+          Special Thirumanjanam, Thaligai, Maavilakku Deepam, and Grand Annadhanam will be celebrated by our community.
+        </p>
+      </div>
 
       {/* 2. 4-Year Gokulaashdami Special Cycle Banner */}
-      <View style={{ marginHorizontal: spacing.lg, marginTop: spacing.md }}>
-        <Card
-          variant="default"
-          style={{
-            backgroundColor: isDark ? '#1C271E' : '#ECFDF5',
-            borderColor: '#10B981',
-            borderWidth: 1.5,
-            padding: spacing.md,
-          }}
-        >
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="gift-outline" size={18} color="#059669" />
-              <Text style={{ color: isDark ? '#A7F3D0' : '#065F46', fontSize: fontSize.sm, fontWeight: fontWeight.bold }}>
-                4-YEAR FUNCTION: GOKULAASHDAMI
-              </Text>
-            </View>
-            <Badge label="QUADRENNIAL" variant="success" size="sm" />
-          </View>
+      <div
+        className="rounded-2xl p-5 border shadow-sm transition-colors"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: '#10B981',
+          borderWidth: '1.5px',
+        }}
+      >
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <Gift className="w-5 h-5 text-emerald-600" />
+            <h3 className="text-sm font-bold text-emerald-700 dark:text-emerald-400 uppercase tracking-wide">
+              4-Year Function: Gokulaashdami
+            </h3>
+          </div>
+          <Badge label="QUADRENNIAL" variant="success" size="sm" />
+        </div>
 
-          <Text style={{ color: colors.textPrimary, fontSize: fontSize.md, fontWeight: fontWeight.bold, marginTop: 4 }}>
-            கோகுலாஷ்டமி 4 வருடத்திற்கு ஒருமுறை பெருவிழா
-          </Text>
+        <p className="text-base font-bold mt-1" style={{ color: 'var(--text-primary)' }}>
+          கோகுலாஷ்டமி 4 வருடத்திற்கு ஒருமுறை பெருவிழா
+        </p>
 
-          <View style={{ marginTop: spacing.sm, backgroundColor: isDark ? '#152E20' : '#DCFCE7', padding: spacing.sm, borderRadius: borderRadius.sm }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              <Ionicons name="checkmark-circle" size={16} color="#15803D" />
-              <Text style={{ color: isDark ? '#FEF3C7' : '#92400E', fontSize: fontSize.xs, fontWeight: fontWeight.bold }}>
-                Celebrated in 2025 (Completed)
-              </Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
-              <Ionicons name="sparkles" size={16} color="#D97706" />
-              <Text style={{ color: isDark ? '#FDE68A' : '#B45309', fontSize: fontSize.xs, fontWeight: fontWeight.bold }}>
-                🌟 Next Grand Celebration is coming in 2029!
-              </Text>
-            </View>
-          </View>
+        <div className="mt-3 p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 space-y-2">
+          <div className="flex items-center gap-2 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>Celebrated in 2025 (Completed)</span>
+          </div>
+          <div className="flex items-center gap-2 text-xs font-bold text-amber-700 dark:text-amber-300">
+            <Sparkles className="w-4 h-4 text-amber-500 flex-shrink-0" />
+            <span>🌟 Next Grand Celebration is coming in 2029!</span>
+          </div>
+        </div>
 
-          {/* 4-Year Stepper Timeline */}
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: spacing.md, paddingHorizontal: 4 }}>
-            {[
-              { yr: 2025, label: 'Celebrated', isPast: true },
-              { yr: 2026, label: 'Year 1 (Active)', isCurrent: selectedYear === 2026 },
-              { yr: 2027, label: 'Year 2', isFuture: true },
-              { yr: 2028, label: 'Year 3', isFuture: true },
-              { yr: 2029, label: 'Next Festival!', isTarget: true },
-            ].map((step) => (
-              <View key={step.yr} style={{ alignItems: 'center', flex: 1 }}>
-                <View
-                  style={{
-                    width: 28,
-                    height: 28,
-                    borderRadius: 14,
-                    backgroundColor: step.isPast
-                      ? '#15803D'
-                      : step.isTarget
-                      ? '#D97706'
-                      : step.isCurrent
-                      ? colors.primary
-                      : colors.surfaceVariant,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    borderWidth: 2,
-                    borderColor: step.isTarget ? '#F59E0B' : 'transparent',
-                  }}
-                >
-                  <Text style={{ color: '#FFFFFF', fontSize: 10, fontWeight: '700' }}>
-                    {String(step.yr).substring(2)}
-                  </Text>
-                </View>
-                <Text
-                  style={{
-                    color: step.isTarget ? '#D97706' : colors.textSecondary,
-                    fontSize: 9,
-                    fontWeight: step.isTarget || step.isCurrent ? '700' : '400',
-                    marginTop: 3,
-                    textAlign: 'center',
-                  }}
-                >
-                  {step.yr}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </Card>
-      </View>
-
-      {/* 3. Bespoke Native Tamil Calendar Grid */}
-      <View style={{ marginHorizontal: spacing.lg, marginTop: spacing.md }}>
-        <Card variant="default" style={{ padding: 0, overflow: 'hidden', borderWidth: 1.5, borderColor: colors.border }}>
-          {/* Calendar Month Navigation Header */}
-          <View
-            style={{
-              paddingVertical: spacing.sm + 2,
-              paddingHorizontal: spacing.md,
-              backgroundColor: isDark ? '#2E2218' : '#F7EFE0',
-              borderBottomWidth: 1,
-              borderBottomColor: colors.border,
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-            }}
-          >
-            <TouchableOpacity
-              onPress={handlePrevMonth}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              style={{ padding: 4 }}
-            >
-              <Ionicons name="chevron-back" size={22} color={colors.primary} />
-            </TouchableOpacity>
-
-            <View style={{ alignItems: 'center' }}>
-              <Text style={{ color: colors.primary, fontSize: fontSize.md, fontWeight: fontWeight.bold }}>
-                {MONTH_NAMES_EN[selectedMonthNum - 1]} {selectedYear}
-              </Text>
-              <Text style={{ color: '#D97706', fontSize: fontSize.xs, fontWeight: fontWeight.semibold, marginTop: 1 }}>
-                {primaryTamilMonth}
-              </Text>
-            </View>
-
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.xs }}>
-              <TouchableOpacity
-                onPress={handleToday}
+        {/* 4-Year Stepper Timeline */}
+        <div className="flex items-center justify-between mt-4 px-2">
+          {[
+            { yr: 2025, label: 'Celebrated', isPast: true },
+            { yr: 2026, label: 'Year 1 (Active)', isCurrent: selectedYear === 2026 },
+            { yr: 2027, label: 'Year 2', isFuture: true },
+            { yr: 2028, label: 'Year 3', isFuture: true },
+            { yr: 2029, label: 'Next Festival!', isTarget: true },
+          ].map((step) => (
+            <div key={step.yr} className="flex flex-col items-center flex-1">
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all"
                 style={{
-                  paddingHorizontal: 8,
-                  paddingVertical: 3,
-                  borderRadius: borderRadius.sm,
-                  backgroundColor: colors.surface,
-                  borderWidth: 1,
-                  borderColor: colors.border,
+                  backgroundColor: step.isPast
+                    ? '#15803D'
+                    : step.isTarget
+                    ? '#D97706'
+                    : step.isCurrent
+                    ? 'var(--primary)'
+                    : 'var(--surface-variant)',
+                  color: step.isPast || step.isTarget || step.isCurrent ? '#FFFFFF' : 'var(--text-secondary)',
+                  border: step.isTarget ? '2px solid #F59E0B' : 'none',
                 }}
               >
-                <Text style={{ color: colors.primary, fontSize: 10, fontWeight: '700' }}>Today</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={handleNextMonth}
-                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-                style={{ padding: 4 }}
+                {String(step.yr).substring(2)}
+              </div>
+              <span
+                className="text-[10px] mt-1 text-center font-medium leading-tight"
+                style={{
+                  color: step.isTarget ? '#D97706' : 'var(--text-secondary)',
+                  fontWeight: step.isTarget || step.isCurrent ? 700 : 400,
+                }}
               >
-                <Ionicons name="chevron-forward" size={22} color={colors.primary} />
-              </TouchableOpacity>
-            </View>
-          </View>
+                {step.yr}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
 
-          {/* Weekday Labels Header */}
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: isDark ? '#1E293B' : '#F8FAFC',
-              borderBottomWidth: 1,
-              borderBottomColor: colors.border,
-              paddingVertical: 8,
-            }}
+      {/* 3. Bespoke Native Tamil Calendar Grid */}
+      <div
+        className="rounded-2xl border overflow-hidden shadow-sm"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        {/* Calendar Month Navigation Header */}
+        <div
+          className="px-4 py-3 flex items-center justify-between border-b"
+          style={{
+            backgroundColor: 'var(--surface-variant)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          <button
+            onClick={handlePrevMonth}
+            className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            style={{ color: 'var(--primary)' }}
+            aria-label="Previous Month"
           >
-            {WEEKDAYS.map((w, idx) => (
-              <View key={w.en} style={{ flex: 1, alignItems: 'center' }}>
-                <Text
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          <div className="text-center">
+            <h3 className="text-base font-bold" style={{ color: 'var(--primary)' }}>
+              {MONTH_NAMES_EN[selectedMonthNum - 1]} {selectedYear}
+            </h3>
+            <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
+              {primaryTamilMonth}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={handleToday}
+              className="px-3 py-1 rounded-lg text-xs font-bold border transition-colors hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+                color: 'var(--primary)',
+              }}
+            >
+              Today
+            </button>
+            <button
+              onClick={handleNextMonth}
+              className="p-2 rounded-lg hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              style={{ color: 'var(--primary)' }}
+              aria-label="Next Month"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+
+        {/* Weekday Labels Header */}
+        <div
+          className="grid grid-cols-7 border-b py-2 text-center text-xs font-bold"
+          style={{
+            backgroundColor: 'var(--surface-variant)',
+            borderColor: 'var(--border)',
+          }}
+        >
+          {WEEKDAYS.map((w, idx) => (
+            <div key={w.en} className="flex flex-col items-center">
+              <span style={{ color: idx === 6 ? '#D97706' : 'var(--text-secondary)' }}>
+                {w.en}
+              </span>
+              <span
+                className="text-[10px] mt-0.5"
+                style={{ color: idx === 6 ? '#D97706' : 'var(--text-tertiary)' }}
+              >
+                {w.ta}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Days Grid */}
+        <div className="p-2 grid grid-cols-7 gap-1">
+          {calendarGrid.map((cell, idx) => {
+            const isSelected = cell.dateStr === selectedDate;
+            const isToday = cell.dateStr === today;
+            const isSecondSat = cell.isSecondSat;
+            const isPurattasiSat = cell.isPurattasiSat;
+            const isGokula = cell.isGokula;
+            const isEkadashi = cell.isEkadashi;
+            const isSpecial = cell.isSpecial;
+
+            if (!cell.isCurrentMonth) {
+              return (
+                <div
+                  key={cell.dateStr + '-' + idx}
+                  className="aspect-square flex items-center justify-center opacity-25 text-xs select-none"
+                  style={{ color: 'var(--text-tertiary)' }}
+                >
+                  {cell.dayNumber}
+                </div>
+              );
+            }
+
+            // Cell styling
+            let cellBg = 'transparent';
+            let textColor = 'var(--text-primary)';
+            if (isSelected) {
+              cellBg = isSecondSat ? '#851D1D' : 'var(--primary)';
+              textColor = '#FFFFFF';
+            } else if (isSecondSat) {
+              cellBg = 'rgba(217, 119, 6, 0.15)';
+            } else if (isGokula) {
+              cellBg = 'rgba(16, 185, 129, 0.15)';
+            }
+
+            return (
+              <button
+                key={cell.dateStr}
+                onClick={() => setSelectedDate(cell.dateStr)}
+                className="aspect-square rounded-xl flex flex-col items-center justify-center p-1 transition-all relative border cursor-pointer"
+                style={{
+                  backgroundColor: cellBg,
+                  borderColor: isToday && !isSelected
+                    ? 'var(--primary)'
+                    : isSecondSat
+                    ? '#F59E0B'
+                    : isGokula
+                    ? '#10B981'
+                    : isSelected
+                    ? 'var(--primary)'
+                    : 'transparent',
+                  borderWidth: isToday || isSecondSat || isGokula || isSelected ? '1.5px' : '1px',
+                }}
+              >
+                {/* Gregorian Day */}
+                <span
+                  className="text-xs md:text-sm leading-tight"
                   style={{
-                    color: idx === 6 ? '#D97706' : colors.textSecondary,
-                    fontSize: 11,
-                    fontWeight: '700',
+                    color: textColor,
+                    fontWeight: isSelected || cell.isSaturday || isSpecial ? 700 : 500,
                   }}
                 >
-                  {w.en}
-                </Text>
-                <Text
-                  style={{
-                    color: idx === 6 ? '#D97706' : colors.textTertiary,
-                    fontSize: 9,
-                    marginTop: 1,
-                  }}
-                >
-                  {w.ta}
-                </Text>
-              </View>
-            ))}
-          </View>
+                  {cell.dayNumber}
+                </span>
 
-          {/* Days Grid */}
-          <View style={{ padding: 6 }}>
-            {Array.from({ length: Math.ceil(calendarGrid.length / 7) }).map((_, rowIndex) => (
-              <View key={`row-${rowIndex}`} style={{ flexDirection: 'row', marginBottom: 4 }}>
-                {calendarGrid.slice(rowIndex * 7, rowIndex * 7 + 7).map((cell) => {
-                  const isSelected = cell.dateStr === selectedDate;
-                  const isToday = cell.dateStr === today;
-                  const isSecondSat = cell.isSecondSat;
-                  const isPurattasiSat = cell.isPurattasiSat;
-                  const isGokula = cell.isGokula;
-                  const isEkadashi = cell.isEkadashi;
-                  const isSpecial = cell.isSpecial;
+                {/* Tamil Solar Day */}
+                {cell.tamilDay && (
+                  <span
+                    className="text-[9px] font-semibold leading-tight mt-0.5"
+                    style={{
+                      color: isSelected
+                        ? '#FEF3C7'
+                        : isSecondSat
+                        ? '#B45309'
+                        : 'var(--text-tertiary)',
+                    }}
+                  >
+                    {cell.tamilDay}
+                  </span>
+                )}
 
-                  if (!cell.isCurrentMonth) {
-                    return (
-                      <View
-                        key={cell.dateStr}
-                        style={{
-                          flex: 1,
-                          aspectRatio: 1,
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          opacity: 0.25,
-                        }}
-                      >
-                        <Text style={{ color: colors.textTertiary, fontSize: 12 }}>
-                          {cell.dayNumber}
-                        </Text>
-                      </View>
-                    );
-                  }
+                {/* Auspicious Dots Row */}
+                <div className="flex items-center gap-0.5 mt-0.5 h-1.5">
+                  {isSecondSat && (
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-sm" />
+                  )}
+                  {!isSecondSat && isPurattasiSat && (
+                    <div className="w-1 h-1 rounded-full bg-amber-600" />
+                  )}
+                  {isGokula && (
+                    <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                  )}
+                  {(isEkadashi || (isSpecial && !isSecondSat && !isPurattasiSat && !isGokula)) && (
+                    <div
+                      className="w-1 h-1 rounded-full"
+                      style={{ backgroundColor: isSelected ? '#FFFFFF' : 'var(--primary)' }}
+                    />
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
 
-                  // Determine cell background
-                  let cellBg = 'transparent';
-                  let textColor = colors.textPrimary;
-                  if (isSelected) {
-                    cellBg = isSecondSat ? '#851D1D' : colors.primary;
-                    textColor = '#FFFFFF';
-                  } else if (isSecondSat) {
-                    cellBg = isDark ? '#3D1717' : '#FEF3C7';
-                  } else if (isGokula) {
-                    cellBg = isDark ? '#102A1C' : '#ECFDF5';
-                  }
-
-                  return (
-                    <TouchableOpacity
-                      key={cell.dateStr}
-                      onPress={() => setSelectedDate(cell.dateStr)}
-                      activeOpacity={0.7}
-                      style={{
-                        flex: 1,
-                        aspectRatio: 1,
-                        borderRadius: borderRadius.md,
-                        backgroundColor: cellBg,
-                        borderWidth: isToday && !isSelected ? 1.5 : 1,
-                        borderColor: isToday && !isSelected
-                          ? colors.primary
-                          : isSecondSat
-                          ? '#F59E0B'
-                          : isGokula
-                          ? '#10B981'
-                          : isSelected
-                          ? colors.primary
-                          : 'transparent',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: 2,
-                        marginHorizontal: 1,
-                      }}
-                    >
-                      {/* Gregorian Day Number */}
-                      <Text
-                        style={{
-                          color: textColor,
-                          fontSize: 13,
-                          fontWeight: isSelected || cell.isSaturday || isSpecial ? '700' : '500',
-                        }}
-                      >
-                        {cell.dayNumber}
-                      </Text>
-
-                      {/* Tamil Solar Day Number */}
-                      {cell.tamilDay ? (
-                        <Text
-                          style={{
-                            color: isSelected
-                              ? '#FEF3C7'
-                              : isSecondSat
-                              ? '#B45309'
-                              : isDark
-                              ? '#94A3B8'
-                              : '#78716C',
-                            fontSize: 9,
-                            fontWeight: '600',
-                            marginTop: -1,
-                          }}
-                        >
-                          {cell.tamilDay}
-                        </Text>
-                      ) : null}
-
-                      {/* Auspicious Dots Row */}
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, marginTop: 1, height: 5 }}>
-                        {isSecondSat && (
-                          <View style={{ width: 5, height: 5, borderRadius: 2.5, backgroundColor: '#F59E0B' }} />
-                        )}
-                        {!isSecondSat && isPurattasiSat && (
-                          <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: '#D97706' }} />
-                        )}
-                        {isGokula && (
-                          <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: '#10B981' }} />
-                        )}
-                        {(isEkadashi || (isSpecial && !isSecondSat && !isPurattasiSat && !isGokula)) && (
-                          <View
-                            style={{
-                              width: 4,
-                              height: 4,
-                              borderRadius: 2,
-                              backgroundColor: isSelected ? '#FFFFFF' : colors.primary,
-                            }}
-                          />
-                        )}
-                      </View>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ))}
-          </View>
-
-          {/* Legend */}
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              paddingVertical: spacing.sm,
-              paddingHorizontal: spacing.md,
-              borderTopWidth: 1,
-              borderTopColor: colors.border,
-              backgroundColor: isDark ? '#1E293B' : '#FFFFFF',
-            }}
-          >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#F59E0B' }} />
-              <Text style={{ color: colors.textSecondary, fontSize: 10 }}>Purattasi 2nd Sat</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: '#10B981' }} />
-              <Text style={{ color: colors.textSecondary, fontSize: 10 }}>Gokulaashdami</Text>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
-              <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.primary }} />
-              <Text style={{ color: colors.textSecondary, fontSize: 10 }}>Ekadashi / Utsavam</Text>
-            </View>
-          </View>
-        </Card>
-      </View>
+        {/* Legend */}
+        <div
+          className="flex flex-wrap items-center justify-around py-2.5 px-4 border-t text-xs"
+          style={{
+            backgroundColor: 'var(--surface-variant)',
+            borderColor: 'var(--border)',
+            color: 'var(--text-secondary)',
+          }}
+        >
+          <div className="flex items-center gap-1.5">
+            <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+            <span>Purattasi 2nd Sat</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Gokulaashdami</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--primary)' }} />
+            <span>Ekadashi / Utsavam</span>
+          </div>
+        </div>
+      </div>
 
       {/* 4. Daily Dynamic Panchangam Card for Selected Date */}
-      <View style={{ marginHorizontal: spacing.lg, marginTop: spacing.md }}>
-        <Card variant="default" padding="md" style={{ borderColor: colors.border, borderWidth: 1 }}>
-          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: colors.textSecondary, fontSize: fontSize.xs }}>Selected Date Panchangam</Text>
-              <Text style={{ color: colors.primary, fontSize: fontSize.lg, fontWeight: fontWeight.bold, marginTop: 2 }}>
-                {new Date(selectedDate).toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-              </Text>
-              {selectedDayInfo && (
-                <Text style={{ color: '#D97706', fontSize: fontSize.sm, fontWeight: fontWeight.semibold, marginTop: 2 }}>
-                  {selectedDayInfo.tamilMonthTamil} {selectedDayInfo.tamilDay} ({selectedDayInfo.tamilMonth})
-                </Text>
-              )}
-            </View>
-            <View style={{ padding: 6, backgroundColor: colors.primaryLight, borderRadius: borderRadius.sm }}>
-              <Ionicons name="sparkles-outline" size={20} color={colors.primary} />
-            </View>
-          </View>
+      <div
+        className="rounded-2xl p-5 border shadow-sm"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+              Selected Date Panchangam
+            </p>
+            <h4 className="text-lg font-bold mt-0.5" style={{ color: 'var(--primary)' }}>
+              {new Date(selectedDate).toLocaleDateString('en-IN', {
+                weekday: 'long',
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })}
+            </h4>
+            {selectedDayInfo && (
+              <p className="text-sm font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
+                {selectedDayInfo.tamilMonthTamil} {selectedDayInfo.tamilDay} ({selectedDayInfo.tamilMonth})
+              </p>
+            )}
+          </div>
+          <div
+            className="p-2 rounded-xl"
+            style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}
+          >
+            <Sparkles className="w-5 h-5" />
+          </div>
+        </div>
 
-          {selectedDayInfo && (
-            <View style={{ marginTop: spacing.sm }}>
-              {/* Tithi and Nakshatra Chips */}
-              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginBottom: spacing.sm }}>
-                <View style={{ backgroundColor: colors.surfaceVariant, paddingHorizontal: 8, paddingVertical: 4, borderRadius: borderRadius.sm }}>
-                  <Text style={{ color: colors.textPrimary, fontSize: fontSize.xs, fontWeight: fontWeight.semibold }}>
-                    Tithi: {selectedDayInfo.paksha} {selectedDayInfo.tithiName}
-                  </Text>
-                </View>
-                <View style={{ backgroundColor: colors.surfaceVariant, paddingHorizontal: 8, paddingVertical: 4, borderRadius: borderRadius.sm }}>
-                  <Text style={{ color: colors.textPrimary, fontSize: fontSize.xs, fontWeight: fontWeight.semibold }}>
-                    Star: {selectedDayInfo.nakshatraName}
-                  </Text>
-                </View>
-                {selectedDayInfo.rahuKalam && (
-                  <View style={{ backgroundColor: colors.surfaceVariant, paddingHorizontal: 8, paddingVertical: 4, borderRadius: borderRadius.sm }}>
-                    <Text style={{ color: colors.textTertiary, fontSize: fontSize.xs }}>
-                      Rahu: {selectedDayInfo.rahuKalam.start} - {selectedDayInfo.rahuKalam.end}
-                    </Text>
-                  </View>
-                )}
-                {selectedDayInfo.yamagandaKalam && (
-                  <View style={{ backgroundColor: colors.surfaceVariant, paddingHorizontal: 8, paddingVertical: 4, borderRadius: borderRadius.sm }}>
-                    <Text style={{ color: colors.textTertiary, fontSize: fontSize.xs }}>
-                      Yamaganda: {selectedDayInfo.yamagandaKalam.start} - {selectedDayInfo.yamagandaKalam.end}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              {/* Special Event Description Banner if Auspicious Day */}
-              {selectedDayInfo.isPerumalSpecialDay ? (
-                <View
+        {selectedDayInfo && (
+          <div className="mt-4 space-y-3">
+            {/* Tithi, Nakshatra, Rahu Kalam Chips */}
+            <div className="flex flex-wrap gap-2 text-xs font-semibold">
+              <div
+                className="px-3 py-1.5 rounded-lg border"
+                style={{
+                  backgroundColor: 'var(--surface-variant)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-primary)',
+                }}
+              >
+                Tithi: {selectedDayInfo.paksha} {selectedDayInfo.tithiName}
+              </div>
+              <div
+                className="px-3 py-1.5 rounded-lg border"
+                style={{
+                  backgroundColor: 'var(--surface-variant)',
+                  borderColor: 'var(--border)',
+                  color: 'var(--text-primary)',
+                }}
+              >
+                Star: {selectedDayInfo.nakshatraName}
+              </div>
+              {selectedDayInfo.rahuKalam && (
+                <div
+                  className="px-3 py-1.5 rounded-lg border"
                   style={{
-                    backgroundColor: selectedDayInfo.isPurattasiSecondSaturday
-                      ? (isDark ? '#2E1C14' : '#FFFBEB')
-                      : selectedDayInfo.isGokulashtami
-                      ? (isDark ? '#132A1C' : '#F0FDF4')
-                      : (isDark ? '#2E2218' : '#FEF3C7'),
-                    padding: spacing.sm,
-                    borderRadius: borderRadius.sm,
-                    borderLeftWidth: 3,
-                    borderLeftColor: selectedDayInfo.isPurattasiSecondSaturday
-                      ? '#F59E0B'
-                      : selectedDayInfo.isGokulashtami
-                      ? '#10B981'
-                      : colors.primary,
+                    backgroundColor: 'var(--surface-variant)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-secondary)',
                   }}
                 >
-                  <Text style={{ color: colors.textPrimary, fontWeight: fontWeight.bold, fontSize: fontSize.sm }}>
-                    {selectedDayInfo.specialEventTitle}
-                  </Text>
-                  <Text style={{ color: '#D97706', fontSize: fontSize.xs, marginTop: 2, fontWeight: fontWeight.semibold }}>
-                    {selectedDayInfo.specialEventTitleTamil}
-                  </Text>
-                  <Text style={{ color: colors.textSecondary, fontSize: fontSize.xs, marginTop: 4, lineHeight: 16 }}>
-                    {selectedDayInfo.specialEventDescription}
-                  </Text>
-                </View>
-              ) : (
-                <Text style={{ color: colors.textTertiary, fontSize: fontSize.xs, fontStyle: 'italic' }}>
-                  Auspicious day for Balaji seva and prayer.
-                </Text>
+                  Rahu: {selectedDayInfo.rahuKalam.start} - {selectedDayInfo.rahuKalam.end}
+                </div>
               )}
-            </View>
-          )}
-        </Card>
-      </View>
+              {selectedDayInfo.yamagandaKalam && (
+                <div
+                  className="px-3 py-1.5 rounded-lg border"
+                  style={{
+                    backgroundColor: 'var(--surface-variant)',
+                    borderColor: 'var(--border)',
+                    color: 'var(--text-secondary)',
+                  }}
+                >
+                  Yamaganda: {selectedDayInfo.yamagandaKalam.start} - {selectedDayInfo.yamagandaKalam.end}
+                </div>
+              )}
+            </div>
+
+            {/* Special Event Description Banner */}
+            {selectedDayInfo.isPerumalSpecialDay ? (
+              <div
+                className="p-4 rounded-xl border-l-4 mt-2"
+                style={{
+                  backgroundColor: selectedDayInfo.isPurattasiSecondSaturday
+                    ? 'rgba(217, 119, 6, 0.1)'
+                    : selectedDayInfo.isGokulashtami
+                    ? 'rgba(16, 185, 129, 0.1)'
+                    : 'var(--primary-light)',
+                  borderLeftColor: selectedDayInfo.isPurattasiSecondSaturday
+                    ? '#F59E0B'
+                    : selectedDayInfo.isGokulashtami
+                    ? '#10B981'
+                    : 'var(--primary)',
+                }}
+              >
+                <h5 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                  {selectedDayInfo.specialEventTitle}
+                </h5>
+                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
+                  {selectedDayInfo.specialEventTitleTamil}
+                </p>
+                <p className="text-xs text-stone-600 dark:text-stone-300 mt-2 leading-relaxed">
+                  {selectedDayInfo.specialEventDescription}
+                </p>
+              </div>
+            ) : (
+              <p className="text-xs italic" style={{ color: 'var(--text-tertiary)' }}>
+                Auspicious day for Balaji seva and prayer.
+              </p>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* 5. Special Days for Perumal in Visible Month with Filter */}
-      <View style={{ marginHorizontal: spacing.lg, marginTop: spacing.lg }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm }}>
-          <Text style={{ color: colors.textPrimary, fontSize: fontSize.md, fontWeight: fontWeight.bold }}>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h3 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
             Perumal Special Days ({MONTH_NAMES_EN[selectedMonthNum - 1]} {selectedYear})
-          </Text>
-          {loadingMonth && <ActivityIndicator size="small" color={colors.primary} />}
-        </View>
+          </h3>
+          {loadingMonth && (
+            <span className="text-xs animate-pulse" style={{ color: 'var(--primary)' }}>
+              Calculating...
+            </span>
+          )}
+        </div>
 
         {/* Filter Pills */}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: spacing.md }}>
+        <div className="flex flex-wrap gap-2">
           {[
             { id: 'ALL', label: 'All Days' },
             { id: 'PURATTASI', label: '⭐ Purattasi Saturdays' },
@@ -741,112 +728,95 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
           ].map((cat) => {
             const isSel = filterCategory === cat.id;
             return (
-              <TouchableOpacity
+              <button
                 key={cat.id}
-                onPress={() => setFilterCategory(cat.id as any)}
+                onClick={() => setFilterCategory(cat.id as any)}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer"
                 style={{
-                  marginRight: spacing.xs,
-                  paddingHorizontal: spacing.sm + 4,
-                  paddingVertical: spacing.xs,
-                  borderRadius: borderRadius.full,
-                  backgroundColor: isSel ? colors.primary : colors.surface,
-                  borderWidth: 1,
-                  borderColor: isSel ? colors.primary : colors.border,
+                  backgroundColor: isSel ? 'var(--primary)' : 'var(--surface)',
+                  color: isSel ? '#FFFFFF' : 'var(--text-secondary)',
+                  borderColor: isSel ? 'var(--primary)' : 'var(--border)',
                 }}
               >
-                <Text
-                  style={{
-                    color: isSel ? '#FFFFFF' : colors.textSecondary,
-                    fontSize: fontSize.xs,
-                    fontWeight: isSel ? '700' : '500',
-                  }}
-                >
-                  {cat.label}
-                </Text>
-              </TouchableOpacity>
+                {cat.label}
+              </button>
             );
           })}
-        </ScrollView>
+        </div>
 
         {/* List of Special Days */}
-        <View style={{ gap: spacing.sm }}>
+        <div className="space-y-3">
           {filteredSpecialDays.length === 0 ? (
-            <Card variant="default" padding="md">
-              <Text style={{ color: colors.textTertiary, fontSize: fontSize.xs, textAlign: 'center' }}>
+            <div
+              className="rounded-xl p-6 text-center border"
+              style={{
+                backgroundColor: 'var(--surface)',
+                borderColor: 'var(--border)',
+                color: 'var(--text-tertiary)',
+              }}
+            >
+              <p className="text-xs">
                 No specific filtered Perumal special days in this month. Browse other months using the calendar above.
-              </Text>
-            </Card>
+              </p>
+            </div>
           ) : (
             filteredSpecialDays.map((day) => {
               const isSecondSat = day.isPurattasiSecondSaturday;
               const isGokula = day.isGokulashtami;
 
               return (
-                <TouchableOpacity
+                <div
                   key={day.date}
-                  onPress={() => setSelectedDate(day.date)}
-                  activeOpacity={0.8}
+                  onClick={() => setSelectedDate(day.date)}
+                  className="rounded-xl p-4 border transition-all cursor-pointer hover:shadow-md"
+                  style={{
+                    backgroundColor: isSecondSat
+                      ? 'rgba(217, 119, 6, 0.08)'
+                      : isGokula
+                      ? 'rgba(16, 185, 129, 0.08)'
+                      : 'var(--surface)',
+                    borderColor: isSecondSat ? '#F59E0B' : isGokula ? '#10B981' : 'var(--border)',
+                    borderWidth: isSecondSat || isGokula ? '1.5px' : '1px',
+                  }}
                 >
-                  <Card
-                    variant="default"
-                    padding="sm"
-                    style={{
-                      borderColor: isSecondSat ? '#F59E0B' : isGokula ? '#10B981' : colors.border,
-                      borderWidth: isSecondSat || isGokula ? 1.5 : 1,
-                      backgroundColor: isSecondSat
-                        ? (isDark ? '#2E1C14' : '#FFFBEB')
-                        : isGokula
-                        ? (isDark ? '#132A1C' : '#F0FDF4')
-                        : colors.surface,
-                    }}
-                  >
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <View style={{ flex: 1 }}>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-                          <Text style={{ color: colors.textPrimary, fontWeight: fontWeight.bold, fontSize: fontSize.sm }}>
-                            {day.specialEventTitle}
-                          </Text>
-                          {isSecondSat && (
-                            <Badge
-                              label="ANNUAL FUNCTION"
-                              variant="warning"
-                              size="sm"
-                            />
-                          )}
-                          {isGokula && (
-                            <Badge
-                              label="4-YEAR CYCLE"
-                              variant="success"
-                              size="sm"
-                            />
-                          )}
-                        </View>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="space-y-1 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h5 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                          {day.specialEventTitle}
+                        </h5>
+                        {isSecondSat && (
+                          <Badge label="ANNUAL FUNCTION" variant="warning" size="sm" />
+                        )}
+                        {isGokula && (
+                          <Badge label="4-YEAR CYCLE" variant="success" size="sm" />
+                        )}
+                      </div>
 
-                        <Text style={{ color: '#D97706', fontSize: fontSize.xs, fontWeight: fontWeight.semibold, marginTop: 2 }}>
-                          {day.specialEventTitleTamil} • {day.tamilMonthTamil} {day.tamilDay}
-                        </Text>
+                      <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
+                        {day.specialEventTitleTamil} • {day.tamilMonthTamil} {day.tamilDay}
+                      </p>
 
-                        <Text style={{ color: colors.textSecondary, fontSize: fontSize.xs, marginTop: 4, lineHeight: 16 }}>
-                          {day.specialEventDescription}
-                        </Text>
-                      </View>
+                      <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                        {day.specialEventDescription}
+                      </p>
+                    </div>
 
-                      <View style={{ alignItems: 'flex-end', marginLeft: spacing.sm }}>
-                        <Text style={{ color: colors.primary, fontWeight: fontWeight.bold, fontSize: fontSize.sm }}>
-                          {new Date(day.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                        </Text>
-                        <Text style={{ color: colors.textTertiary, fontSize: 10 }}>
-                          {new Date(day.date).toLocaleDateString('en-IN', { weekday: 'short' })}
-                        </Text>
-                      </View>
-                    </View>
-                  </Card>
-                </TouchableOpacity>
+                    <div className="text-right flex-shrink-0">
+                      <p className="text-sm font-bold" style={{ color: 'var(--primary)' }}>
+                        {new Date(day.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                      </p>
+                      <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
+                        {new Date(day.date).toLocaleDateString('en-IN', { weekday: 'short' })}
+                      </p>
+                    </div>
+                  </div>
+                </div>
               );
             })
           )}
-        </View>
-      </View>
-    </ScrollView>
+        </div>
+      </div>
+    </div>
   );
 };
