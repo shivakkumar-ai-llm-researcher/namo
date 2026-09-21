@@ -121,7 +121,7 @@ export default function VisitorCalendarPage() {
 
       {/* Content */}
       {viewMode === 'TAMIL_CALENDAR' ? (
-        <TamilCalendarView functions={functions} />
+        <TamilCalendarView functions={functions} isAdmin={false} />
       ) : (
         <div className="space-y-4">
           {/* Year Pills & Filter Pills */}

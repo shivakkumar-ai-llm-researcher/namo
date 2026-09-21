@@ -138,6 +138,7 @@ export default function AdminCalendarPage() {
       {viewMode === 'TAMIL_CALENDAR' ? (
         <TamilCalendarView
           functions={functions}
+          isAdmin={true}
           onSelectFunction={(fn) => router.push(`/admin/functions/${fn.id}`)}
         />
       ) : (

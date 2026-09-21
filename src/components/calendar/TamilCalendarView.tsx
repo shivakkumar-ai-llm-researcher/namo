@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import {
   ChevronLeft,
   ChevronRight,
@@ -25,11 +26,13 @@ import {
   CalendarSyncResult,
   ScrapedFestival,
 } from '../../services/calendarScraperService';
+import { useAuth } from '../../hooks/useAuth';
 import { CommunityFunction } from '../../types';
 
 interface TamilCalendarViewProps {
   functions?: CommunityFunction[];
   onSelectFunction?: (fn: CommunityFunction) => void;
+  isAdmin?: boolean;
 }
 
 const MONTH_NAMES_EN = [
@@ -50,7 +53,15 @@ const WEEKDAYS = [
 export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
   functions = [],
   onSelectFunction,
+  isAdmin: propIsAdmin,
 }) => {
+  const pathname = usePathname();
+  const { isAdmin: authIsAdmin, profile } = useAuth();
+
+  // Show manual 'Sync Now' only for Admin logins; hide for visitor portal and devotee logins
+  const isVisitor = propIsAdmin === false || (pathname ? pathname.startsWith('/visitor') : false) || profile?.role === 'visitor';
+  const showSyncButton = propIsAdmin === true || (!isVisitor && authIsAdmin);
+
   const today = useMemo(() => {
     const d = new Date();
     const yyyy = d.getFullYear();
@@ -334,20 +345,22 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
           </div>
         </div>
 
-        <button
-          onClick={() => loadSyncData(true)}
-          disabled={isSyncing}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
-          style={{
-            backgroundColor: 'var(--surface-variant)',
-            borderColor: 'var(--border)',
-            color: 'var(--primary)',
-          }}
-          title="Run instant synchronization from SrirangamInfo"
-        >
-          <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
-          <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
-        </button>
+        {showSyncButton && (
+          <button
+            onClick={() => loadSyncData(true)}
+            disabled={isSyncing}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
+            style={{
+              backgroundColor: 'var(--surface-variant)',
+              borderColor: 'var(--border)',
+              color: 'var(--primary)',
+            }}
+            title="Run instant synchronization from SrirangamInfo"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+            <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+          </button>
+        )}
       </div>
 
       {/* Perumal Sacred Days Live Notification Alert Card */}
