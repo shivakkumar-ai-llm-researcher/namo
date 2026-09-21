@@ -77,7 +77,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
       />
 
       {/* ── Temple Name in Tamil & English (Sharp Crisp Vector Typography) ── */}
-      <div className="absolute left-[8.5%] top-1/2 -translate-y-1/2 flex flex-col justify-center min-w-0 z-20 pointer-events-none max-w-[38%]">
+      <div className="absolute left-[3%] sm:left-[3.5%] top-1/2 -translate-y-1/2 flex flex-col justify-center min-w-0 z-20 pointer-events-none max-w-[44%] ml-7 sm:ml-0">
         <h1
           className="text-[10px] sm:text-sm md:text-base lg:text-[18px] font-black tracking-tight leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate sm:whitespace-normal"
           style={{
