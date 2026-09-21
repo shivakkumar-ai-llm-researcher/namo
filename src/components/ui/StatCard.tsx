@@ -14,25 +14,27 @@ interface StatCardProps {
 export function StatCard({ title, amount, color, bgColor, icon, compact = false, className = '' }: StatCardProps) {
   return (
     <div
-      className={`rounded-2xl border p-3 sm:p-4 flex flex-col justify-between gap-1.5 sm:gap-2 shadow-xs transition-shadow hover:shadow-md ${className}`}
+      className={`rounded-2xl border p-3 sm:p-4 flex flex-col justify-between gap-2 shadow-xs transition-shadow hover:shadow-md min-w-0 ${className}`}
       style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
     >
-      <div className="flex items-start justify-between gap-1.5">
-        <p className="text-[11px] sm:text-xs font-semibold leading-snug line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
+      {/* Title row with optional icon */}
+      <div className="flex items-start justify-between gap-1">
+        <p className="text-[10px] sm:text-xs font-semibold leading-snug line-clamp-2 flex-1 min-w-0 break-words" style={{ color: 'var(--text-secondary)' }}>
           {title}
         </p>
         {icon && (
-          <div className="rounded-lg p-1.5 sm:p-2 shrink-0" style={{ backgroundColor: bgColor }}>
+          <div className="rounded-lg p-1 sm:p-1.5 shrink-0 ml-1" style={{ backgroundColor: bgColor }}>
             <span style={{ color }}>{icon}</span>
           </div>
         )}
       </div>
+      {/* Amount — scales down on very narrow mobile */}
       <div className="min-w-0">
         <p
-          className={`font-black tracking-tight ${
+          className={`font-black tracking-tight break-all leading-tight ${
             compact
-              ? 'text-sm xs:text-[15px] sm:text-base lg:text-lg'
-              : 'text-base sm:text-xl lg:text-2xl'
+              ? 'text-[12px] xs:text-sm sm:text-base lg:text-lg'
+              : 'text-sm sm:text-xl lg:text-2xl'
           }`}
           style={{ color }}
         >

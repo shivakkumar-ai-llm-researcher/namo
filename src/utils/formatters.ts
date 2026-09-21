@@ -2,15 +2,17 @@ import { format, parseISO, isValid } from 'date-fns';
 import type { ExpenseCategory, PaymentMethod, FunctionType, FunctionStatus } from '../types';
 
 export const formatCurrency = (amount: number | string | null | undefined): string => {
-  if (amount === null || amount === undefined) return '\u20b90';
+  if (amount === null || amount === undefined) return '\u20b90.00';
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  if (isNaN(num)) return '\u20b90';
-  const fixed = num.toFixed(2);
+  if (isNaN(num)) return '\u20b90.00';
+  const isNegative = num < 0;
+  const absNum = Math.abs(num);
+  const fixed = absNum.toFixed(2);
   const [intPart, decPart] = fixed.split('.');
   const lastThree = intPart.slice(-3);
   const rest = intPart.slice(0, -3);
   const formatted = rest.length > 0 ? rest.replace(/\B(?=(\d{2})+(?!\d))/g, ',') + ',' + lastThree : lastThree;
-  return `\u20b9${formatted}.${decPart}`;
+  return `${isNegative ? '-' : ''}\u20b9${formatted}.${decPart}`;
 };
 
 export const formatCurrencyCompact = (amount: number): string => {

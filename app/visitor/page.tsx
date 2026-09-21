@@ -213,11 +213,11 @@ export default function VisitorDashboard() {
       </div>
 
       {/* Financial Stat Cards Grid */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard title={t('dashboard.totalContributions')} amount={filtered.totalContributions} color="var(--income)" bgColor="var(--income-light)" icon={<TrendingUp size={18} />} compact />
-        <StatCard title={t('dashboard.totalExpenses')} amount={filtered.totalExpenses} color="var(--expense)" bgColor="var(--expense-light)" icon={<TrendingDown size={18} />} compact />
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
+        <StatCard title={t('dashboard.totalContributions')} amount={filtered.totalContributions} color="var(--income)" bgColor="var(--income-light)" icon={<TrendingUp size={16} />} compact />
+        <StatCard title={t('dashboard.totalExpenses')} amount={filtered.totalExpenses} color="var(--expense)" bgColor="var(--expense-light)" icon={<TrendingDown size={16} />} compact />
         <StatCard title={t('dashboard.srivariSavings')} amount={Math.max(0, filtered.balance)} color="var(--savings)" bgColor="var(--savings-light)" compact />
-        <StatCard title={t('dashboard.balance')} amount={filtered.balance} color="var(--balance)" bgColor="var(--balance-light)" icon={<Scale size={18} />} compact />
+        <StatCard title={t('dashboard.balance')} amount={filtered.balance} color="var(--balance)" bgColor="var(--balance-light)" icon={<Scale size={16} />} compact />
       </div>
 
       {/* Community Services Quick Links */}
@@ -225,23 +225,23 @@ export default function VisitorDashboard() {
         <p className="text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: 'var(--text-secondary)' }}>
           {t('dashboard.communityServices')}
         </p>
-        <div className="grid grid-cols-4 gap-2 sm:gap-3">
+        <div className="grid grid-cols-4 gap-1.5 sm:gap-3">
           {[
-            { href: '/visitor/members', icon: '👥', label: t('dashboard.members'), bg: '#EFF6FF' },
-            { href: '/visitor/contributions', icon: '📈', label: t('dashboard.income'), bg: '#F0FDF4' },
-            { href: '/visitor/expenses', icon: '📉', label: t('dashboard.expenses'), bg: '#FEF2F2' },
-            { href: '/visitor/savings', icon: '💰', label: t('dashboard.savings'), bg: '#F5F3FF' },
+            { href: '/visitor/members', icon: '👥', label: language === 'ta' ? 'உறுப்பினர்' : 'Members', bg: '#EFF6FF' },
+            { href: '/visitor/contributions', icon: '📈', label: language === 'ta' ? 'வருமானம்' : 'Income', bg: '#F0FDF4' },
+            { href: '/visitor/expenses', icon: '📉', label: language === 'ta' ? 'செலவுகள்' : 'Expenses', bg: '#FEF2F2' },
+            { href: '/visitor/savings', icon: '💰', label: language === 'ta' ? 'சேமிப்பு' : 'Savings', bg: '#F5F3FF' },
           ].map((a) => (
             <Link
               key={a.href}
               href={a.href}
-              className="flex flex-col items-center gap-1.5 p-2 sm:p-3 rounded-xl border text-center hover:shadow-md transition-shadow"
+              className="flex flex-col items-center gap-1 p-1.5 sm:p-3 rounded-xl border text-center hover:shadow-md transition-shadow overflow-hidden"
               style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg shrink-0" style={{ backgroundColor: a.bg }}>
                 {a.icon}
               </div>
-              <span className="text-[11px] sm:text-xs font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
+              <span className="text-[9px] sm:text-[11px] font-bold leading-tight line-clamp-2 w-full text-center break-words" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
             </Link>
           ))}
         </div>
