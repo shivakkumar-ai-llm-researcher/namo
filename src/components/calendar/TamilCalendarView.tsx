@@ -178,6 +178,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
       dayNumber: number;
       isCurrentMonth: boolean;
       tamilDay?: number;
+      tamilMonthTamil?: string;
+      isMonthStart?: boolean;
       isSecondSat?: boolean;
       isPurattasiSat?: boolean;
       isGokula?: boolean;
@@ -209,6 +211,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
         dayNumber: d,
         isCurrentMonth: true,
         tamilDay: dayData?.tamilDay,
+        tamilMonthTamil: dayData?.tamilMonthTamil,
+        isMonthStart: dayData?.isMonthStart || dayData?.tamilDay === 1,
         isSecondSat: dayData?.isPurattasiSecondSaturday,
         isPurattasiSat: dayData?.isPurattasiSaturday,
         isGokula: dayData?.isGokulashtami,
@@ -237,19 +241,14 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     return cells;
   }, [selectedYear, selectedMonthNum, monthData]);
 
-  // Current primary Tamil month active
-  const primaryTamilMonth = useMemo(() => {
+  // Dual Tamil months spanning this Gregorian month (e.g. "ஆவணி – புரட்டாசி (Avani – Purattasi)")
+  const monthTamilSpan = useMemo(() => {
     try {
-      const midDate = `${currentYearMonth}-15`;
-      if (monthData[midDate]) {
-        return `${monthData[midDate].tamilMonthTamil} மாதம் (${monthData[midDate].tamilMonth})`;
-      }
-      const tDate = tamilCalendarService.getTamilDate(new Date(selectedYear, selectedMonthNum - 1, 15));
-      return `${tDate.tamilMonthTamil} மாதம் (${tDate.tamilMonth})`;
+      return tamilCalendarService.getMonthTamilSpan(currentYearMonth, monthData);
     } catch {
-      return '';
+      return { titleEn: '', titleTamil: '', subtitle: '' };
     }
-  }, [currentYearMonth, monthData, selectedYear, selectedMonthNum]);
+  }, [currentYearMonth, monthData]);
 
   return (
     <div className="space-y-6">
@@ -402,12 +401,24 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
           </button>
 
           <div className="text-center">
-            <h3 className="text-base font-bold" style={{ color: 'var(--primary)' }}>
+            <h3 className="text-base sm:text-lg font-bold" style={{ color: 'var(--primary)' }}>
               {MONTH_NAMES_EN[selectedMonthNum - 1]} {selectedYear}
             </h3>
-            <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
-              {primaryTamilMonth}
-            </p>
+            <div className="flex items-center justify-center gap-1.5 mt-0.5 flex-wrap">
+              <span className="text-xs sm:text-sm font-bold text-amber-600 dark:text-amber-400">
+                {monthTamilSpan.titleTamil || 'தமிழ் மாதம்'}
+              </span>
+              {monthTamilSpan.titleEn && (
+                <span className="text-[11px] font-medium text-stone-500 dark:text-stone-400">
+                  ({monthTamilSpan.titleEn})
+                </span>
+              )}
+            </div>
+            {monthTamilSpan.subtitle && (
+              <p className="text-[10px] font-medium text-stone-500 dark:text-stone-400 mt-0.5">
+                {monthTamilSpan.subtitle}
+              </p>
+            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -521,20 +532,35 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
                   {cell.dayNumber}
                 </span>
 
-                {/* Tamil Solar Day */}
+                {/* Tamil Solar Day & Month Start Badge */}
                 {cell.tamilDay && (
-                  <span
-                    className="text-[9px] font-semibold leading-tight mt-0.5"
-                    style={{
-                      color: isSelected
-                        ? '#FEF3C7'
-                        : isSecondSat
-                        ? '#B45309'
-                        : 'var(--text-tertiary)',
-                    }}
-                  >
-                    {cell.tamilDay}
-                  </span>
+                  <div className="flex items-center gap-0.5 mt-0.5 leading-tight">
+                    {cell.isMonthStart ? (
+                      <span
+                        className="text-[8px] font-bold px-1 rounded-sm uppercase tracking-tighter"
+                        style={{
+                          backgroundColor: isSelected ? 'rgba(255,255,255,0.25)' : 'rgba(217, 119, 6, 0.18)',
+                          color: isSelected ? '#FFFFFF' : '#D97706',
+                          border: isSelected ? '1px solid rgba(255,255,255,0.4)' : '1px solid rgba(217, 119, 6, 0.3)',
+                        }}
+                      >
+                        {cell.tamilMonthTamil?.slice(0, 3)} 1
+                      </span>
+                    ) : (
+                      <span
+                        className="text-[9px] font-semibold leading-tight"
+                        style={{
+                          color: isSelected
+                            ? '#FEF3C7'
+                            : isSecondSat
+                            ? '#B45309'
+                            : 'var(--text-tertiary)',
+                        }}
+                      >
+                        {cell.tamilDay}
+                      </span>
+                    )}
+                  </div>
                 )}
 
                 {/* Auspicious Dots Row */}
@@ -607,7 +633,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
             </h4>
             {selectedDayInfo && (
               <p className="text-sm font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
-                {selectedDayInfo.tamilMonthTamil} {selectedDayInfo.tamilDay} ({selectedDayInfo.tamilMonth})
+                {selectedDayInfo.tamilMonthTamil} {selectedDayInfo.tamilDay} ({selectedDayInfo.tamilMonth}) • {selectedDayInfo.tamilYear}
               </p>
             )}
           </div>

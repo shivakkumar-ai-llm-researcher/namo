@@ -23,6 +23,8 @@ export interface DailyPanchangamData {
   tamilMonth: string;
   tamilMonthTamil: string;
   tamilDay: number;
+  tamilYear: string;
+  isMonthStart?: boolean;
   isEkadashi: boolean;
   ekadashiName?: string;
   isThiruvonam: boolean;
@@ -53,56 +55,130 @@ export interface GokulashtamiCycleInfo {
   }[];
 }
 
-// Tamil Solar Month Names (approx start dates)
+// 12 Tamil Solar Months matching astronomical Sun Rashi indices 0-11
 export const TAMIL_MONTHS = [
-  { name: 'Chithirai', nameTamil: 'சித்திரை', startMonth: 3, startDay: 14 },
-  { name: 'Vaikasi', nameTamil: 'வைகாசி', startMonth: 4, startDay: 15 },
-  { name: 'Aani', nameTamil: 'ஆனி', startMonth: 5, startDay: 15 },
-  { name: 'Aadi', nameTamil: 'ஆடி', startMonth: 6, startDay: 16 },
-  { name: 'Avani', nameTamil: 'ஆவணி', startMonth: 7, startDay: 17 },
-  { name: 'Purattasi', nameTamil: 'புரட்டாசி', startMonth: 8, startDay: 17 },
-  { name: 'Aippasi', nameTamil: 'ஐப்பசி', startMonth: 9, startDay: 17 },
-  { name: 'Karthigai', nameTamil: 'கார்த்திகை', startMonth: 10, startDay: 16 },
-  { name: 'Margazhi', nameTamil: 'மார்கழி', startMonth: 11, startDay: 16 },
-  { name: 'Thai', nameTamil: 'தை', startMonth: 0, startDay: 14 },
-  { name: 'Masi', nameTamil: 'மாசி', startMonth: 1, startDay: 13 },
-  { name: 'Panguni', nameTamil: 'பங்குனி', startMonth: 2, startDay: 14 },
+  { name: 'Chithirai', nameTamil: 'சித்திரை' }, // Sun in Mesha (0)
+  { name: 'Vaikasi', nameTamil: 'வைகாசி' },     // Sun in Vrishabha (1)
+  { name: 'Aani', nameTamil: 'ஆனி' },           // Sun in Mithuna (2)
+  { name: 'Aadi', nameTamil: 'ஆடி' },           // Sun in Kataka (3)
+  { name: 'Avani', nameTamil: 'ஆவணி' },         // Sun in Simha (4)
+  { name: 'Purattasi', nameTamil: 'புரட்டாசி' }, // Sun in Kanya (5)
+  { name: 'Aippasi', nameTamil: 'ஐப்பசி' },     // Sun in Tula (6)
+  { name: 'Karthigai', nameTamil: 'கார்த்திகை' },// Sun in Vrischika (7)
+  { name: 'Margazhi', nameTamil: 'மார்கழி' },   // Sun in Dhanus (8)
+  { name: 'Thai', nameTamil: 'தை' },           // Sun in Makara (9)
+  { name: 'Masi', nameTamil: 'மாசி' },           // Sun in Kumbha (10)
+  { name: 'Panguni', nameTamil: 'பங்குனி' },     // Sun in Meena (11)
 ];
 
-const CACHE_PREFIX = 'namo_panchangam_v1_';
+// 60-Year Tamil Cycle (அறுபது தமிழ் வருடங்கள்)
+export const TAMIL_60_YEARS = [
+  { name: 'Prabhava', nameTamil: 'பிரபவ' },       // 1987
+  { name: 'Vibhava', nameTamil: 'விபவ' },
+  { name: 'Shukla', nameTamil: 'சுக்ல' },
+  { name: 'Pramodoota', nameTamil: 'பிரமோதூத' },
+  { name: 'Prajorpatti', nameTamil: 'பிரசோற்பத்தி' },
+  { name: 'Angirasa', nameTamil: 'ஆங்கீரச' },
+  { name: 'Srimukha', nameTamil: 'ஸ்ரீமுக' },
+  { name: 'Bhava', nameTamil: 'பவ' },
+  { name: 'Yuva', nameTamil: 'யுவ' },
+  { name: 'Dhatru', nameTamil: 'தாது' },
+  { name: 'Ishvara', nameTamil: 'ஈஸ்வர' },
+  { name: 'Vehudhanya', nameTamil: 'வெகுதானிய' },
+  { name: 'Pramathi', nameTamil: 'பிரமாதி' },
+  { name: 'Vikrama', nameTamil: 'விக்ரம' },
+  { name: 'Vishu', nameTamil: 'விஷு' },
+  { name: 'Chitrabhanu', nameTamil: 'சித்திரபானு' },
+  { name: 'Subhanu', nameTamil: 'சுபானு' },
+  { name: 'Dharana', nameTamil: 'தாரண' },
+  { name: 'Parthiba', nameTamil: 'பார்த்திப' },
+  { name: 'Viya', nameTamil: 'விய' },
+  { name: 'Sarvajit', nameTamil: 'சர்வஜித்' },
+  { name: 'Sarvadhari', nameTamil: 'சர்வதாரி' },
+  { name: 'Virodhi', nameTamil: 'விரோதி' },
+  { name: 'Vikruti', nameTamil: 'விக்ருதி' },
+  { name: 'Kara', nameTamil: 'கர' },
+  { name: 'Nandana', nameTamil: 'நந்தன' },
+  { name: 'Vijaya', nameTamil: 'விஜய' },
+  { name: 'Jaya', nameTamil: 'ஜய' },
+  { name: 'Manmatha', nameTamil: 'மன்மத' },
+  { name: 'Dunmukhi', nameTamil: 'துன்முகி' },
+  { name: 'Hevilambi', nameTamil: 'ஹேவிளம்பி' },
+  { name: 'Vilambi', nameTamil: 'விளம்பி' },
+  { name: 'Vikari', nameTamil: 'விகாரி' },
+  { name: 'Sarvari', nameTamil: 'சார்வரி' },
+  { name: 'Plava', nameTamil: 'பிலவ' },
+  { name: 'Subhakritu', nameTamil: 'சுபகிருது' },
+  { name: 'Sobhakritu', nameTamil: 'சோபகிருது' },
+  { name: 'Krodhi', nameTamil: 'குரோதி' },       // 2024-2025
+  { name: 'Visvavasu', nameTamil: 'விசுவாவசு' },   // 2025-2026
+  { name: 'Parabhava', nameTamil: 'பராபவ' },       // 2026-2027
+  { name: 'Plavanga', nameTamil: 'பிலவங்க' },     // 2027-2028
+  { name: 'Kilaka', nameTamil: 'கீலக' },           // 2028-2029
+  { name: 'Saumya', nameTamil: 'சௌமிய' },         // 2029-2030 (4-Year Gokulaashdami!)
+  { name: 'Sadharana', nameTamil: 'சாதாரண' },
+  { name: 'Virodhikritu', nameTamil: 'விரோதிகிருது' },
+  { name: 'Paridhavi', nameTamil: 'பரிதாபி' },
+  { name: 'Pramadicha', nameTamil: 'பிரமாதீச' },
+  { name: 'Ananda', nameTamil: 'ஆனந்த' },
+  { name: 'Rakshasa', nameTamil: 'ராட்சச' },
+  { name: 'Nala', nameTamil: 'நள' },
+  { name: 'Pingala', nameTamil: 'பிங்கள' },
+  { name: 'Kalayukthi', nameTamil: 'காளயுக்தி' },
+  { name: 'Siddharthi', nameTamil: 'சித்தார்த்தி' },
+  { name: 'Raudri', nameTamil: 'ரௌத்திரி' },
+  { name: 'Dunmathi', nameTamil: 'துன்மதி' },
+  { name: 'Dundubhi', nameTamil: 'துந்துபி' },
+  { name: 'Rudhrodhkari', nameTamil: 'ருத்ரோத்காரி' },
+  { name: 'Raktakshi', nameTamil: 'ரக்தாட்சி' },
+  { name: 'Krodhana', nameTamil: 'குரோதன' },
+  { name: 'Akshaya', nameTamil: 'அட்சய' },
+];
+
+export function getTamilYearName(date: Date, rashiIndex: number): { name: string; nameTamil: string } {
+  const gYear = date.getFullYear();
+  const effectiveYear = rashiIndex >= 9 ? gYear - 1 : gYear;
+  const cycleIndex = ((effectiveYear - 1987) % 60 + 60) % 60;
+  return TAMIL_60_YEARS[cycleIndex];
+}
+
+const CACHE_PREFIX = 'namo_panchangam_v2_';
 
 export const tamilCalendarService = {
   /**
-   * Convert Gregorian Date to Tamil Month and Day
+   * Convert Gregorian Date to 100% Astronomical Tamil Month and Day
+   * using exact Solar Ingress (Sankranti / சூரிய சங்கிரமணம்).
    */
-  getTamilDate(date: Date) {
-    const year = date.getFullYear();
-    const day = date.getDate();
+  getTamilDate(date: Date, observer = TAMIL_NADU_OBSERVER) {
+    const d = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 6, 0, 0);
+    const p = getPanchangam(d, observer);
+    const curRashi = p.sunRashi.index;
 
-    let tamilMonthObj = TAMIL_MONTHS[TAMIL_MONTHS.length - 1];
-    let tamilDay = day;
-
-    for (let i = 0; i < TAMIL_MONTHS.length; i++) {
-      const tm = TAMIL_MONTHS[i];
-      const nextTm = TAMIL_MONTHS[(i + 1) % TAMIL_MONTHS.length];
-
-      const start = new Date(year, tm.startMonth, tm.startDay);
-      const endYear = tm.startMonth === 11 ? year + 1 : year;
-      const end = new Date(endYear, nextTm.startMonth, nextTm.startDay);
-
-      if (date >= start && date < end) {
-        tamilMonthObj = tm;
-        const diffTime = Math.abs(date.getTime() - start.getTime());
-        tamilDay = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-        break;
+    // Walk backwards day-by-day to find Day 1 (Sankranti day)
+    let count = 1;
+    let walk = new Date(d);
+    while (true) {
+      const prev = new Date(walk);
+      prev.setDate(prev.getDate() - 1);
+      const prevP = getPanchangam(prev, observer);
+      if (prevP.sunRashi.index !== curRashi) {
+        break; // prev was previous solar month, so walk is Day 1
       }
+      count++;
+      walk = prev;
+      if (count > 35) break; // safety
     }
 
+    const tMonth = TAMIL_MONTHS[curRashi];
+    const tYear = getTamilYearName(date, curRashi);
+
     return {
-      tamilMonth: tamilMonthObj.name,
-      tamilMonthTamil: tamilMonthObj.nameTamil,
-      tamilDay,
-      tamilYear: 'குரோதி (Krodhi)',
+      tamilMonth: tMonth.name,
+      tamilMonthTamil: tMonth.nameTamil,
+      tamilDay: count,
+      tamilYear: `${tYear.nameTamil} (${tYear.name})`,
+      rashiIndex: curRashi,
+      isMonthStart: count === 1,
     };
   },
 
@@ -174,9 +250,9 @@ export const tamilCalendarService = {
    * Get all Saturdays in Purattasi month for a given year,
    * specifically flagging the 2nd Saturday.
    */
-  getPurattasiSaturdays(year: number) {
-    const purattasiStart = new Date(year, 8, 17); // Sep 17
-    const purattasiEnd = new Date(year, 9, 17);   // Oct 17
+  getPurattasiSaturdays(year: number, observer = TAMIL_NADU_OBSERVER) {
+    const searchStart = new Date(year, 8, 15, 6, 0, 0); // Sep 15
+    const searchEnd = new Date(year, 9, 20, 6, 0, 0);   // Oct 20
 
     const saturdays: {
       date: string;
@@ -185,23 +261,28 @@ export const tamilCalendarService = {
       title: string;
       titleTamil: string;
       description: string;
+      tamilDay: number;
     }[] = [];
 
-    const cur = new Date(purattasiStart);
     let saturdayIndex = 1;
+    const cur = new Date(searchStart);
 
-    while (cur <= purattasiEnd) {
-      if (cur.getDay() === 6) {
+    while (cur <= searchEnd) {
+      const p = getPanchangam(cur, observer);
+      if (p.sunRashi.index === 5 && cur.getDay() === 6) {
         const yyyy = cur.getFullYear();
         const mm = String(cur.getMonth() + 1).padStart(2, '0');
         const dd = String(cur.getDate()).padStart(2, '0');
         const dateStr = `${yyyy}-${mm}-${dd}`;
         const isSecond = saturdayIndex === 2;
 
+        const tDate = this.getTamilDate(cur, observer);
+
         saturdays.push({
           date: dateStr,
           index: saturdayIndex,
           isSecond,
+          tamilDay: tDate.tamilDay,
           title: isSecond
             ? '2nd Purattasi Saturday - Annual Community Function'
             : `Purattasi Saturday ${saturdayIndex}`,
@@ -231,8 +312,8 @@ export const tamilCalendarService = {
     const dateStr = `${yyyy}-${mm}-${dd}`;
 
     // 1. Dynamic astronomical calculation
-    const raw = getPanchangam(date, observer);
-    const tamilDate = this.getTamilDate(date);
+    const raw = getPanchangam(new Date(yyyy, date.getMonth(), date.getDate(), 6, 0, 0), observer);
+    const tamilDate = this.getTamilDate(date, observer);
 
     // Tithi & Paksha
     const tithiNumber = raw.tithi ?? 1;
@@ -265,7 +346,7 @@ export const tamilCalendarService = {
 
     if (tamilDate.tamilMonth === 'Purattasi' && date.getDay() === 6) {
       isPurattasiSaturday = true;
-      const allSats = this.getPurattasiSaturdays(yyyy);
+      const allSats = this.getPurattasiSaturdays(yyyy, observer);
       const matched = allSats.find((s) => s.date === dateStr);
       if (matched) {
         purattasiSaturdayIndex = matched.index;
@@ -273,14 +354,12 @@ export const tamilCalendarService = {
       }
     }
 
-    // 5. Detect Gokulashtami / Sri Krishna Jayanthi
+    // 5. Detect Gokulashtami / Sri Krishna Jayanthi accurately (Strict check, avoids false positives on Pradosham)
     const hasGokulaFestival = raw.festivals?.some(
       (f: any) =>
-        f.name?.toLowerCase().includes('krishna') ||
-        f.name?.toLowerCase().includes('gokul') ||
-        f.name?.toLowerCase().includes('janmashtami')
+        /\b(janmashtami|gokulashtami|gokula\s*ashtami|krishna\s*jayanthi)\b/i.test(f.name || '')
     );
-    const isAvaniAshtami = tamilDate.tamilMonth === 'Avani' && (tithiNumber === 23 || tithiNumber === 8);
+    const isAvaniAshtami = tamilDate.tamilMonth === 'Avani' && paksha === 'Krishna' && (tithiNumber === 22 || tithiNumber === 23) && nakshatraName.toLowerCase().includes('rohini');
     const isGokulashtami = Boolean(hasGokulaFestival || isAvaniAshtami);
 
     // 6. Detect other major Perumal festivals
@@ -299,7 +378,8 @@ export const tamilCalendarService = {
       isEkadashi ||
       isThiruvonam ||
       hasRamaNavami ||
-      hasNarasimhaJayanti;
+      hasNarasimhaJayanti ||
+      (tamilDate.tamilMonth === 'Purattasi' && tamilDate.tamilDay === 1);
 
     let specialEventTitle: string | undefined;
     let specialEventTitleTamil: string | undefined;
@@ -313,10 +393,14 @@ export const tamilCalendarService = {
       specialEventTitle = `Purattasi Saturday ${purattasiSaturdayIndex ?? ''}`;
       specialEventTitleTamil = `புரட்டாசி ${purattasiSaturdayIndex ?? ''}-வது சனிக்கிழமை`;
       specialEventDescription = 'Auspicious Purattasi Sani Kizhamai: Special Venkateswara fasting, Maavilakku Deepam offering, and Perumal pooja.';
+    } else if (tamilDate.tamilMonth === 'Purattasi' && tamilDate.tamilDay === 1) {
+      specialEventTitle = 'Purattasi Masappirappu (Holy Month Begins)';
+      specialEventTitleTamil = 'புரட்டாசி மாதப்பிறப்பு (புனித மாதம் ஆரம்பம்)';
+      specialEventDescription = 'Auspicious commencement of the sacred Purattasi month dedicated to Lord Venkateswara. Daily fasting, Vishnu Sahasranama chanting, and deepam devotion begin.';
     } else if (isGokulashtami) {
       specialEventTitle = 'Gokulaashdami (4-Year Cycle Function)';
       specialEventTitleTamil = 'கோகுலாஷ்டமி (4 ஆண்டு சுழற்சி திருவிழா)';
-      specialEventDescription = 'Celebrated in 2025 • Next Grand Celebration is coming in 2029! Sri Krishna Jayanthi pooja and uri-yadi utsavam.';
+      specialEventDescription = 'Annual Sri Krishna Jayanthi pooja • Celebrated in 2025 • Next Grand Celebration in 2029!';
     } else if (isVaikuntaEkadashi) {
       specialEventTitle = 'Vaikunta Ekadashi (Paramapada Vaasal)';
       specialEventTitleTamil = 'வைகுண்ட ஏகாதசி (சொர்க்கவாசல் திறப்பு)';
@@ -337,6 +421,10 @@ export const tamilCalendarService = {
       specialEventTitle = 'Narasimha Jayanti';
       specialEventTitleTamil = 'ஸ்ரீ நரசிம்ம ஜெயந்தி';
       specialEventDescription = 'Divine incarnation of Lord Sri Narasimha Swami to protect devotee Prahlada.';
+    } else if (tamilDate.isMonthStart) {
+      specialEventTitle = `${tamilDate.tamilMonth} Masappirappu (Month Ingress)`;
+      specialEventTitleTamil = `${tamilDate.tamilMonthTamil} மாதப்பிறப்பு`;
+      specialEventDescription = `Auspicious first day of the Tamil month of ${tamilDate.tamilMonthTamil} (${tamilDate.tamilMonth}). Surya Bhagavan transitions into ${raw.sunRashi?.name ?? 'Sign'} (Sankranti).`;
     }
 
     return {
@@ -349,6 +437,8 @@ export const tamilCalendarService = {
       tamilMonth: tamilDate.tamilMonth,
       tamilMonthTamil: tamilDate.tamilMonthTamil,
       tamilDay: tamilDate.tamilDay,
+      tamilYear: tamilDate.tamilYear,
+      isMonthStart: tamilDate.isMonthStart,
       isEkadashi,
       ekadashiName,
       isThiruvonam,
@@ -373,6 +463,47 @@ export const tamilCalendarService = {
             end: new Date(raw.yamagandaKalam.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           }
         : undefined,
+    };
+  },
+
+  /**
+   * Get the dual Tamil month span for any Gregorian month (e.g. September -> "Avani – Purattasi")
+   */
+  getMonthTamilSpan(yearMonth: string, monthData: Record<string, DailyPanchangamData>) {
+    const dates = Object.keys(monthData).sort();
+    if (dates.length === 0) {
+      return {
+        titleEn: '',
+        titleTamil: '',
+        subtitle: '',
+      };
+    }
+
+    const firstDay = monthData[dates[0]];
+    const lastDay = monthData[dates[dates.length - 1]];
+
+    if (!firstDay || !lastDay) {
+      return { titleEn: '', titleTamil: '', subtitle: '' };
+    }
+
+    if (firstDay.tamilMonth === lastDay.tamilMonth) {
+      return {
+        titleEn: `${firstDay.tamilMonth} Month`,
+        titleTamil: `${firstDay.tamilMonthTamil} மாதம்`,
+        subtitle: `${firstDay.tamilMonthTamil} (${firstDay.tamilDay} – ${lastDay.tamilDay})`,
+      };
+    }
+
+    // Two Tamil months span this Gregorian month
+    const ingressDate = dates.find((d) => monthData[d]?.isMonthStart || monthData[d]?.tamilDay === 1);
+    const ingressDayNum = ingressDate ? parseInt(ingressDate.split('-')[2], 10) : null;
+
+    return {
+      titleEn: `${firstDay.tamilMonth} – ${lastDay.tamilMonth}`,
+      titleTamil: `${firstDay.tamilMonthTamil} – ${lastDay.tamilMonthTamil}`,
+      subtitle: ingressDayNum
+        ? `${firstDay.tamilMonthTamil} (1–${ingressDayNum - 1}) • ${lastDay.tamilMonthTamil} (${ingressDayNum}–${dates.length})`
+        : `${firstDay.tamilMonthTamil} & ${lastDay.tamilMonthTamil}`,
     };
   },
 
