@@ -96,8 +96,8 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
                 className={isActive ? 'text-amber-300' : 'group-hover:text-amber-600 transition-colors'}
               />
               <div className="flex-1 min-w-0">
-                <div className="text-sm font-semibold truncate">{item.label}</div>
-                <div className="text-[10px] opacity-75 truncate">{item.tamil}</div>
+                <div className="text-sm font-semibold truncate">{language === 'ta' ? item.tamil : item.label}</div>
+                <div className="text-[10px] opacity-75 truncate">{language === 'ta' ? item.label : item.tamil}</div>
               </div>
               {isActive && <ChevronRight size={14} className="ml-auto text-amber-300" />}
             </Link>

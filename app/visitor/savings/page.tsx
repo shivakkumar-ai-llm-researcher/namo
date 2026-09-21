@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { CommunityFunction } from '@/types';
 
 export default function VisitorSavingsPage() {
-  const { language, t } = useLanguage();
+  const { language, t, translateFunction } = useLanguage();
   const [fns, setFns] = useState<CommunityFunction[]>([]);
   const [savings, setSavings] = useState<Record<string, { contributions: number; expenses: number; balance: number }>>({});
   const [loading, setLoading] = useState(true);
@@ -78,7 +78,9 @@ export default function VisitorSavingsPage() {
             <Card key={fn.id}>
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>{fn.name}</h3>
+                  <h3 className="font-bold text-lg" style={{ color: 'var(--text-primary)' }}>
+                    {translateFunction(fn.name)}
+                  </h3>
                   <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
                     {fn.type === 'ANNUAL' ? t('savings.purattasiYearly') : t('savings.gokulFourYear')}
                   </p>

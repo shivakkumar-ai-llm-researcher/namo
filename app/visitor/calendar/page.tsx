@@ -12,6 +12,8 @@ import { functionService } from '@/services';
 import type { CommunityFunction } from '@/types';
 import { formatFunctionType, formatFunctionStatus } from '@/utils/formatters';
 
+import { useLanguage } from '@/context/LanguageContext';
+
 const TamilCalendarView = dynamic(
   () => import('@/components/calendar/TamilCalendarView').then((mod) => mod.TamilCalendarView),
   {
@@ -28,6 +30,7 @@ const TamilCalendarView = dynamic(
 );
 
 export default function VisitorCalendarPage() {
+  const { language, t, translateFunction, translateText } = useLanguage();
   const [functions, setFunctions] = useState<CommunityFunction[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'TAMIL_CALENDAR' | 'FUNCTIONS'>('TAMIL_CALENDAR');
@@ -75,12 +78,14 @@ export default function VisitorCalendarPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-          {viewMode === 'TAMIL_CALENDAR' ? 'Tamil Calendar & Perumal Days' : 'Functions Schedule'}
+          {language === 'ta'
+            ? (viewMode === 'TAMIL_CALENDAR' ? 'தமிழ் நாட்காட்டி & விசேஷங்கள்' : 'திருவிழாக்கள் அட்டவணை')
+            : (viewMode === 'TAMIL_CALENDAR' ? 'Tamil Calendar & Perumal Days' : 'Functions Schedule')}
         </h1>
         <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          {viewMode === 'TAMIL_CALENDAR'
-            ? 'தமிழ் நாட்காட்டி • புரட்டாசி சனி & கோகுலாஷ்டமி'
-            : 'Annual & 4-Year Community Events Schedule • நிகழ்வுகள் அட்டவணை'}
+          {language === 'ta'
+            ? 'தமிழ் நாட்காட்டி • புரட்டாசி சனி & கோகுலாஷ்டமி திருவிழாக்கள்'
+            : 'Annual & 4-Year Community Events Schedule'}
         </p>
       </div>
 
@@ -102,7 +107,7 @@ export default function VisitorCalendarPage() {
           }}
         >
           <CalendarDays size={15} />
-          <span>Tamil Calendar (நாட்காட்டி)</span>
+          <span>{language === 'ta' ? 'தமிழ் நாட்காட்டி' : 'Tamil Calendar'}</span>
         </button>
 
         <button
@@ -115,7 +120,7 @@ export default function VisitorCalendarPage() {
           }}
         >
           <List size={15} />
-          <span>Functions Schedule (அட்டவணை)</span>
+          <span>{language === 'ta' ? 'விழாக்கள் அட்டவணை' : 'Functions Schedule'}</span>
         </button>
       </div>
 

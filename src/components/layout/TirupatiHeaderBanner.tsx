@@ -11,7 +11,7 @@ interface TirupatiHeaderBannerProps {
 
 export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: TirupatiHeaderBannerProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, setLanguage, toggleLanguage, t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -328,25 +328,39 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
       {/* ── Top-Right Header Action Bar (Cleanly Placed Away From Venkatesaya Text) ── */}
       <div className="absolute top-2 right-2.5 sm:top-2.5 sm:right-4 z-30 flex items-center gap-1.5 sm:gap-2">
-        {/* Language Switcher (EN / தமிழ்) */}
-        <button
-          onClick={toggleLanguage}
-          title={language === 'en' ? 'தமிழில் மாற்றவும் (Switch to Tamil)' : 'Switch to English'}
-          aria-label={language === 'en' ? 'Switch to Tamil' : 'Switch to English'}
-          className={`flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full border backdrop-blur-md shadow-md transition-all active:scale-95 cursor-pointer select-none font-bold text-[10px] sm:text-xs ${
-            isDark
-              ? 'bg-amber-950/60 hover:bg-amber-900/80 text-amber-300 border-amber-500/50'
-              : 'bg-white/85 hover:bg-white text-amber-900 border-amber-400/70 shadow-amber-900/10'
-          }`}
-        >
-          <Languages size={12} className="shrink-0 text-amber-500" />
-          <span>{language === 'en' ? 'தமிழ்' : 'English'}</span>
-        </button>
+        {/* Explicit Bilingual Segmented Language Selector (தமிழ் | English) */}
+        <div className="flex items-center bg-black/60 backdrop-blur-md rounded-full p-0.5 border border-amber-400/60 shadow-lg select-none">
+          <button
+            onClick={() => setLanguage('ta')}
+            title="தமிழ் மொழிக்கு மாற்றுக"
+            aria-label="Switch to Tamil"
+            className={`flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer ${
+              language === 'ta'
+                ? 'bg-amber-400 text-amber-950 font-black shadow-xs ring-1 ring-amber-300'
+                : 'text-amber-200 hover:text-white'
+            }`}
+          >
+            <Languages size={11} className={language === 'ta' ? 'text-amber-950' : 'text-amber-300'} />
+            <span>தமிழ்</span>
+          </button>
+          <button
+            onClick={() => setLanguage('en')}
+            title="Switch to English"
+            aria-label="Switch to English"
+            className={`flex items-center gap-1 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer ${
+              language === 'en'
+                ? 'bg-amber-400 text-amber-950 font-black shadow-xs ring-1 ring-amber-300'
+                : 'text-amber-200 hover:text-white'
+            }`}
+          >
+            <span>English</span>
+          </button>
+        </div>
 
         {/* Mobile Compact Fallback Theme Switcher */}
         <button
           onClick={() => setTheme(isDark ? 'light' : 'dark')}
-          title={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+          title={isDark ? (language === 'ta' ? 'பகல் பயன்முறை' : 'Switch to Light Theme') : (language === 'ta' ? 'இரவு பயன்முறை' : 'Switch to Dark Theme')}
           className={`sm:hidden p-1 sm:p-1.5 rounded-full border backdrop-blur-md shadow-sm transition-transform active:scale-90 cursor-pointer ${
             isDark
               ? 'bg-stone-950/70 text-amber-300 border-amber-500/40'
@@ -359,7 +373,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
         {/* Sacred Temple Continuous Sound Toggle (Mute / Unmute) */}
         <button
           onClick={toggleMute}
-          title={isMuted ? 'Muted • Click to play continuous sacred temple sound' : 'Continuous sacred sound playing • Click to mute'}
+          title={isMuted ? (language === 'ta' ? 'மவுனம் • இசைக்க கிளிக் செய்க' : 'Muted • Click to play') : (language === 'ta' ? 'நாதம் ஒலிக்கிறது • மவுனமாக்க கிளிக் செய்க' : 'Continuous sound playing • Click to mute')}
           aria-label={isMuted ? 'Play continuous sacred temple sound' : 'Mute sacred temple sound'}
           className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-2.5 sm:py-1 rounded-full border backdrop-blur-md shadow-md transition-all active:scale-95 cursor-pointer select-none ${
             !isMuted
@@ -381,14 +395,14 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
                 <span className="w-0.5 bg-amber-500 dark:bg-amber-300 rounded-full h-2 animate-[pulse_0.9s_ease-in-out_infinite]" />
               </span>
               <span className="text-[9px] sm:text-[10px] font-bold tracking-tight uppercase hidden md:inline">
-                Sacred Sound
+                {language === 'ta' ? 'நாதம்' : 'Sacred Sound'}
               </span>
             </>
           ) : (
             <>
               <VolumeX size={13} className="text-stone-400 shrink-0" />
               <span className="text-[9px] sm:text-[10px] font-medium tracking-tight text-stone-400 hidden md:inline">
-                Muted
+                {language === 'ta' ? 'மவுனம்' : 'Muted'}
               </span>
             </>
           )}

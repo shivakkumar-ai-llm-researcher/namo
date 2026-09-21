@@ -11,7 +11,7 @@ import type { Contribution, Expense, CommunityFunction, FunctionType } from '@/t
 type FnSummary = { contributions: number; expenses: number; balance: number; contributors: number };
 
 export default function VisitorDashboard() {
-  const { language, t, formatMethod } = useLanguage();
+  const { language, t, formatMethod, translateMember, translateFunction } = useLanguage();
   const [allContributions, setAllContributions] = useState<Contribution[]>([]);
   const [allExpenses, setAllExpenses] = useState<Expense[]>([]);
   const [annualFn, setAnnualFn] = useState<CommunityFunction | null>(null);
@@ -126,7 +126,7 @@ export default function VisitorDashboard() {
             </span>
             <h3 className="text-lg font-bold">{t('dashboard.purattasiTitle')}</h3>
             <p className="text-xs mb-3" style={{ color: '#FDE68A' }}>
-              {language === 'ta' ? 'புரட்டாசி சனிக்கிழமை • ஆண்டு விழா' : `Purattasi Sani • ${annualFn?.name || 'Annual Function'}`}
+              {t('dashboard.purattasiSubLabel')} • {translateFunction(annualFn?.name)}
             </p>
             <div className="bg-black/30 rounded-lg p-3 mb-3 border-l-4 border-yellow-400">
               <p className="text-xs font-bold">{t('dashboard.purattasiEventNotice')}</p>
@@ -159,7 +159,7 @@ export default function VisitorDashboard() {
             </span>
             <h3 className="text-lg font-bold">{t('dashboard.gokulTitle')}</h3>
             <p className="text-xs mb-3" style={{ color: '#A7F3D0' }}>
-              {language === 'ta' ? 'கோகுலாஷ்டமி 4 வருட பெருவிழா' : `Gokulaashdami 4-Year Festival • ${fourYearFn?.name || '2026-2029'}`}
+              {t('dashboard.gokulSubLabel')} • {translateFunction(fourYearFn?.name)}
             </p>
             <div className="bg-black/30 rounded-lg p-3 mb-3 border-l-4 border-emerald-400">
               <p className="text-xs font-bold">{t('dashboard.gokulEventNotice')}</p>
@@ -223,26 +223,25 @@ export default function VisitorDashboard() {
       {/* Community Services Quick Links */}
       <div>
         <p className="text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: 'var(--text-secondary)' }}>
-          {language === 'ta' ? 'சமுதாய விரைவு சேவைகள்' : 'Community Services • விரைவு சேவைகள்'}
+          {t('dashboard.communityServices')}
         </p>
         <div className="grid grid-cols-4 gap-2 sm:gap-3">
           {[
-            { href: '/visitor/members', icon: '👥', label: language === 'ta' ? 'உறுப்பினர்கள்' : 'Members', sub: language === 'ta' ? 'பக்தர்கள்' : 'உறுப்பினர்கள்', bg: '#EFF6FF' },
-            { href: '/visitor/contributions', icon: '📈', label: language === 'ta' ? 'வருமானம்' : 'Income', sub: language === 'ta' ? 'நன்கொடைகள்' : 'வருமானம்', bg: '#F0FDF4' },
-            { href: '/visitor/expenses', icon: '📉', label: language === 'ta' ? 'செலவுகள்' : 'Expenses', sub: language === 'ta' ? 'செலவினம்' : 'செலவுகள்', bg: '#FEF2F2' },
-            { href: '/visitor/savings', icon: '💰', label: language === 'ta' ? 'சேமிப்பு' : 'Savings', sub: language === 'ta' ? 'இருப்பு நிதி' : 'சேமிப்பு', bg: '#F5F3FF' },
+            { href: '/visitor/members', icon: '👥', label: t('dashboard.members'), bg: '#EFF6FF' },
+            { href: '/visitor/contributions', icon: '📈', label: t('dashboard.income'), bg: '#F0FDF4' },
+            { href: '/visitor/expenses', icon: '📉', label: t('dashboard.expenses'), bg: '#FEF2F2' },
+            { href: '/visitor/savings', icon: '💰', label: t('dashboard.savings'), bg: '#F5F3FF' },
           ].map((a) => (
             <Link
               key={a.href}
               href={a.href}
-              className="flex flex-col items-center gap-1 p-2 sm:p-3 rounded-xl border text-center hover:shadow-md transition-shadow"
+              className="flex flex-col items-center gap-1.5 p-2 sm:p-3 rounded-xl border text-center hover:shadow-md transition-shadow"
               style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg shrink-0" style={{ backgroundColor: a.bg }}>
                 {a.icon}
               </div>
               <span className="text-[11px] sm:text-xs font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
-              <span className="text-[9px] sm:text-[10px] leading-tight" style={{ color: 'var(--text-tertiary)' }}>{a.sub}</span>
             </Link>
           ))}
         </div>
@@ -252,7 +251,7 @@ export default function VisitorDashboard() {
       <div>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-bold text-sm sm:text-base" style={{ color: 'var(--text-primary)' }}>
-            {language === 'ta' ? 'சமீபத்திய நன்கொடைகள்' : 'Recent Contributions • சமீபத்திய நன்கொடைகள்'}
+            {t('dashboard.recentContributions')}
           </h3>
           <Link href="/visitor/contributions" className="text-xs sm:text-sm font-semibold flex items-center gap-1" style={{ color: 'var(--primary)' }}>
             {t('common.viewAll')} <ArrowRight size={14} />
@@ -277,7 +276,7 @@ export default function VisitorDashboard() {
                       <TrendingUp size={15} style={{ color: 'var(--income)' }} />
                     </div>
                     <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
-                      {item.member?.full_name || t('contributions.member')}
+                      {translateMember(item.member?.full_name)}
                     </p>
                   </div>
                   <span className="text-sm sm:text-base font-extrabold px-2.5 py-0.5 rounded-lg shrink-0" style={{ color: 'var(--income)', backgroundColor: 'var(--income-light)' }}>
@@ -295,7 +294,7 @@ export default function VisitorDashboard() {
                   </span>
                   {item.function?.name && (
                     <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium">
-                      🛕 {item.function.name}
+                      🛕 {translateFunction(item.function.name)}
                     </span>
                   )}
                 </div>

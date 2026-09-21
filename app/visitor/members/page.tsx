@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { Member } from '@/types';
 
 export default function VisitorMembersPage() {
-  const { language, t } = useLanguage();
+  const { language, t, translateMember } = useLanguage();
   const [members, setMembers] = useState<Member[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -76,7 +76,7 @@ export default function VisitorMembersPage() {
                 </div>
                 <div className="min-w-0">
                   <p className="font-bold text-sm sm:text-base leading-tight" style={{ color: 'var(--text-primary)' }}>
-                    {m.full_name}
+                    {translateMember(m.full_name)}
                   </p>
                   <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
                     {t('members.id')}: <span className="font-mono font-medium">{m.member_id}</span>

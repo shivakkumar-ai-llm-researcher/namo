@@ -8,7 +8,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import type { Contribution } from '@/types';
 
 export default function VisitorContributionsPage() {
-  const { language, t, formatMethod } = useLanguage();
+  const { language, t, formatMethod, translateMember, translateFunction, translateText } = useLanguage();
   const [items, setItems] = useState<Contribution[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
@@ -83,7 +83,7 @@ export default function VisitorContributionsPage() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-bold text-sm sm:text-base leading-tight" style={{ color: 'var(--text-primary)' }}>
-                      {item.member?.full_name || t('contributions.member')}
+                      {translateMember(item.member?.full_name)}
                     </p>
                     {item.member?.member_id && (
                       <p className="text-[11px] font-medium" style={{ color: 'var(--text-tertiary)' }}>
@@ -110,7 +110,7 @@ export default function VisitorContributionsPage() {
                 </span>
                 {item.function?.name && (
                   <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
-                    🛕 {item.function.name}
+                    🛕 {translateFunction(item.function.name)}
                   </span>
                 )}
                 {item.reference_number && (
@@ -123,7 +123,7 @@ export default function VisitorContributionsPage() {
               {/* Optional Notes */}
               {item.notes && (
                 <p className="text-xs text-stone-500 dark:text-stone-400 italic pt-0.5">
-                  &ldquo;{item.notes}&rdquo;
+                  &ldquo;{translateText(item.notes)}&rdquo;
                 </p>
               )}
             </div>
