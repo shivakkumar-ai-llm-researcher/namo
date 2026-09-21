@@ -9,6 +9,7 @@ import { Observer } from 'astronomy-engine';
 import { getPanchangam } from '@ishubhamx/panchangam-js/dist/core/panchangam.js';
 import { tithiNames, nakshatraNames } from '@ishubhamx/panchangam-js/dist/core/constants.js';
 import { getEkadashiName } from '@ishubhamx/panchangam-js/dist/core/festivals.js';
+import { AUTHENTICATED_2026_VISHNU_DATA } from './calendarScraperService';
 
 // Tamil Nadu Coordinates (Neyveli / Chennai region: 11.7480 N, 79.4970 E)
 export const TAMIL_NADU_OBSERVER = new Observer(11.7480, 79.4970, 0);
@@ -37,6 +38,8 @@ export interface DailyPanchangamData {
   specialEventTitle?: string;
   specialEventTitleTamil?: string;
   specialEventDescription?: string;
+  festivalCategory?: 'PURATTASI' | 'GOKULASHTAMI' | 'EKADASHI' | 'THIRUVONAM' | 'VISHNU_UTSAVAM' | 'OTHER';
+  festivalSource?: string;
   rahuKalam?: { start: string; end: string };
   yamagandaKalam?: { start: string; end: string };
 }
@@ -371,6 +374,10 @@ export const tamilCalendarService = {
 
     const isVaikuntaEkadashi = isEkadashi && tamilDate.tamilMonth === 'Margazhi' && paksha === 'Shukla';
 
+    // Consult verified SrirangamInfo scraped database
+    const scrapedVishnu = AUTHENTICATED_2026_VISHNU_DATA[dateStr];
+    const isPerumalFromScraper = scrapedVishnu?.isVishnuSpecial ?? false;
+
     // Combine special day status
     const isPerumalSpecialDay =
       isPurattasiSaturday ||
@@ -379,52 +386,65 @@ export const tamilCalendarService = {
       isThiruvonam ||
       hasRamaNavami ||
       hasNarasimhaJayanti ||
+      isPerumalFromScraper ||
       (tamilDate.tamilMonth === 'Purattasi' && tamilDate.tamilDay === 1);
 
-    let specialEventTitle: string | undefined;
-    let specialEventTitleTamil: string | undefined;
-    let specialEventDescription: string | undefined;
+    let specialEventTitle: string | undefined = scrapedVishnu?.title;
+    let specialEventTitleTamil: string | undefined = scrapedVishnu?.titleTamil;
+    let specialEventDescription: string | undefined = scrapedVishnu?.descriptionEn;
+    let festivalCategory = scrapedVishnu?.category;
+    let festivalSource = scrapedVishnu?.source;
 
     if (isPurattasiSecondSaturday) {
       specialEventTitle = '2nd Purattasi Saturday - Annual Community Function';
       specialEventTitleTamil = 'புரட்டாசி 2-வது சனிக்கிழமை (ஆண்டு பெருவிழா)';
       specialEventDescription = 'OUR ANNUAL COMMUNITY FUNCTION: Grand Tirupati Balaji Thaligai, Thirumanjanam, Deepam Aradhana & Annadhanam feast. Most auspicious day for Lord Venkateswara!';
+      festivalCategory = 'PURATTASI';
     } else if (isPurattasiSaturday) {
       specialEventTitle = `Purattasi Saturday ${purattasiSaturdayIndex ?? ''}`;
       specialEventTitleTamil = `புரட்டாசி ${purattasiSaturdayIndex ?? ''}-வது சனிக்கிழமை`;
       specialEventDescription = 'Auspicious Purattasi Sani Kizhamai: Special Venkateswara fasting, Maavilakku Deepam offering, and Perumal pooja.';
+      festivalCategory = 'PURATTASI';
     } else if (tamilDate.tamilMonth === 'Purattasi' && tamilDate.tamilDay === 1) {
       specialEventTitle = 'Purattasi Masappirappu (Holy Month Begins)';
       specialEventTitleTamil = 'புரட்டாசி மாதப்பிறப்பு (புனித மாதம் ஆரம்பம்)';
       specialEventDescription = 'Auspicious commencement of the sacred Purattasi month dedicated to Lord Venkateswara. Daily fasting, Vishnu Sahasranama chanting, and deepam devotion begin.';
+      festivalCategory = 'PURATTASI';
     } else if (isGokulashtami) {
       specialEventTitle = 'Gokulaashdami (4-Year Cycle Function)';
       specialEventTitleTamil = 'கோகுலாஷ்டமி (4 ஆண்டு சுழற்சி திருவிழா)';
       specialEventDescription = 'Annual Sri Krishna Jayanthi pooja • Celebrated in 2025 • Next Grand Celebration in 2029!';
+      festivalCategory = 'GOKULASHTAMI';
     } else if (isVaikuntaEkadashi) {
       specialEventTitle = 'Vaikunta Ekadashi (Paramapada Vaasal)';
       specialEventTitleTamil = 'வைகுண்ட ஏகாதசி (சொர்க்கவாசல் திறப்பு)';
       specialEventDescription = 'The crown jewel festival of Lord Venkateswara. Paramapada Vaasal opens in Tirumala and all Vishnu temples.';
+      festivalCategory = 'EKADASHI';
     } else if (isEkadashi) {
-      specialEventTitle = `${ekadashiName ?? 'Ekadashi'} Fasting`;
-      specialEventTitleTamil = `${paksha === 'Shukla' ? 'வளர்பிறை' : 'தேய்பிறை'} ஏகாதசி விரதம்`;
-      specialEventDescription = `Auspicious Vishnu fasting day (${tithiName} Tithi). Reading Vishnu Sahasranamam and chanting brings great merit.`;
+      specialEventTitle = scrapedVishnu?.title ?? `${ekadashiName ?? 'Ekadashi'} Fasting`;
+      specialEventTitleTamil = scrapedVishnu?.titleTamil ?? `${paksha === 'Shukla' ? 'வளர்பிறை' : 'தேய்பிறை'} ஏகாதசி விரதம்`;
+      specialEventDescription = scrapedVishnu?.descriptionEn ?? `Auspicious Vishnu fasting day (${tithiName} Tithi). Reading Vishnu Sahasranamam and chanting brings great merit.`;
+      festivalCategory = 'EKADASHI';
     } else if (isThiruvonam) {
-      specialEventTitle = 'Thiruvonam (Shravana Nakshatram)';
-      specialEventTitleTamil = 'திருவோணம் நட்சத்திரம்';
-      specialEventDescription = "Lord Venkateswara's sacred Janma Nakshatram. Special Sahasranama archana & thirumanjanam day.";
+      specialEventTitle = scrapedVishnu?.title ?? 'Thiruvonam (Shravana Nakshatram)';
+      specialEventTitleTamil = scrapedVishnu?.titleTamil ?? 'திருவோணம் நட்சத்திரம்';
+      specialEventDescription = scrapedVishnu?.descriptionEn ?? "Lord Venkateswara's sacred Janma Nakshatram. Special Sahasranama archana & thirumanjanam day.";
+      festivalCategory = 'THIRUVONAM';
     } else if (hasRamaNavami) {
       specialEventTitle = 'Sri Rama Navami';
       specialEventTitleTamil = 'ஸ்ரீ ராம நவமி';
       specialEventDescription = 'Divine incarnation of Lord Sri Rama, 7th avatar of Lord Maha Vishnu.';
+      festivalCategory = 'VISHNU_UTSAVAM';
     } else if (hasNarasimhaJayanti) {
       specialEventTitle = 'Narasimha Jayanti';
       specialEventTitleTamil = 'ஸ்ரீ நரசிம்ம ஜெயந்தி';
       specialEventDescription = 'Divine incarnation of Lord Sri Narasimha Swami to protect devotee Prahlada.';
+      festivalCategory = 'VISHNU_UTSAVAM';
     } else if (tamilDate.isMonthStart) {
       specialEventTitle = `${tamilDate.tamilMonth} Masappirappu (Month Ingress)`;
       specialEventTitleTamil = `${tamilDate.tamilMonthTamil} மாதப்பிறப்பு`;
       specialEventDescription = `Auspicious first day of the Tamil month of ${tamilDate.tamilMonthTamil} (${tamilDate.tamilMonth}). Surya Bhagavan transitions into ${raw.sunRashi?.name ?? 'Sign'} (Sankranti).`;
+      festivalCategory = 'OTHER';
     }
 
     return {
@@ -451,6 +471,8 @@ export const tamilCalendarService = {
       specialEventTitle,
       specialEventTitleTamil,
       specialEventDescription,
+      festivalCategory,
+      festivalSource,
       rahuKalam: (raw.rahuKalamStart && raw.rahuKalamEnd)
         ? {
             start: new Date(raw.rahuKalamStart).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),

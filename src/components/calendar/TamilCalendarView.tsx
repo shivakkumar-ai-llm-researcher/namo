@@ -10,6 +10,9 @@ import {
   Star,
   Clock,
   Flame,
+  RefreshCw,
+  Bell,
+  Radio,
 } from 'lucide-react';
 import { Card, Badge } from '../ui';
 import { BalajiNamam } from '../ui/BalajiNamam';
@@ -17,6 +20,11 @@ import {
   tamilCalendarService,
   DailyPanchangamData,
 } from '../../services/tamilCalendarService';
+import {
+  calendarScraperService,
+  CalendarSyncResult,
+  ScrapedFestival,
+} from '../../services/calendarScraperService';
 import { CommunityFunction } from '../../types';
 
 interface TamilCalendarViewProps {
@@ -55,7 +63,10 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
   const [currentYearMonth, setCurrentYearMonth] = useState<string>(today.substring(0, 7));
   const [monthData, setMonthData] = useState<Record<string, DailyPanchangamData>>({});
   const [loadingMonth, setLoadingMonth] = useState<boolean>(true);
-  const [filterCategory, setFilterCategory] = useState<'ALL' | 'PURATTASI' | 'GOKULASHTAMI' | 'EKADASHI'>('ALL');
+  const [filterCategory, setFilterCategory] = useState<'ALL' | 'PERUMAL' | 'PURATTASI' | 'GOKULASHTAMI' | 'EKADASHI' | 'THIRUVONAM'>('ALL');
+  const [syncResult, setSyncResult] = useState<CalendarSyncResult | null>(null);
+  const [isSyncing, setIsSyncing] = useState<boolean>(false);
+  const [syncStatusMsg, setSyncStatusMsg] = useState<string>('');
 
   const selectedYear = parseInt(currentYearMonth.split('-')[0], 10) || new Date().getFullYear();
   const selectedMonthNum = parseInt(currentYearMonth.split('-')[1], 10) || (new Date().getMonth() + 1);
@@ -82,7 +93,30 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     setSelectedDate(today);
   };
 
-  // 1. Fetch dynamic panchangam data for visible month (with localStorage caching)
+  // 1. Automated 8-Hour Sync from SrirangamInfo & TamilCalendarz
+  const loadSyncData = async (force = false) => {
+    setIsSyncing(true);
+    try {
+      const data = await calendarScraperService.getOrSyncCalendarData(force);
+      setSyncResult(data);
+      const status = calendarScraperService.getSyncStatus(data.lastSyncedAt);
+      setSyncStatusMsg(status.text);
+
+      // Refresh current month's panchangam to reflect newly scraped data
+      const updated = await tamilCalendarService.getMonthPanchangam(currentYearMonth);
+      setMonthData(updated);
+    } catch (err) {
+      console.warn('Failed to load sync data:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  useEffect(() => {
+    loadSyncData(false);
+  }, []);
+
+  // 2. Fetch dynamic panchangam data for visible month (with localStorage caching)
   useEffect(() => {
     let isMounted = true;
     async function loadMonth() {
@@ -107,7 +141,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     };
   }, [currentYearMonth]);
 
-  // 2. 4-Year Gokulaashdami cycle information
+  // 3. 4-Year Gokulaashdami cycle information
   const gokulashtamiCycle = useMemo(() => {
     try {
       return tamilCalendarService.getGokulashtamiCycleInfo(selectedYear);
@@ -116,7 +150,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     }
   }, [selectedYear]);
 
-  // 3. Purattasi Saturdays for the year
+  // 4. Purattasi Saturdays for the year
   const purattasiSaturdays = useMemo(() => {
     try {
       return tamilCalendarService.getPurattasiSaturdays(selectedYear);
@@ -125,12 +159,12 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     }
   }, [selectedYear]);
 
-  // 4. Identify the 2nd Saturday of Purattasi
+  // 5. Identify the 2nd Saturday of Purattasi
   const secondSaturday = useMemo(() => {
     return purattasiSaturdays.find((s) => s.isSecond);
   }, [purattasiSaturdays]);
 
-  // 5. Selected Day Panchangam Data
+  // 6. Selected Day Panchangam Data
   const selectedDayInfo = useMemo(() => {
     if (monthData[selectedDate]) {
       return monthData[selectedDate];
@@ -145,25 +179,48 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
     }
   }, [monthData, selectedDate]);
 
-  // 6. Special days list for the visible month
+  // 7. Special days list for the visible month
   const specialDaysInMonth = useMemo(() => {
     const list = Object.values(monthData).filter((d) => d.isPerumalSpecialDay);
     return list.sort((a, b) => a.date.localeCompare(b.date));
   }, [monthData]);
 
-  // Filtered list
+  // 8. Filtered list based on category
   const filteredSpecialDays = useMemo(() => {
     switch (filterCategory) {
+      case 'PERUMAL':
+        return specialDaysInMonth.filter((d) => d.isPerumalSpecialDay);
       case 'PURATTASI':
         return specialDaysInMonth.filter((d) => d.isPurattasiSaturday);
       case 'GOKULASHTAMI':
         return specialDaysInMonth.filter((d) => d.isGokulashtami);
       case 'EKADASHI':
         return specialDaysInMonth.filter((d) => d.isEkadashi);
+      case 'THIRUVONAM':
+        return specialDaysInMonth.filter((d) => d.isThiruvonam);
       default:
         return specialDaysInMonth;
     }
   }, [specialDaysInMonth, filterCategory]);
+
+  // 9. Active / Upcoming Perumal Special Day for Notification Alert
+  const activeVishnuDay = useMemo(() => {
+    if (selectedDayInfo?.isPerumalSpecialDay) {
+      return selectedDayInfo;
+    }
+    if (monthData[today]?.isPerumalSpecialDay) {
+      return monthData[today];
+    }
+    const upcoming = Object.values(monthData)
+      .filter((d) => d.isPerumalSpecialDay && d.date >= today)
+      .sort((a, b) => a.date.localeCompare(b.date))[0];
+    if (upcoming) return upcoming;
+
+    if (syncResult?.upcomingVishnuDay) {
+      return syncResult.upcomingVishnuDay as any;
+    }
+    return null;
+  }, [selectedDayInfo, monthData, today, syncResult]);
 
   // Calendar Grid Computations
   const calendarGrid = useMemo(() => {
@@ -184,6 +241,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
       isPurattasiSat?: boolean;
       isGokula?: boolean;
       isEkadashi?: boolean;
+      isThiruvonam?: boolean;
       isSpecial?: boolean;
       isSaturday?: boolean;
     }> = [];
@@ -217,6 +275,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
         isPurattasiSat: dayData?.isPurattasiSaturday,
         isGokula: dayData?.isGokulashtami,
         isEkadashi: dayData?.isEkadashi,
+        isThiruvonam: dayData?.isThiruvonam,
         isSpecial: dayData?.isPerumalSpecialDay,
         isSaturday: isSat,
       });
@@ -252,6 +311,131 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
 
   return (
     <div className="space-y-6">
+      {/* Automated 8-Hour Sync Status Bar (SrirangamInfo & TamilCalendarz) */}
+      <div
+        className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 rounded-2xl border transition-all"
+        style={{
+          backgroundColor: 'var(--surface)',
+          borderColor: 'var(--border)',
+        }}
+      >
+        <div className="flex items-center gap-2.5">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+          </span>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
+            <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>
+              SrirangamInfo & TamilCalendarz Auto-Sync
+            </span>
+            <span className="text-[11px] text-stone-500 dark:text-stone-400">
+              {syncStatusMsg || 'Automated background sync every 8 hours'}
+            </span>
+          </div>
+        </div>
+
+        <button
+          onClick={() => loadSyncData(true)}
+          disabled={isSyncing}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer disabled:opacity-50"
+          style={{
+            backgroundColor: 'var(--surface-variant)',
+            borderColor: 'var(--border)',
+            color: 'var(--primary)',
+          }}
+          title="Run instant synchronization from SrirangamInfo"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
+          <span>{isSyncing ? 'Syncing...' : 'Sync Now'}</span>
+        </button>
+      </div>
+
+      {/* Perumal Sacred Days Live Notification Alert Card */}
+      {activeVishnuDay && (
+        <div
+          className="rounded-2xl p-5 text-white relative overflow-hidden shadow-lg border-2"
+          style={{
+            background: 'linear-gradient(135deg, #450A0A 0%, #7F1D1D 50%, #78350F 100%)',
+            borderColor: '#F59E0B',
+          }}
+        >
+          <div className="flex items-start justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-black/30 border border-yellow-400/80 shadow-md">
+                <BalajiNamam size={26} />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span
+                    className="inline-flex items-center rounded-full text-[10px] font-extrabold px-2.5 py-0.5 uppercase tracking-wider text-stone-900 shadow-sm"
+                    style={{ backgroundColor: '#F59E0B' }}
+                  >
+                    PERUMAL SPECIAL DAY • பெருமாள் விசேஷ நாள்
+                  </span>
+                  {activeVishnuDay.date === today && (
+                    <span className="bg-red-500 text-white font-extrabold text-[10px] px-2 py-0.5 rounded-full animate-pulse shadow-sm">
+                      TODAY • இன்று
+                    </span>
+                  )}
+                  {activeVishnuDay.isPurattasiSecondSaturday && (
+                    <span className="bg-amber-400 text-stone-900 font-extrabold text-[10px] px-2 py-0.5 rounded-full shadow-sm">
+                      ANNUAL COMMUNITY FUNCTION
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="text-lg font-bold text-white mt-1">
+                  {activeVishnuDay.specialEventTitle || (activeVishnuDay as any).title}
+                </h3>
+                <p className="text-xs font-semibold text-amber-200 mt-0.5">
+                  {activeVishnuDay.specialEventTitleTamil || (activeVishnuDay as any).titleTamil}
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => {
+                setSelectedDate(activeVishnuDay.date);
+                setCurrentYearMonth(activeVishnuDay.date.substring(0, 7));
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-stone-950 text-xs font-bold transition-all shadow-md cursor-pointer self-start"
+            >
+              View on Calendar 📅
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+            <div className="bg-black/30 rounded-xl p-3 border border-amber-500/30">
+              <p className="text-[11px] font-bold text-amber-300 uppercase tracking-wide">
+                Sacred Date & Day • புனித நாள்
+              </p>
+              <p className="text-sm font-bold text-white mt-0.5">
+                {new Date(activeVishnuDay.date).toLocaleDateString('en-IN', {
+                  weekday: 'long',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
+              <p className="text-xs text-amber-100/90 mt-1">
+                {activeVishnuDay.tamilMonthTamil} {activeVishnuDay.tamilDay} ({activeVishnuDay.tamilMonth}) • {activeVishnuDay.tamilYear}
+              </p>
+            </div>
+
+            <div className="bg-black/30 rounded-xl p-3 border border-amber-500/30">
+              <p className="text-[11px] font-bold text-amber-300 uppercase tracking-wide">
+                Spiritual Seva & Fasting • விரத வழிபாட்டு முறை
+              </p>
+              <p className="text-xs text-stone-100 leading-relaxed mt-0.5">
+                {activeVishnuDay.specialEventDescription ||
+                  (activeVishnuDay as any).descriptionEn ||
+                  'Auspicious day for Lord Venkateswara Balaji worship, fasting, and reciting Sri Vishnu Sahasranamam.'}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 1. Sacred Purattasi 2nd Saturday Special Feature Banner */}
       <div
         className="rounded-2xl p-5 text-white relative overflow-hidden shadow-lg border-2"
@@ -500,6 +684,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
               cellBg = 'rgba(217, 119, 6, 0.15)';
             } else if (isGokula) {
               cellBg = 'rgba(16, 185, 129, 0.15)';
+            } else if (isSpecial) {
+              cellBg = 'rgba(217, 119, 6, 0.08)';
             }
 
             return (
@@ -517,8 +703,10 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
                     ? '#10B981'
                     : isSelected
                     ? 'var(--primary)'
+                    : isSpecial
+                    ? '#F59E0B'
                     : 'transparent',
-                  borderWidth: isToday || isSecondSat || isGokula || isSelected ? '1.5px' : '1px',
+                  borderWidth: isToday || isSecondSat || isGokula || isSelected || isSpecial ? '1.5px' : '1px',
                 }}
               >
                 {/* Gregorian Day */}
@@ -554,6 +742,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
                             ? '#FEF3C7'
                             : isSecondSat
                             ? '#B45309'
+                            : isSpecial
+                            ? '#B45309'
                             : 'var(--text-tertiary)',
                         }}
                       >
@@ -566,18 +756,25 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
                 {/* Auspicious Dots Row */}
                 <div className="flex items-center gap-0.5 mt-0.5 h-1.5">
                   {isSecondSat && (
-                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-sm" />
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-sm" title="2nd Purattasi Saturday" />
                   )}
                   {!isSecondSat && isPurattasiSat && (
-                    <div className="w-1 h-1 rounded-full bg-amber-600" />
+                    <div className="w-1 h-1 rounded-full bg-amber-600" title="Purattasi Saturday" />
                   )}
                   {isGokula && (
-                    <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                    <div className="w-1 h-1 rounded-full bg-emerald-500" title="Gokulaashdami" />
                   )}
-                  {(isEkadashi || (isSpecial && !isSecondSat && !isPurattasiSat && !isGokula)) && (
+                  {isEkadashi && (
+                    <div className="w-1 h-1 rounded-full bg-purple-500" title="Ekadashi" />
+                  )}
+                  {cell.isThiruvonam && (
+                    <div className="w-1 h-1 rounded-full bg-amber-400" title="Thiruvonam Nakshatra" />
+                  )}
+                  {(isSpecial && !isSecondSat && !isPurattasiSat && !isGokula && !isEkadashi && !cell.isThiruvonam) && (
                     <div
                       className="w-1 h-1 rounded-full"
                       style={{ backgroundColor: isSelected ? '#FFFFFF' : 'var(--primary)' }}
+                      title="Perumal Sacred Day"
                     />
                   )}
                 </div>
@@ -588,7 +785,7 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
 
         {/* Legend */}
         <div
-          className="flex flex-wrap items-center justify-around py-2.5 px-4 border-t text-xs"
+          className="flex flex-wrap items-center justify-around py-2.5 px-4 border-t text-xs gap-2"
           style={{
             backgroundColor: 'var(--surface-variant)',
             borderColor: 'var(--border)',
@@ -600,12 +797,20 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
             <span>Purattasi 2nd Sat</span>
           </div>
           <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-amber-600" />
+            <span>Purattasi Sat</span>
+          </div>
+          <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-emerald-500" />
             <span>Gokulaashdami</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--primary)' }} />
-            <span>Ekadashi / Utsavam</span>
+            <div className="w-2 h-2 rounded-full bg-purple-500" />
+            <span>Ekadashi Vratam</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-amber-400" />
+            <span>Thiruvonam / Perumal Day</span>
           </div>
         </div>
       </div>
@@ -747,10 +952,12 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
         {/* Filter Pills */}
         <div className="flex flex-wrap gap-2">
           {[
-            { id: 'ALL', label: 'All Days' },
-            { id: 'PURATTASI', label: '⭐ Purattasi Saturdays' },
-            { id: 'GOKULASHTAMI', label: '🌟 Gokulaashdami' },
-            { id: 'EKADASHI', label: 'Ekadashi Vratams' },
+            { id: 'ALL', label: 'All Sacred Days (அனைத்தும்)' },
+            { id: 'PERUMAL', label: '🛕 All Perumal Days (பெருமாள் விசேஷங்கள்)' },
+            { id: 'PURATTASI', label: '⭐ Purattasi Saturdays (புரட்டாசி சனி)' },
+            { id: 'GOKULASHTAMI', label: '🌟 Gokulaashdami (கோகுலாஷ்டமி)' },
+            { id: 'EKADASHI', label: '✨ Ekadashi (ஏகாதசி விரதம்)' },
+            { id: 'THIRUVONAM', label: '🔱 Thiruvonam (திருவோணம்)' },
           ].map((cat) => {
             const isSel = filterCategory === cat.id;
             return (
@@ -789,6 +996,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
             filteredSpecialDays.map((day) => {
               const isSecondSat = day.isPurattasiSecondSaturday;
               const isGokula = day.isGokulashtami;
+              const isThiru = day.isThiruvonam;
+              const isEka = day.isEkadashi;
 
               return (
                 <div
@@ -800,14 +1009,21 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
                       ? 'rgba(217, 119, 6, 0.08)'
                       : isGokula
                       ? 'rgba(16, 185, 129, 0.08)'
+                      : isThiru
+                      ? 'rgba(245, 158, 11, 0.06)'
                       : 'var(--surface)',
-                    borderColor: isSecondSat ? '#F59E0B' : isGokula ? '#10B981' : 'var(--border)',
-                    borderWidth: isSecondSat || isGokula ? '1.5px' : '1px',
+                    borderColor: isSecondSat ? '#F59E0B' : isGokula ? '#10B981' : isThiru ? '#F59E0B' : 'var(--border)',
+                    borderWidth: isSecondSat || isGokula || isThiru ? '1.5px' : '1px',
                   }}
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="space-y-1 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
+                        {day.isPerumalSpecialDay && (
+                          <div className="w-5 h-5 rounded-md flex items-center justify-center bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                            <BalajiNamam size={16} />
+                          </div>
+                        )}
                         <h5 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
                           {day.specialEventTitle}
                         </h5>
@@ -816,6 +1032,12 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
                         )}
                         {isGokula && (
                           <Badge label="4-YEAR CYCLE" variant="success" size="sm" />
+                        )}
+                        {isThiru && (
+                          <Badge label="PERUMAL JANMA STAR" variant="warning" size="sm" />
+                        )}
+                        {isEka && (
+                          <Badge label="EKADASHI VRATAM" variant="info" size="sm" />
                         )}
                       </div>
 
