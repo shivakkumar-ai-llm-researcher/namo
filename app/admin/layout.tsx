@@ -53,14 +53,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Brand */}
-      <div className="px-4 py-5 border-b" style={{ borderColor: 'var(--border)', borderBottom: '2px solid #D97706' }}>
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}>
-            <BalajiNamam size={22} />
+      <div className="h-[70px] px-4 flex items-center border-b flex-shrink-0" style={{ borderColor: 'var(--border)', borderBottom: '2px solid #D97706' }}>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0" style={{ backgroundColor: 'var(--primary)', border: '1.5px solid #F59E0B' }}>
+            <BalajiNamam size={24} />
           </div>
-          <div>
-            <div className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Srivari Community Fund</div>
-            <div className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>Admin Portal</div>
+          <div className="min-w-0">
+            <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>Srivari Community Fund</div>
+            <div className="text-[10px] font-medium truncate" style={{ color: 'var(--text-tertiary)' }}>Admin Portal • நிர்வாகம்</div>
           </div>
         </div>
       </div>
@@ -118,12 +118,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-64 shadow-2xl" style={{ backgroundColor: 'var(--surface)' }}>
-            <div className="flex items-center justify-between px-4 py-3 border-b" style={{ borderColor: 'var(--border)' }}>
-              <span className="font-bold" style={{ color: 'var(--text-primary)' }}>Menu</span>
+          <aside className="absolute left-0 top-0 bottom-0 w-72 max-w-[85vw] shadow-2xl flex flex-col z-10" style={{ backgroundColor: 'var(--surface)' }}>
+            <div className="h-[70px] flex items-center justify-between px-4 border-b flex-shrink-0" style={{ borderColor: 'var(--border)', borderBottom: '2px solid #D97706' }}>
+              <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>Admin Menu • பட்டி</span>
               <button onClick={() => setSidebarOpen(false)} style={{ color: 'var(--text-secondary)' }}><X size={20} /></button>
             </div>
-            {sidebarContent}
+            <div className="flex-1 overflow-y-auto">
+              {sidebarContent}
+            </div>
           </aside>
         </div>
       )}
@@ -131,8 +133,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="sticky top-0 z-40 flex items-center gap-3 px-4 py-3 border-b" style={{ backgroundColor: 'var(--surface)', borderBottom: '2px solid #D97706' }}>
-          <button className="lg:hidden p-2 rounded-lg" style={{ color: 'var(--text-secondary)' }} onClick={() => setSidebarOpen(true)}><Menu size={20} /></button>
+        <header className="sticky top-0 z-40 h-[70px] flex items-center gap-3 px-4 lg:px-6 border-b flex-shrink-0" style={{ backgroundColor: 'var(--surface)', borderBottom: '2px solid #D97706' }}>
+          <button className="lg:hidden p-2 rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 transition-colors" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }} onClick={() => setSidebarOpen(true)}>
+            <Menu size={20} />
+          </button>
           <div className="flex-1" />
           <ThemeToggle />
         </header>

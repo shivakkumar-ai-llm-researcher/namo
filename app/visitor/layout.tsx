@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -61,8 +61,8 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
   const sidebarContent = (
     <div className="flex flex-col h-full">
       {/* Brand Header */}
-      <div className="px-5 py-5 border-b" style={{ borderColor: 'var(--border)', borderBottom: '2px solid #D97706' }}>
-        <div className="flex items-center gap-3">
+      <div className="h-[70px] px-4 flex items-center border-b flex-shrink-0" style={{ borderColor: 'var(--border)', borderBottom: '2px solid #D97706' }}>
+        <div className="flex items-center gap-3 min-w-0">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm flex-shrink-0"
             style={{ backgroundColor: 'var(--primary)', border: '1.5px solid #F59E0B' }}
@@ -73,7 +73,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
             <div className="text-sm font-bold truncate" style={{ color: 'var(--text-primary)' }}>
               {profile?.full_name || 'Srivari Devotee'}
             </div>
-            <div className="text-[11px] font-medium" style={{ color: 'var(--text-tertiary)' }}>
+            <div className="text-[11px] font-medium truncate" style={{ color: 'var(--text-tertiary)' }}>
               Devotee Portal • பக்தர் தளம்
             </div>
           </div>
@@ -167,8 +167,8 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
             style={{ backgroundColor: 'var(--surface)' }}
           >
             <div
-              className="flex items-center justify-between px-4 py-3.5 border-b"
-              style={{ borderColor: 'var(--border)' }}
+              className="h-[70px] flex items-center justify-between px-4 border-b flex-shrink-0"
+              style={{ borderColor: 'var(--border)', borderBottom: '2px solid #D97706' }}
             >
               <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
                 Devotee Navigation • பட்டி
@@ -193,7 +193,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Header Bar for Mobile & Tablet (and Theme Toggle for Desktop) */}
         <header
-          className="sticky top-0 z-40 flex items-center justify-between px-4 lg:px-6 py-3 border-b"
+          className="sticky top-0 z-40 h-[70px] flex items-center justify-between px-4 lg:px-6 border-b flex-shrink-0"
           style={{
             backgroundColor: 'var(--surface)',
             borderBottom: '2px solid #D97706',
