@@ -2,7 +2,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { Menu, Volume2 } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface TirupatiHeaderBannerProps {
   onMenuClick?: () => void;
@@ -10,7 +9,7 @@ interface TirupatiHeaderBannerProps {
 }
 
 export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: TirupatiHeaderBannerProps) {
-  const { resolvedTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -109,31 +108,101 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
         </svg>
       </div>
 
-      {/* ── Sacred Hills Silhouette & Glowing Sun: Right Side ── */}
-      <div className="absolute right-0 bottom-0 top-0 w-40 sm:w-60 pointer-events-none z-0">
+      {/* ── Sacred Hills Silhouette & Celestial Body (Sun/Moon): Right Side ── */}
+      <div
+        onClick={() => setTheme(isDark ? 'light' : 'dark')}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setTheme(isDark ? 'light' : 'dark');
+          }
+        }}
+        title={
+          isDark
+            ? 'சந்திர தரிசனம் (Moon with Tirumala) • Click to switch to Light Theme'
+            : 'சூரிய தரிசனம் (Sun with Tirumala) • Click to switch to Dark Theme'
+        }
+        aria-label={isDark ? 'Switch to Light Theme' : 'Switch to Dark Theme'}
+        className="absolute right-0 bottom-0 top-0 w-44 sm:w-64 cursor-pointer z-0 group select-none transition-opacity duration-300 hover:opacity-90"
+      >
         <svg viewBox="0 0 200 80" preserveAspectRatio="none" className="w-full h-full">
           <defs>
+            {/* Sun Glow Gradient */}
             <radialGradient id="sunGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor={isDark ? '#FEF08A' : '#FEF08A'} stopOpacity="1" />
-              <stop offset="35%" stopColor="#F59E0B" stopOpacity={isDark ? '0.95' : '0.9'} />
-              <stop offset="70%" stopColor="#D97706" stopOpacity={isDark ? '0.6' : '0.5'} />
+              <stop offset="0%" stopColor="#FEF08A" stopOpacity="1" />
+              <stop offset="35%" stopColor="#F59E0B" stopOpacity="0.9" />
+              <stop offset="70%" stopColor="#D97706" stopOpacity="0.5" />
               <stop offset="100%" stopColor="#B45309" stopOpacity="0" />
             </radialGradient>
+
+            {/* Moon Glow Gradient */}
+            <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+              <stop offset="30%" stopColor="#E0E7FF" stopOpacity="0.85" />
+              <stop offset="65%" stopColor="#818CF8" stopOpacity="0.35" />
+              <stop offset="100%" stopColor="#312E81" stopOpacity="0" />
+            </radialGradient>
+
+            {/* Moon Surface Gradient */}
+            <radialGradient id="moonSurface" cx="40%" cy="35%" r="60%">
+              <stop offset="0%" stopColor="#FFFFFF" />
+              <stop offset="65%" stopColor="#E2E8F0" />
+              <stop offset="100%" stopColor="#CBD5E1" />
+            </radialGradient>
+
+            {/* Right Hill Gradient */}
             <linearGradient id="rightHillGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor={isDark ? '#3D1C2E' : '#603423'} />
-              <stop offset="50%" stopColor={isDark ? '#250F1D' : '#451A10'} />
-              <stop offset="100%" stopColor={isDark ? '#12050E' : '#250B08'} />
+              <stop offset="0%" stopColor={isDark ? '#361528' : '#603423'} />
+              <stop offset="50%" stopColor={isDark ? '#230C1A' : '#451A10'} />
+              <stop offset="100%" stopColor={isDark ? '#11040D' : '#250B08'} />
             </linearGradient>
           </defs>
 
-          {/* Glowing Sun behind the sacred cliff */}
-          <circle cx="165" cy="40" r="34" fill="url(#sunGlow)" />
-          <circle cx="165" cy="40" r="16" fill="#FDE047" opacity="0.95" />
+          {isDark ? (
+            /* ── Dark Theme: Moon with Tirumala & Night Stars ── */
+            <>
+              {/* Night Sky Stars */}
+              <circle cx="115" cy="18" r="0.9" fill="#FFFFFF" opacity="0.8" />
+              <circle cx="132" cy="12" r="0.7" fill="#93C5FD" opacity="0.85" />
+              <circle cx="148" cy="22" r="1.1" fill="#FEF08A" opacity="0.9" />
+              <circle cx="178" cy="12" r="0.8" fill="#FFFFFF" opacity="0.7" />
+              <circle cx="192" cy="22" r="1.0" fill="#BAE6FD" opacity="0.8" />
+              {/* Twinkle star */}
+              <path d="M125,8 L126,10 L128,11 L126,12 L125,14 L124,12 L122,11 L124,10 Z" fill="#FFFFFF" opacity="0.75" />
+
+              {/* Glowing Full Moon over Sacred Tirumala Cliff */}
+              <circle cx="165" cy="38" r="32" fill="url(#moonGlow)" />
+              <circle cx="165" cy="38" r="15" fill="url(#moonSurface)" />
+              {/* Realistic subtle lunar craters */}
+              <ellipse cx="162" cy="36" rx="3.2" ry="2.2" fill="#94A3B8" opacity="0.32" />
+              <ellipse cx="168" cy="41" rx="2.5" ry="1.8" fill="#94A3B8" opacity="0.28" />
+              <ellipse cx="170" cy="34" rx="2" ry="2.4" fill="#64748B" opacity="0.22" />
+              <circle cx="160" cy="42" r="1.5" fill="#94A3B8" opacity="0.25" />
+            </>
+          ) : (
+            /* ── Light Theme: Radiant Golden Sun with Tirumala ── */
+            <>
+              {/* Glowing Sun behind the sacred cliff */}
+              <circle cx="165" cy="40" r="34" fill="url(#sunGlow)" />
+              <circle cx="165" cy="40" r="16" fill="#FDE047" opacity="0.95" />
+              <circle cx="165" cy="40" r="11" fill="#FEF08A" opacity="0.9" />
+            </>
+          )}
 
           {/* Rocky mountain crags of Tirumala Hills */}
           <path
             d="M130,80 Q138,55 145,45 Q152,32 160,35 Q168,38 175,22 Q182,10 188,18 Q194,26 200,32 L200,80 Z"
             fill="url(#rightHillGrad)"
+          />
+          {/* Subtle luminous rim light along Tirumala mountain crest */}
+          <path
+            d="M130,80 Q138,55 145,45 Q152,32 160,35 Q168,38 175,22 Q182,10 188,18 Q194,26 200,32"
+            fill="none"
+            stroke={isDark ? '#93C5FD' : '#FDE047'}
+            strokeWidth="0.8"
+            opacity={isDark ? '0.45' : '0.65'}
           />
           <path
             d="M142,80 L148,58 Q155,42 165,48 Q172,30 182,38 Q190,28 200,38 L200,80 Z"
@@ -351,14 +420,145 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
           </button>
         </div>
 
-        {/* Theme Toggle */}
-        <div
-          className={`rounded-xl p-0.5 border backdrop-blur-xs flex items-center shadow-xs ${
-            isDark ? 'bg-black/40 border-amber-500/40' : 'bg-black/15 border-white/30'
+        {/* ── Sacred Tirumala Sun / Moon Celestial Theme Switcher ── */}
+        <button
+          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          title={
+            isDark
+              ? 'சந்திர தரிசனம் (Moon with Tirumala) • Tap to switch to Light Theme'
+              : 'சூரிய தரிசனம் (Sun with Tirumala) • Tap to switch to Dark Theme'
+          }
+          aria-label={
+            isDark
+              ? 'Current theme: Moon with Tirumala (Dark). Tap to switch to Light Theme.'
+              : 'Current theme: Sun with Tirumala (Light). Tap to switch to Dark Theme.'
+          }
+          className={`relative group flex items-center justify-center p-0.5 sm:p-1 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer shadow-md hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 ${
+            isDark
+              ? 'bg-stone-950/85 border-amber-400/50 hover:border-amber-300 hover:shadow-[0_0_14px_rgba(147,197,253,0.4)] focus:ring-amber-400/50'
+              : 'bg-white/85 border-purple-300/90 hover:border-amber-500/80 hover:shadow-[0_0_14px_rgba(245,158,11,0.45)] focus:ring-amber-500/50'
           }`}
         >
-          <ThemeToggle />
-        </div>
+          {/* Miniature Tirumala Artwork Card */}
+          <div className="w-13 sm:w-16 h-8 sm:h-9 relative rounded-lg overflow-hidden flex items-center justify-center shadow-inner">
+            <svg viewBox="0 0 64 36" preserveAspectRatio="none" className="w-full h-full">
+              <defs>
+                {/* Mini Sun Gradients */}
+                <radialGradient id="btnSunGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#FEF08A" stopOpacity="1" />
+                  <stop offset="45%" stopColor="#F59E0B" stopOpacity="0.85" />
+                  <stop offset="100%" stopColor="#D97706" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="btnSkyLight" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#C49AB8" />
+                  <stop offset="50%" stopColor="#E2AC9E" />
+                  <stop offset="100%" stopColor="#FED7AA" />
+                </linearGradient>
+
+                {/* Mini Moon Gradients */}
+                <radialGradient id="btnMoonGlow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#FFFFFF" stopOpacity="1" />
+                  <stop offset="45%" stopColor="#93C5FD" stopOpacity="0.75" />
+                  <stop offset="100%" stopColor="#312E81" stopOpacity="0" />
+                </radialGradient>
+                <linearGradient id="btnSkyDark" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#11071F" />
+                  <stop offset="60%" stopColor="#220D38" />
+                  <stop offset="100%" stopColor="#3B1754" />
+                </linearGradient>
+              </defs>
+
+              {isDark ? (
+                /* ── Moon with Tirumala Image (Dark Theme) ── */
+                <>
+                  {/* Midnight Sky */}
+                  <rect width="64" height="36" fill="url(#btnSkyDark)" />
+
+                  {/* Stars */}
+                  <circle cx="8" cy="8" r="0.7" fill="#FFFFFF" opacity="0.8" />
+                  <circle cx="18" cy="6" r="0.5" fill="#FEF08A" opacity="0.85" />
+                  <circle cx="30" cy="9" r="0.6" fill="#93C5FD" opacity="0.7" />
+                  <circle cx="56" cy="7" r="0.8" fill="#FFFFFF" opacity="0.75" />
+                  {/* Small sparkle */}
+                  <path d="M14,14 L14.7,15.3 L16,16 L14.7,16.7 L14,18 L13.3,16.7 L12,16 L13.3,15.3 Z" fill="#FFFFFF" opacity="0.7" />
+
+                  {/* Luminous Moon over the Sacred Hills */}
+                  <circle cx="44" cy="13" r="10" fill="url(#btnMoonGlow)" />
+                  <circle cx="44" cy="13" r="6" fill="#F8FAFC" />
+                  {/* Subtle Moon craters */}
+                  <ellipse cx="42.5" cy="12" rx="1.5" ry="1.1" fill="#94A3B8" opacity="0.4" />
+                  <ellipse cx="45" cy="14.5" rx="1.2" ry="0.9" fill="#94A3B8" opacity="0.35" />
+                  <circle cx="46" cy="11.8" r="0.8" fill="#64748B" opacity="0.3" />
+
+                  {/* Tirumala Hills Silhouettes */}
+                  <path
+                    d="M0,36 L0,22 Q14,15 28,21 Q38,25 50,18 Q58,21 64,17 L64,36 Z"
+                    fill="#1A0A26"
+                  />
+                  {/* Ridge highlight */}
+                  <path
+                    d="M0,22 Q14,15 28,21 Q38,25 50,18 Q58,21 64,17"
+                    fill="none"
+                    stroke="#93C5FD"
+                    strokeWidth="0.6"
+                    opacity="0.5"
+                  />
+                  <path
+                    d="M0,36 L0,26 Q12,20 25,23 Q35,16 48,22 Q58,19 64,24 L64,36 Z"
+                    fill="#0A0210"
+                    opacity="0.9"
+                  />
+                </>
+              ) : (
+                /* ── Sun with Tirumala Image (Light Theme) ── */
+                <>
+                  {/* Radiant Sunset/Dusk Sky */}
+                  <rect width="64" height="36" fill="url(#btnSkyLight)" />
+
+                  {/* Glowing Sun over Tirumala */}
+                  <circle cx="44" cy="13" r="11" fill="url(#btnSunGlow)" />
+                  <circle cx="44" cy="13" r="6" fill="#FDE047" />
+                  <circle cx="44" cy="13" r="3.5" fill="#FEF08A" />
+
+                  {/* Sun rays */}
+                  <line x1="44" y1="4" x2="44" y2="2" stroke="#F59E0B" strokeWidth="0.8" opacity="0.7" />
+                  <line x1="51" y1="6" x2="52.5" y2="4.5" stroke="#F59E0B" strokeWidth="0.8" opacity="0.7" />
+                  <line x1="53" y1="13" x2="55" y2="13" stroke="#F59E0B" strokeWidth="0.8" opacity="0.7" />
+                  <line x1="37" y1="6" x2="35.5" y2="4.5" stroke="#F59E0B" strokeWidth="0.8" opacity="0.7" />
+                  <line x1="35" y1="13" x2="33" y2="13" stroke="#F59E0B" strokeWidth="0.8" opacity="0.7" />
+
+                  {/* Tirumala Hills Silhouettes */}
+                  <path
+                    d="M0,36 L0,22 Q14,15 28,21 Q38,25 50,18 Q58,21 64,17 L64,36 Z"
+                    fill="#6A2E44"
+                  />
+                  {/* Golden Ridge Rim */}
+                  <path
+                    d="M0,22 Q14,15 28,21 Q38,25 50,18 Q58,21 64,17"
+                    fill="none"
+                    stroke="#FDE047"
+                    strokeWidth="0.7"
+                    opacity="0.85"
+                  />
+                  <path
+                    d="M0,36 L0,26 Q12,20 25,23 Q35,16 48,22 Q58,19 64,24 L64,36 Z"
+                    fill="#3B1220"
+                    opacity="0.9"
+                  />
+                </>
+              )}
+            </svg>
+
+            {/* Subtle overlay badge text */}
+            <span
+              className={`absolute bottom-0 inset-x-0 text-[7px] sm:text-[8px] font-black uppercase text-center py-0.2 tracking-wider ${
+                isDark ? 'bg-indigo-950/85 text-amber-300' : 'bg-stone-900/75 text-amber-200'
+              }`}
+            >
+              {isDark ? 'சந்திரன்' : 'சூரியன்'}
+            </span>
+          </div>
+        </button>
       </div>
     </header>
   );
