@@ -145,7 +145,7 @@ export function getTamilYearName(date: Date, rashiIndex: number): { name: string
   return TAMIL_60_YEARS[cycleIndex];
 }
 
-const CACHE_PREFIX = 'namo_panchangam_v2_';
+const CACHE_PREFIX = 'namo_panchangam_v3_';
 
 export const tamilCalendarService = {
   /**
@@ -327,10 +327,21 @@ export const tamilCalendarService = {
     const nakshatraNumber = raw.nakshatra ?? 1;
     const nakshatraName = nakshatraNames[nakshatraNumber - 1] ?? 'Ashwini';
 
-    // 2. Detect Ekadashi (Tithi 11 or 26)
-    const isEkadashi = tithiNumber === 11 || tithiNumber === 26 || tithiName.toLowerCase().includes('ekadashi');
-    let ekadashiName: string | undefined = undefined;
-    if (isEkadashi) {
+    // Consult verified SrirangamInfo scraped database
+    const scrapedVishnu = AUTHENTICATED_2026_VISHNU_DATA[dateStr];
+    const isPerumalFromScraper = scrapedVishnu?.isVishnuSpecial ?? false;
+
+    // Check adjacent days to prevent false duplicate Ekadashis
+    const prevDate = new Date(date);
+    prevDate.setDate(prevDate.getDate() - 1);
+    const prevDateStr = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}-${String(prevDate.getDate()).padStart(2, '0')}`;
+    const prevDayHadEkadashi = AUTHENTICATED_2026_VISHNU_DATA[prevDateStr]?.category === 'EKADASHI';
+
+    // 2. Detect Ekadashi (Tithi 11 or 26) with Srirangam priority
+    const isEkadashi = scrapedVishnu?.category === 'EKADASHI' ||
+      (!prevDayHadEkadashi && (tithiNumber === 11 || tithiNumber === 26 || tithiName.toLowerCase().includes('ekadashi')));
+    let ekadashiName: string | undefined = scrapedVishnu?.category === 'EKADASHI' ? scrapedVishnu.title : undefined;
+    if (isEkadashi && !ekadashiName) {
       try {
         const masaIdx = raw.masa?.index ?? 0;
         ekadashiName = getEkadashiName(masaIdx, paksha, raw.masa?.isAdhika ?? false);
@@ -340,7 +351,7 @@ export const tamilCalendarService = {
     }
 
     // 3. Detect Thiruvonam (Shravana Nakshatra, index 22) - Perumal Janma Nakshatram
-    const isThiruvonam = nakshatraNumber === 22 || nakshatraName.toLowerCase().includes('shravana');
+    const isThiruvonam = scrapedVishnu?.category === 'THIRUVONAM' || nakshatraNumber === 22 || nakshatraName.toLowerCase().includes('shravana');
 
     // 4. Check Purattasi Saturdays (with explicit 2nd Saturday flag)
     let isPurattasiSaturday = false;
@@ -357,13 +368,10 @@ export const tamilCalendarService = {
       }
     }
 
-    // 5. Detect Gokulashtami / Sri Krishna Jayanthi accurately (Strict check, avoids false positives on Pradosham)
-    const hasGokulaFestival = raw.festivals?.some(
-      (f: any) =>
-        /\b(janmashtami|gokulashtami|gokula\s*ashtami|krishna\s*jayanthi)\b/i.test(f.name || '')
-    );
-    const isAvaniAshtami = tamilDate.tamilMonth === 'Avani' && paksha === 'Krishna' && (tithiNumber === 22 || tithiNumber === 23) && nakshatraName.toLowerCase().includes('rohini');
-    const isGokulashtami = Boolean(hasGokulaFestival || isAvaniAshtami);
+    // 5. Detect Gokulashtami / Sri Krishna Jayanthi strictly on Rohini Nakshatra in Avani month
+    const isAvaniRohini = tamilDate.tamilMonth === 'Avani' && paksha === 'Krishna' && nakshatraName.toLowerCase().includes('rohini');
+    const isGokulashtami = (scrapedVishnu?.category === 'GOKULASHTAMI') ||
+      Boolean(isAvaniRohini && !raw.festivals?.some((f: any) => /dahi\s*handi/i.test(f.name || '')));
 
     // 6. Detect other major Perumal festivals
     const hasRamaNavami = raw.festivals?.some((f: any) => f.name?.toLowerCase().includes('rama navami')) ||
@@ -373,10 +381,6 @@ export const tamilCalendarService = {
       (tamilDate.tamilMonth === 'Vaikasi' && tithiNumber === 14 && paksha === 'Shukla');
 
     const isVaikuntaEkadashi = isEkadashi && tamilDate.tamilMonth === 'Margazhi' && paksha === 'Shukla';
-
-    // Consult verified SrirangamInfo scraped database
-    const scrapedVishnu = AUTHENTICATED_2026_VISHNU_DATA[dateStr];
-    const isPerumalFromScraper = scrapedVishnu?.isVishnuSpecial ?? false;
 
     // Combine special day status
     const isPerumalSpecialDay =

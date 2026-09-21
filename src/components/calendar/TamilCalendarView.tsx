@@ -903,32 +903,37 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
             {/* Special Event Description Banner */}
             {selectedDayInfo.isPerumalSpecialDay ? (
               <div
-                className="p-4 rounded-xl border-l-4 mt-2"
+                className="p-4 rounded-xl border-l-4 mt-2 bg-amber-50/40 dark:bg-amber-950/20 border border-stone-200 dark:border-stone-800"
                 style={{
-                  backgroundColor: selectedDayInfo.isPurattasiSecondSaturday
-                    ? 'rgba(217, 119, 6, 0.1)'
-                    : selectedDayInfo.isGokulashtami
-                    ? 'rgba(16, 185, 129, 0.1)'
-                    : 'var(--primary-light)',
                   borderLeftColor: selectedDayInfo.isPurattasiSecondSaturday
-                    ? '#F59E0B'
+                    ? '#D97706'
                     : selectedDayInfo.isGokulashtami
-                    ? '#10B981'
-                    : 'var(--primary)',
+                    ? '#059669'
+                    : selectedDayInfo.isThiruvonam
+                    ? '#EA580C'
+                    : selectedDayInfo.isEkadashi
+                    ? '#7C3AED'
+                    : '#851D1D',
+                  borderLeftWidth: '5px',
                 }}
               >
-                <h5 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {selectedDayInfo.specialEventTitle}
-                </h5>
-                <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mt-0.5">
+                <div className="flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-md flex items-center justify-center bg-amber-500/10 text-amber-700 dark:text-amber-400">
+                    <BalajiNamam size={16} />
+                  </div>
+                  <h5 className="text-sm sm:text-base font-extrabold text-stone-900 dark:text-stone-50">
+                    {selectedDayInfo.specialEventTitle}
+                  </h5>
+                </div>
+                <p className="text-xs sm:text-sm font-bold text-[#851D1D] dark:text-amber-400 mt-1">
                   {selectedDayInfo.specialEventTitleTamil}
                 </p>
-                <p className="text-xs text-stone-600 dark:text-stone-300 mt-2 leading-relaxed">
+                <p className="text-xs sm:text-[13px] text-stone-700 dark:text-stone-300 mt-1.5 leading-relaxed font-normal">
                   {selectedDayInfo.specialEventDescription}
                 </p>
               </div>
             ) : (
-              <p className="text-xs italic" style={{ color: 'var(--text-tertiary)' }}>
+              <p className="text-xs font-medium text-stone-500 dark:text-stone-400 italic pt-1">
                 Auspicious day for Balaji seva and prayer.
               </p>
             )}
@@ -937,13 +942,18 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
       </div>
 
       {/* 5. Special Days for Perumal in Visible Month with Filter */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold" style={{ color: 'var(--text-primary)' }}>
-            Perumal Special Days ({MONTH_NAMES_EN[selectedMonthNum - 1]} {selectedYear})
-          </h3>
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <h3 className="text-base sm:text-lg font-black text-stone-900 dark:text-stone-100 tracking-tight">
+              Perumal Special Days ({MONTH_NAMES_EN[selectedMonthNum - 1]} {selectedYear})
+            </h3>
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-900 dark:bg-amber-950/80 dark:text-amber-200 border border-amber-300 dark:border-amber-800">
+              {filteredSpecialDays.length} {filteredSpecialDays.length === 1 ? 'Day' : 'Days'}
+            </span>
+          </div>
           {loadingMonth && (
-            <span className="text-xs animate-pulse" style={{ color: 'var(--primary)' }}>
+            <span className="text-xs font-semibold animate-pulse text-amber-700 dark:text-amber-400">
               Calculating...
             </span>
           )}
@@ -964,12 +974,11 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
               <button
                 key={cat.id}
                 onClick={() => setFilterCategory(cat.id as any)}
-                className="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer"
-                style={{
-                  backgroundColor: isSel ? 'var(--primary)' : 'var(--surface)',
-                  color: isSel ? '#FFFFFF' : 'var(--text-secondary)',
-                  borderColor: isSel ? 'var(--primary)' : 'var(--border)',
-                }}
+                className={`px-3.5 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer shadow-xs ${
+                  isSel
+                    ? 'bg-[#851D1D] text-white border-[#851D1D] ring-2 ring-amber-400/50 shadow-sm'
+                    : 'bg-white dark:bg-[#1E1610] text-stone-700 dark:text-stone-300 border-stone-200 dark:border-stone-800 hover:border-amber-400 dark:hover:border-amber-600 hover:bg-amber-50/40 dark:hover:bg-stone-800'
+                }`}
               >
                 {cat.label}
               </button>
@@ -980,15 +989,8 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
         {/* List of Special Days */}
         <div className="space-y-3">
           {filteredSpecialDays.length === 0 ? (
-            <div
-              className="rounded-xl p-6 text-center border"
-              style={{
-                backgroundColor: 'var(--surface)',
-                borderColor: 'var(--border)',
-                color: 'var(--text-tertiary)',
-              }}
-            >
-              <p className="text-xs">
+            <div className="rounded-2xl p-8 text-center border border-stone-200 dark:border-stone-800 bg-white dark:bg-[#1E1610] text-stone-500 dark:text-stone-400 shadow-xs">
+              <p className="text-sm font-semibold">
                 No specific filtered Perumal special days in this month. Browse other months using the calendar above.
               </p>
             </div>
@@ -998,65 +1000,94 @@ export const TamilCalendarView: React.FC<TamilCalendarViewProps> = ({
               const isGokula = day.isGokulashtami;
               const isThiru = day.isThiruvonam;
               const isEka = day.isEkadashi;
+              const isSelected = selectedDate === day.date;
+
+              // Left stripe accent
+              let leftBorderColor = '#851D1D';
+              if (isSecondSat) {
+                leftBorderColor = '#D97706';
+              } else if (day.isPurattasiSaturday) {
+                leftBorderColor = '#B45309';
+              } else if (isGokula) {
+                leftBorderColor = '#059669';
+              } else if (isThiru) {
+                leftBorderColor = '#EA580C';
+              } else if (isEka) {
+                leftBorderColor = '#7C3AED';
+              }
+
+              const dateObj = new Date(day.date);
+              const dayNum = dateObj.getDate();
+              const monthStr = dateObj.toLocaleDateString('en-IN', { month: 'short' });
+              const weekdayStr = dateObj.toLocaleDateString('en-IN', { weekday: 'short' });
 
               return (
                 <div
                   key={day.date}
                   onClick={() => setSelectedDate(day.date)}
-                  className="rounded-xl p-4 border transition-all cursor-pointer hover:shadow-md"
+                  className={`rounded-2xl p-4 sm:p-5 border transition-all cursor-pointer bg-white dark:bg-[#1E1610] shadow-xs hover:shadow-md ${
+                    isSelected
+                      ? 'ring-2 ring-amber-500 shadow-md border-amber-400 dark:border-amber-600'
+                      : 'border-stone-200 dark:border-stone-800 hover:border-stone-300 dark:hover:border-stone-700'
+                  }`}
                   style={{
-                    backgroundColor: isSecondSat
-                      ? 'rgba(217, 119, 6, 0.08)'
-                      : isGokula
-                      ? 'rgba(16, 185, 129, 0.08)'
-                      : isThiru
-                      ? 'rgba(245, 158, 11, 0.06)'
-                      : 'var(--surface)',
-                    borderColor: isSecondSat ? '#F59E0B' : isGokula ? '#10B981' : isThiru ? '#F59E0B' : 'var(--border)',
-                    borderWidth: isSecondSat || isGokula || isThiru ? '1.5px' : '1px',
+                    borderLeftColor: leftBorderColor,
+                    borderLeftWidth: '5px',
                   }}
                 >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1 flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    {/* Content */}
+                    <div className="space-y-1.5 flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        {day.isPerumalSpecialDay && (
-                          <div className="w-5 h-5 rounded-md flex items-center justify-center bg-amber-500/10 text-amber-700 dark:text-amber-400">
-                            <BalajiNamam size={16} />
-                          </div>
-                        )}
-                        <h5 className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>
+                        <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 flex-shrink-0">
+                          <BalajiNamam size={18} />
+                        </div>
+                        <h4 className="text-sm sm:text-base font-extrabold text-stone-900 dark:text-stone-50 leading-snug">
                           {day.specialEventTitle}
-                        </h5>
+                        </h4>
+
                         {isSecondSat && (
-                          <Badge label="ANNUAL FUNCTION" variant="warning" size="sm" />
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-950 dark:text-amber-200 dark:border-amber-800">
+                            ANNUAL COMMUNITY FUNCTION
+                          </span>
                         )}
                         {isGokula && (
-                          <Badge label="4-YEAR CYCLE" variant="success" size="sm" />
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-300 dark:bg-emerald-950 dark:text-emerald-200 dark:border-emerald-800">
+                            4-YEAR CYCLE
+                          </span>
                         )}
                         {isThiru && (
-                          <Badge label="PERUMAL JANMA STAR" variant="warning" size="sm" />
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-orange-100 text-orange-900 border border-orange-300 dark:bg-orange-950 dark:text-orange-200 dark:border-orange-800">
+                            PERUMAL JANMA STAR
+                          </span>
                         )}
                         {isEka && (
-                          <Badge label="EKADASHI VRATAM" variant="info" size="sm" />
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-purple-100 text-purple-900 border border-purple-300 dark:bg-purple-950 dark:text-purple-200 dark:border-purple-800">
+                            EKADASHI VRATAM
+                          </span>
                         )}
                       </div>
 
-                      <p className="text-xs font-semibold text-amber-600 dark:text-amber-400">
-                        {day.specialEventTitleTamil} • {day.tamilMonthTamil} {day.tamilDay}
+                      <p className="text-xs sm:text-sm font-bold text-[#851D1D] dark:text-amber-400">
+                        {day.specialEventTitleTamil} • <span className="text-stone-700 dark:text-stone-300 font-semibold">{day.tamilMonthTamil} {day.tamilDay}</span>
                       </p>
 
-                      <p className="text-xs text-stone-600 dark:text-stone-300 leading-relaxed">
+                      <p className="text-xs sm:text-[13px] text-stone-700 dark:text-stone-300 leading-relaxed font-normal">
                         {day.specialEventDescription}
                       </p>
                     </div>
 
-                    <div className="text-right flex-shrink-0">
-                      <p className="text-sm font-bold" style={{ color: 'var(--primary)' }}>
-                        {new Date(day.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
-                      </p>
-                      <p className="text-[11px]" style={{ color: 'var(--text-tertiary)' }}>
-                        {new Date(day.date).toLocaleDateString('en-IN', { weekday: 'short' })}
-                      </p>
+                    {/* Tear-Off Calendar Date Stamp */}
+                    <div className="flex flex-col items-center justify-center rounded-xl border border-stone-200 dark:border-stone-750 bg-stone-50 dark:bg-stone-850 shadow-xs overflow-hidden flex-shrink-0 w-14 sm:w-16">
+                      <div className="w-full py-0.5 bg-[#851D1D] text-white text-[10px] font-extrabold tracking-wider uppercase text-center">
+                        {monthStr}
+                      </div>
+                      <div className="text-lg sm:text-xl font-black text-stone-900 dark:text-stone-100 py-1 leading-none">
+                        {dayNum}
+                      </div>
+                      <div className="text-[10px] font-bold text-stone-600 dark:text-stone-400 pb-1 text-center uppercase tracking-tight">
+                        {weekdayStr}
+                      </div>
                     </div>
                   </div>
                 </div>
