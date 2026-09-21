@@ -5,14 +5,14 @@ import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, ShieldCheck, KeyRound } from 'lucide-react';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { BalajiNamam } from '@/components/ui';
 import { authService } from '@/services';
 
 const loginSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  email: z.string().min(1, 'Please enter a username or email'),
+  password: z.string().min(1, 'Please enter a password'),
 });
 type LoginForm = z.infer<typeof loginSchema>;
 
@@ -22,7 +22,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [showPass, setShowPass] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<LoginForm>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
@@ -30,6 +30,31 @@ export default function LoginPage() {
   const onSubmit = async (data: LoginForm) => {
     setIsLoading(true);
     setError(null);
+
+    // Handle shortcut admin/admin credentials
+    const isAdminShortcut =
+      data.email.toLowerCase() === 'admin' && data.password === 'admin';
+
+    if (isAdminShortcut) {
+      const demoProfile = {
+        id: '00000000-0000-0000-0000-000000000001',
+        role: 'admin' as const,
+        full_name: 'Murugan Rajan (Admin)',
+        avatar_url: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(
+          'namo_demo_user',
+          JSON.stringify({ id: demoProfile.id, email: 'admin', profile: demoProfile })
+        );
+      }
+      setIsLoading(false);
+      router.replace('/admin');
+      return;
+    }
+
     try {
       const result = await authService.signIn(data.email, data.password);
       if (result.user) {
@@ -69,6 +94,12 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleQuickAdminLogin = () => {
+    setValue('email', 'admin');
+    setValue('password', 'admin');
+    onSubmit({ email: 'admin', password: 'admin' });
   };
 
   return (
@@ -116,7 +147,29 @@ export default function LoginPage() {
               <span>Direct Open →</span>
             </Link>
           </div>
-
+          {/* Admin Credentials */}
+          <div className="rounded-xl p-3 border space-y-2" style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 text-xs font-bold" style={{ color: 'var(--gold)' }}>
+                <KeyRound size={14} /> Admin Credentials • நிர்வாகி விவரம்
+              </div>
+              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300">
+                Admin Only
+              </span>
+            </div>
+            <div className="text-xs font-mono bg-white/70 dark:bg-black/20 p-2 rounded-lg border flex justify-between items-center gap-4" style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
+              <span className="font-semibold">Username: <span style={{ color: 'var(--gold)' }}>admin</span></span>
+              <span className="font-semibold">Password: <span style={{ color: 'var(--gold)' }}>admin</span></span>
+            </div>
+            <button
+              type="button"
+              onClick={handleQuickAdminLogin}
+              className="flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-white font-bold text-xs shadow-sm hover:opacity-90 transition-opacity w-full cursor-pointer"
+              style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+            >
+              <ShieldCheck size={14} /> 1-Click Admin Login • உடனடி நிர்வாகி உள்நுழைவு
+            </button>
+          </div>
 
           {error && (
             <div className="flex items-center gap-2 p-3 rounded-xl border" style={{ backgroundColor: 'var(--error-light)', borderColor: 'var(--error)' }}>
@@ -130,15 +183,15 @@ export default function LoginPage() {
             {/* Email */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider mb-1" style={{ color: 'var(--text-secondary)' }}>
-                Email Address • மின்னஞ்சல் *
+                Username or Email • பயனர்பெயர் / மின்னஞ்சல் *
               </label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-tertiary)' }} />
                 <input
                   {...register('email')}
-                  type="email"
-                  placeholder="name@community.org"
-                  autoComplete="email"
+                  type="text"
+                  placeholder="admin or name@community.org"
+                  autoComplete="username"
                   className="w-full pl-9 pr-3 py-2.5 text-sm border rounded-xl outline-none focus:ring-2 focus:ring-amber-500"
                   style={{ backgroundColor: 'var(--surface)', color: 'var(--text-primary)', borderColor: errors.email ? 'var(--error)' : 'var(--border)' }}
                 />
