@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Search, TrendingUp } from 'lucide-react';
 import { Card, EmptyState } from '@/components/ui';
@@ -61,34 +61,70 @@ export default function VisitorContributionsPage() {
       ) : items.length === 0 ? (
         <EmptyState icon="📈" title="No contributions found" />
       ) : (
-        <Card padding="none">
-          {items.map((item, idx) => (
+        <div className="space-y-3">
+          {items.map((item) => (
             <div
               key={item.id}
-              className="flex items-center gap-3 px-4 py-3"
-              style={{ borderBottom: idx < items.length - 1 ? '1px solid var(--border)' : 'none' }}
+              className="rounded-2xl border p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all space-y-2.5"
+              style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
-                style={{ backgroundColor: 'var(--income-light)' }}
-              >
-                <TrendingUp size={16} style={{ color: 'var(--income)' }} />
+              {/* Header: Member Name & Amount */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center shrink-0"
+                    style={{ backgroundColor: 'var(--income-light)' }}
+                  >
+                    <TrendingUp size={16} style={{ color: 'var(--income)' }} />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm sm:text-base leading-tight" style={{ color: 'var(--text-primary)' }}>
+                      {item.member?.full_name || 'Devotee Member'}
+                    </p>
+                    {item.member?.member_id && (
+                      <p className="text-[11px] font-medium" style={{ color: 'var(--text-tertiary)' }}>
+                        ID: {item.member.member_id}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <span
+                  className="text-sm sm:text-base font-black px-2.5 py-1 rounded-xl shrink-0"
+                  style={{ color: 'var(--income)', backgroundColor: 'var(--income-light)' }}
+                >
+                  +{formatCurrency(item.amount)}
+                </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
-                  {item.member?.full_name || 'Member'}
-                </p>
-                <p className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>
-                  {formatDate(item.payment_date)} • {item.payment_method.toUpperCase()}
-                  {item.function?.name ? ` • ${item.function.name}` : ''}
-                </p>
+
+              {/* Badges / Metadata Tags (Full text visible, cleanly wrapped) */}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1 border-t border-dashed" style={{ borderColor: 'var(--border)' }}>
+                <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
+                  📅 {formatDate(item.payment_date)}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 font-bold text-[11px] border border-emerald-200/60 dark:border-emerald-800/60">
+                  💳 {item.payment_method.toUpperCase()}
+                </span>
+                {item.function?.name && (
+                  <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
+                    🛕 {item.function.name}
+                  </span>
+                )}
+                {item.reference_number && (
+                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 text-[11px] font-mono text-stone-600 dark:text-stone-300">
+                    Ref: {item.reference_number}
+                  </span>
+                )}
               </div>
-              <span className="text-sm font-bold flex-shrink-0" style={{ color: 'var(--income)' }}>
-                +{formatCurrency(item.amount)}
-              </span>
+
+              {/* Optional Notes */}
+              {item.notes && (
+                <p className="text-xs text-stone-500 dark:text-stone-400 italic pt-0.5">
+                  &ldquo;{item.notes}&rdquo;
+                </p>
+              )}
             </div>
           ))}
-        </Card>
+        </div>
       )}
     </div>
   );

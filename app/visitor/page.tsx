@@ -216,10 +216,10 @@ export default function VisitorDashboard() {
 
       {/* Community Services Quick Links */}
       <div>
-        <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-xs font-bold uppercase tracking-wider mb-2.5" style={{ color: 'var(--text-secondary)' }}>
           Community Services • விரைவு சேவைகள்
         </p>
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-2 sm:gap-3">
           {[
             { href: '/visitor/members', icon: '👥', label: 'Members', tamil: 'உறுப்பினர்கள்', bg: '#EFF6FF' },
             { href: '/visitor/contributions', icon: '📈', label: 'Income', tamil: 'வருமானம்', bg: '#F0FDF4' },
@@ -229,52 +229,74 @@ export default function VisitorDashboard() {
             <Link
               key={a.href}
               href={a.href}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-xl border text-center hover:shadow-md transition-shadow"
+              className="flex flex-col items-center gap-1 p-2 sm:p-3 rounded-xl border text-center hover:shadow-md transition-shadow"
               style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ backgroundColor: a.bg }}>
+              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-base sm:text-lg shrink-0" style={{ backgroundColor: a.bg }}>
                 {a.icon}
               </div>
-              <span className="text-xs font-bold" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
-              <span className="text-[10px]" style={{ color: 'var(--text-tertiary)' }}>{a.tamil}</span>
+              <span className="text-[11px] sm:text-xs font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{a.label}</span>
+              <span className="text-[9px] sm:text-[10px] leading-tight" style={{ color: 'var(--text-tertiary)' }}>{a.tamil}</span>
             </Link>
           ))}
         </div>
       </div>
-      {/* Recent Contributions list */}
+
+      {/* Recent Contributions Section - Individual Card Cells */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>Recent Contributions</h3>
-          <Link href="/visitor/contributions" className="text-sm font-semibold flex items-center gap-1" style={{ color: 'var(--primary)' }}>
+          <h3 className="font-bold text-sm sm:text-base" style={{ color: 'var(--text-primary)' }}>
+            Recent Contributions • சமீபத்திய நன்கொடைகள்
+          </h3>
+          <Link href="/visitor/contributions" className="text-xs sm:text-sm font-semibold flex items-center gap-1" style={{ color: 'var(--primary)' }}>
             View All <ArrowRight size={14} />
           </Link>
         </div>
-        <Card padding="none">
-          {recentContributions.length === 0 ? (
-            <p className="p-4 text-sm text-center" style={{ color: 'var(--text-secondary)' }}>No contributions match</p>
-          ) : (
-            recentContributions.map((item, idx) => (
+        {recentContributions.length === 0 ? (
+          <div className="rounded-2xl border p-6 text-center" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>No contributions match</p>
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {recentContributions.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between px-4 py-3"
-                style={{ borderBottom: idx < recentContributions.length - 1 ? '1px solid var(--border)' : 'none' }}
+                className="rounded-2xl border p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all space-y-2"
+                style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--income-light)' }}>
-                    <TrendingUp size={16} style={{ color: 'var(--income)' }} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{item.member?.full_name || 'Member'}</p>
-                    <p className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                      {formatDate(item.payment_date)} • {item.payment_method.toUpperCase()}
+                {/* Top Row: Devotee & Amount */}
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0" style={{ backgroundColor: 'var(--income-light)' }}>
+                      <TrendingUp size={15} style={{ color: 'var(--income)' }} />
+                    </div>
+                    <p className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>
+                      {item.member?.full_name || 'Devotee Member'}
                     </p>
                   </div>
+                  <span className="text-sm sm:text-base font-extrabold px-2.5 py-0.5 rounded-lg shrink-0" style={{ color: 'var(--income)', backgroundColor: 'var(--income-light)' }}>
+                    +{formatCurrency(item.amount)}
+                  </span>
                 </div>
-                <span className="text-sm font-bold" style={{ color: 'var(--income)' }}>+{formatCurrency(item.amount)}</span>
+
+                {/* Bottom Row: Badges (Full text visible, no truncation) */}
+                <div className="flex flex-wrap items-center gap-1.5 text-[11px] pt-0.5" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium">
+                    📅 {formatDate(item.payment_date)}
+                  </span>
+                  <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold border border-amber-200/50 dark:border-amber-800/50">
+                    💳 {item.payment_method.toUpperCase()}
+                  </span>
+                  {item.function?.name && (
+                    <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium">
+                      🛕 {item.function.name}
+                    </span>
+                  )}
+                </div>
               </div>
-            ))
-          )}
-        </Card>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

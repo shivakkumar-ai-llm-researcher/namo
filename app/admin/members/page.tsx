@@ -79,31 +79,38 @@ export default function MembersPage() {
           }
         />
       ) : (
-        <Card padding="none">
-          {members.map((m, idx) => (
+        <div className="space-y-2.5">
+          {members.map((m) => (
             <Link
               key={m.id}
               href={`/admin/members/${m.id}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-black/5 transition-colors"
-              style={{ borderBottom: idx < members.length - 1 ? '1px solid var(--border)' : 'none' }}
+              className="rounded-2xl border p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3 group"
+              style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                style={{ backgroundColor: 'var(--primary)' }}
-              >
-                {getInitials(m.full_name)}
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-xs"
+                  style={{ backgroundColor: 'var(--primary)' }}
+                >
+                  {getInitials(m.full_name)}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm sm:text-base leading-tight group-hover:text-amber-700 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                    {m.full_name}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
+                    Member ID: <span className="font-mono font-medium">{m.member_id}</span>
+                    {m.phone ? ` • 📞 ${m.phone}` : ''}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{m.full_name}</p>
-                <p className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>
-                  ID: {m.member_id} {m.phone ? `• ${m.phone}` : ''}
-                </p>
+              <div className="flex items-center gap-2 shrink-0">
+                <Badge label={m.status} variant={m.status === 'active' ? 'success' : 'default'} size="sm" />
+                <ArrowRight size={15} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />
               </div>
-              <Badge label={m.status} variant={m.status === 'active' ? 'success' : 'default'} size="sm" />
-              <ArrowRight size={14} style={{ color: 'var(--text-tertiary)' }} />
             </Link>
           ))}
-        </Card>
+        </div>
       )}
     </div>
   );

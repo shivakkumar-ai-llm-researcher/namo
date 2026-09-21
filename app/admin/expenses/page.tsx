@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Search, Plus, ArrowRight } from 'lucide-react';
@@ -79,36 +79,67 @@ export default function ExpensesPage() {
           }
         />
       ) : (
-        <Card padding="none">
-          {items.map((item, idx) => (
+        <div className="space-y-3">
+          {items.map((item) => (
             <Link
               key={item.id}
               href={`/admin/expenses/${item.id}`}
-              className="flex items-center gap-3 px-4 py-3 hover:bg-black/5 transition-colors"
-              style={{ borderBottom: idx < items.length - 1 ? '1px solid var(--border)' : 'none' }}
+              className="block rounded-2xl border p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all space-y-2.5 group"
+              style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
-              <div
-                className="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-shrink-0"
-                style={{ backgroundColor: 'var(--expense-light)' }}
-              >
-                {getCategoryEmoji(item.category)}
+              {/* Header: Description & Amount */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-start gap-2.5 min-w-0">
+                  <div
+                    className="w-9 h-9 rounded-full flex items-center justify-center text-lg flex-shrink-0 mt-0.5"
+                    style={{ backgroundColor: 'var(--expense-light)' }}
+                  >
+                    {getCategoryEmoji(item.category)}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm sm:text-base leading-snug group-hover:text-amber-700 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <span
+                    className="text-sm sm:text-base font-black px-2.5 py-1 rounded-xl"
+                    style={{ color: 'var(--expense)', backgroundColor: 'var(--expense-light)' }}
+                  >
+                    -{formatCurrency(item.amount)}
+                  </span>
+                  <ArrowRight size={15} className="text-stone-400 group-hover:translate-x-0.5 transition-transform" />
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
-                  {item.description}
-                </p>
-                <p className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>
-                  {formatDate(item.expense_date)} • {formatExpenseCategory(item.category)}
-                  {item.function?.name ? ` • ${item.function.name}` : ''}
-                </p>
+
+              {/* Badges / Metadata Tags (Full text visible, cleanly wrapped) */}
+              <div className="flex flex-wrap items-center gap-1.5 text-xs pt-1 border-t border-dashed" style={{ borderColor: 'var(--border)' }}>
+                <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
+                  📅 {formatDate(item.expense_date)}
+                </span>
+                <span className="px-2 py-0.5 rounded-md bg-rose-50 dark:bg-rose-950/40 text-rose-900 dark:text-rose-300 font-bold text-[11px] border border-rose-200/60 dark:border-rose-800/60">
+                  🏷️ {formatExpenseCategory(item.category)}
+                </span>
+                {item.function?.name && (
+                  <span className="px-2 py-0.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 font-semibold text-[11px] border border-amber-200/50 dark:border-amber-800/50">
+                    🛕 {item.function.name}
+                  </span>
+                )}
+                {item.payment_method && (
+                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 font-medium text-[11px]">
+                    💳 {item.payment_method.toUpperCase()}
+                  </span>
+                )}
+                {item.reference_number && (
+                  <span className="px-2 py-0.5 rounded-md bg-stone-100 dark:bg-stone-800/80 text-[11px] font-mono text-stone-600 dark:text-stone-300">
+                    Ref: {item.reference_number}
+                  </span>
+                )}
               </div>
-              <span className="text-sm font-bold flex-shrink-0" style={{ color: 'var(--expense)' }}>
-                -{formatCurrency(item.amount)}
-              </span>
-              <ArrowRight size={14} style={{ color: 'var(--text-tertiary)' }} />
             </Link>
           ))}
-        </Card>
+        </div>
       )}
     </div>
   );

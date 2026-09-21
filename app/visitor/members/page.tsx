@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import { Card, Badge, EmptyState } from '@/components/ui';
@@ -54,27 +54,34 @@ export default function VisitorMembersPage() {
       ) : members.length === 0 ? (
         <EmptyState icon="👥" title="No members found" />
       ) : (
-        <Card padding="none">
-          {members.map((m, idx) => (
+        <div className="space-y-2.5">
+          {members.map((m) => (
             <div
               key={m.id}
-              className="flex items-center gap-3 px-4 py-3"
-              style={{ borderBottom: idx < members.length - 1 ? '1px solid var(--border)' : 'none' }}
+              className="rounded-2xl border p-3.5 sm:p-4 shadow-xs hover:shadow-md transition-all flex items-center justify-between gap-3"
+              style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}
             >
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white flex-shrink-0"
-                style={{ backgroundColor: 'var(--primary)' }}
-              >
-                {getInitials(m.full_name)}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{m.full_name}</p>
-                <p className="text-xs truncate" style={{ color: 'var(--text-tertiary)' }}>ID: {m.member_id}</p>
+              <div className="flex items-center gap-3 min-w-0">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 shadow-xs"
+                  style={{ backgroundColor: 'var(--primary)' }}
+                >
+                  {getInitials(m.full_name)}
+                </div>
+                <div className="min-w-0">
+                  <p className="font-bold text-sm sm:text-base leading-tight" style={{ color: 'var(--text-primary)' }}>
+                    {m.full_name}
+                  </p>
+                  <p className="text-xs mt-0.5" style={{ color: 'var(--text-tertiary)' }}>
+                    Member ID: <span className="font-mono font-medium">{m.member_id}</span>
+                    {m.phone ? ` • 📞 ${m.phone}` : ''}
+                  </p>
+                </div>
               </div>
               <Badge label={m.status} variant={m.status === 'active' ? 'success' : 'default'} size="sm" />
             </div>
           ))}
-        </Card>
+        </div>
       )}
     </div>
   );

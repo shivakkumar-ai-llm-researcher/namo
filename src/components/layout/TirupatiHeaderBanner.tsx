@@ -253,9 +253,9 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
       />
 
       {/* ── Temple Name in Tamil & English (Sharp Crisp Vector Typography) ── */}
-      <div className="absolute left-[3%] sm:left-[3.5%] top-1/2 -translate-y-1/2 flex flex-col justify-center min-w-0 z-20 pointer-events-none max-w-[44%] ml-7 sm:ml-0">
+      <div className="absolute left-[12%] sm:left-[3.5%] top-1/2 -translate-y-1/2 flex flex-col justify-center min-w-0 z-20 pointer-events-none max-w-[60%] sm:max-w-[52%] md:max-w-[46%] ml-1 sm:ml-0">
         <h1
-          className="text-[10px] sm:text-sm md:text-base lg:text-[18px] font-black tracking-tight leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] truncate sm:whitespace-normal"
+          className="text-[9.5px] xs:text-[11px] sm:text-sm md:text-base lg:text-[18px] font-black tracking-tight leading-snug sm:leading-tight text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] line-clamp-2 sm:line-clamp-none"
           style={{
             fontFamily: 'system-ui, -apple-system, sans-serif',
             textShadow: '0 2px 6px rgba(0, 0, 0, 0.95), 0 0 12px rgba(0, 0, 0, 0.85)',
@@ -265,7 +265,7 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
           அருள்மிகு ஸ்ரீதேவி பூதேவி ஸ்ரீ வரதராஜ பெருமாள் ஆலயம்
         </h1>
         <span
-          className="text-[8px] sm:text-[10.5px] md:text-xs lg:text-[13px] font-bold text-amber-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-tight mt-0.5 truncate"
+          className="text-[7.5px] xs:text-[9px] sm:text-[10.5px] md:text-xs lg:text-[13px] font-bold text-amber-300 drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)] leading-snug sm:leading-tight mt-0.5 line-clamp-1 sm:line-clamp-none"
           style={{
             textShadow: '0 1px 4px rgba(0, 0, 0, 0.95)',
           }}

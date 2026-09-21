@@ -153,28 +153,28 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
 
       {/* ── Sub-bar: Active Tab Indicator & Portal Status ── */}
       <div
-        className="px-4 lg:px-8 py-2 border-b flex items-center justify-between text-xs flex-shrink-0"
+        className="px-3 sm:px-4 lg:px-8 py-2 border-b flex items-center justify-between text-xs flex-shrink-0 gap-2"
         style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}
       >
-        <div className="flex items-center gap-2">
-          <TabIcon size={15} style={{ color: 'var(--primary)' }} />
-          <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
+        <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+          <TabIcon size={15} className="shrink-0" style={{ color: 'var(--primary)' }} />
+          <span className="font-bold truncate" style={{ color: 'var(--text-primary)' }}>
             {currentTab.label}
           </span>
           {currentTab.tamil && (
-            <span className="text-[11px] text-stone-500 font-medium">
+            <span className="text-[11px] text-stone-500 font-medium truncate hidden xs:inline">
               ({currentTab.tamil})
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/40">
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/40 hidden sm:inline-flex">
             🙏 Devotee Portal • பக்தர் தளம்
           </span>
           {profile?.role === 'admin' ? (
             <Link
               href="/admin"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-xs hover:opacity-90 transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-white shadow-xs hover:opacity-90 transition-all shrink-0"
               style={{ backgroundColor: 'var(--primary)' }}
             >
               <Shield size={12} />
@@ -183,7 +183,7 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
           ) : (
             <Link
               href="/login"
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-xs hover:opacity-90 transition-all"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-bold text-white shadow-xs hover:opacity-90 transition-all shrink-0"
               style={{ backgroundColor: 'var(--primary)' }}
             >
               <Shield size={12} />
