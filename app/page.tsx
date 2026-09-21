@@ -1,46 +1,38 @@
 import Link from 'next/link';
 import { BalajiNamam } from '@/components/ui';
+import { TirupatiHeaderBanner } from '@/components/layout/TirupatiHeaderBanner';
 
 export default function LandingPage() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--background)' }}>
-      {/* Nav */}
-      <nav className="border-b-2 border-yellow-500" style={{ backgroundColor: 'var(--surface)' }}>
-        <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-xl flex items-center justify-center shadow-sm"
-              style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
-            >
-              <BalajiNamam size={26} />
-            </div>
-            <div>
-              <div className="text-xs font-bold tracking-widest" style={{ color: 'var(--gold)' }}>
-                || Govinda Govinda • கோவிந்தா கோவிந்தா ||
-              </div>
-              <div className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
-                Srivari Community Fund
-              </div>
-            </div>
+      {/* Majestic Tirupati Devasthanams Sacred Header Banner */}
+      <TirupatiHeaderBanner showMenuButton={false} />
+
+      {/* Sub-bar Quick Access */}
+      <div className="border-b" style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)' }}>
+        <div className="max-w-6xl mx-auto px-4 py-2.5 flex justify-between items-center text-xs">
+          <div className="font-bold flex items-center gap-2" style={{ color: 'var(--text-primary)' }}>
+            <span className="text-amber-500">★</span>
+            <span>Srivari Community Fund • ஸ்ரீவாரி சமுதாய நிதி போர்ட்டல்</span>
           </div>
           <div className="flex items-center gap-2.5">
             <Link
               href="/visitor"
-              className="px-5 py-2 rounded-full text-white font-bold text-xs sm:text-sm transition-opacity hover:opacity-90 shadow-sm"
-              style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+              className="px-4 py-1.5 rounded-full text-white font-bold text-xs transition-opacity hover:opacity-90 shadow-sm"
+              style={{ backgroundColor: '#064E3B', border: '1px solid #10B981' }}
             >
-              Open Dashboard • டாஷ்போர்ட்
+              Direct Open Dashboard →
             </Link>
             <Link
               href="/login"
-              className="px-3.5 py-2 rounded-full font-bold text-xs transition-opacity hover:opacity-90 border"
+              className="px-3 py-1.5 rounded-full font-bold text-xs transition-opacity hover:opacity-90 border"
               style={{ backgroundColor: 'var(--surface-variant)', color: 'var(--text-primary)', borderColor: 'var(--border)' }}
             >
-              Admin • நிர்வாகி
+              Admin Login • நிர்வாகி
             </Link>
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 py-20 text-center">

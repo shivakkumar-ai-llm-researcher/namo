@@ -22,6 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { BalajiNamam } from '@/components/ui';
 import { getInitials } from '@/utils/formatters';
+import { TirupatiHeaderBanner } from '@/components/layout/TirupatiHeaderBanner';
 
 const navItems = [
   { href: '/visitor', label: 'Dashboard', icon: LayoutDashboard, tamil: 'டாஷ்போர்ட்' },
@@ -212,82 +213,46 @@ export default function VisitorLayout({ children }: { children: React.ReactNode 
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header Bar with Tab Name */}
-        <header
-          className="sticky top-0 z-40 h-[70px] flex items-center justify-between px-4 lg:px-6 border-b flex-shrink-0"
-          style={{
-            backgroundColor: 'var(--surface)',
-            borderBottom: '2px solid #D97706',
-          }}
+        {/* Majestic Tirupati Devasthanams Sacred Header Banner */}
+        <TirupatiHeaderBanner onMenuClick={() => setSidebarOpen(true)} />
+
+        {/* Sub-bar showing active tab breadcrumb & admin portal access */}
+        <div
+          className="px-4 lg:px-6 py-2 border-b flex items-center justify-between text-xs flex-shrink-0"
+          style={{ backgroundColor: 'var(--surface-variant)', borderColor: 'var(--border)' }}
         >
-          {/* Mobile / Tablet Menu Button + Tab Title */}
-          <div className="flex items-center gap-3 min-w-0">
-            <button
-              className="lg:hidden p-2 rounded-xl border hover:bg-black/5 dark:hover:bg-white/5 transition-colors flex-shrink-0"
-              style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
-              onClick={() => setSidebarOpen(true)}
-              aria-label="Open navigation sidebar"
-            >
-              <Menu size={20} />
-            </button>
-
-            {/* Tab Name & Icon Badge */}
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm"
-                style={{
-                  backgroundColor: 'var(--surface-variant)',
-                  border: '1px solid var(--border)',
-                  color: 'var(--primary)',
-                }}
-              >
-                <TabIcon size={19} />
-              </div>
-              <div className="flex items-baseline gap-2 min-w-0">
-                <h1 className="text-base lg:text-lg font-bold truncate tracking-tight" style={{ color: 'var(--text-primary)' }}>
-                  {currentTab.label}
-                </h1>
-                {currentTab.tamil && (
-                  <span
-                    className="text-[11px] font-medium px-2 py-0.5 rounded-full hidden sm:inline-block flex-shrink-0"
-                    style={{
-                      backgroundColor: 'var(--surface-variant)',
-                      color: 'var(--gold)',
-                      border: '1px solid var(--border)',
-                    }}
-                  >
-                    {currentTab.tamil}
-                  </span>
-                )}
-              </div>
-            </div>
+          <div className="flex items-center gap-2">
+            <TabIcon size={15} style={{ color: 'var(--primary)' }} />
+            <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{currentTab.label}</span>
+            {currentTab.tamil && (
+              <span className="text-[11px] text-stone-500 font-medium">({currentTab.tamil})</span>
+            )}
           </div>
-
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-300/40">
+              🙏 Devotee Portal • பக்தர் தளம்
+            </span>
             {profile?.role === 'admin' ? (
               <Link
                 href="/admin"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-all"
-                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-xs hover:opacity-90 transition-all"
+                style={{ backgroundColor: 'var(--primary)' }}
               >
-                <Shield size={13} />
+                <Shield size={12} />
                 <span>Admin Panel →</span>
               </Link>
             ) : (
               <Link
                 href="/login"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm hover:opacity-90 transition-all"
-                style={{ backgroundColor: 'var(--primary)', border: '1px solid #F59E0B' }}
-                title="Administrator Login"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-white shadow-xs hover:opacity-90 transition-all"
+                style={{ backgroundColor: 'var(--primary)' }}
               >
-                <Shield size={13} />
-                <span className="hidden sm:inline">Admin Login • நிர்வாகி</span>
-                <span className="sm:hidden">Admin</span>
+                <Shield size={12} />
+                <span>Admin Login</span>
               </Link>
             )}
-            <ThemeToggle />
           </div>
-        </header>
+        </div>
 
         {/* Page Content */}
         <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-6xl w-full mx-auto">
