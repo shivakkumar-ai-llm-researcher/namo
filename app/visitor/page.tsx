@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { TrendingUp, TrendingDown, Scale, Users, ArrowRight, Wallet, QrCode } from 'lucide-react';
+import { TrendingUp, TrendingDown, Scale, Users, ArrowRight, Wallet } from 'lucide-react';
 import { StatCard, Card, Badge } from '@/components/ui';
 import { contributionService, expenseService, functionService } from '@/services';
 import { formatCurrency, formatDate } from '@/utils/formatters';
@@ -241,36 +241,6 @@ export default function VisitorDashboard() {
           ))}
         </div>
       </div>
-
-      {/* Official Community UPI & Bank Details */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>Direct Seva Contribution (காணிக்கை)</h3>
-          <Badge label="Official A/C" variant="success" size="sm" />
-        </div>
-        <Card className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-xl" style={{ backgroundColor: '#FFFBEB', border: '1px solid #FDE68A' }}>
-            <div className="w-10 h-10 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-800">
-              <QrCode size={22} />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-wider text-amber-900">Instant UPI Payment</p>
-              <p className="text-sm font-semibold text-amber-950">GPay • PhonePe • Paytm • BHIM</p>
-            </div>
-          </div>
-          <div className="space-y-2 text-sm">
-            <div className="flex justify-between py-1.5 border-b" style={{ borderColor: 'var(--border)' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>Account Name</span>
-              <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Srivari Community Fund</span>
-            </div>
-            <div className="flex justify-between py-1.5 border-b" style={{ borderColor: 'var(--border)' }}>
-              <span style={{ color: 'var(--text-secondary)' }}>UPI ID</span>
-              <span className="font-mono font-bold" style={{ color: 'var(--primary)' }}>srivari.fund@upi</span>
-            </div>
-          </div>
-        </Card>
-      </div>
-
       {/* Recent Contributions list */}
       <div>
         <div className="flex items-center justify-between mb-3">
