@@ -91,10 +91,10 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
 
       {/* ── In-Artwork Interactive Celestial Hotspot (Moon in Dark / Sun in Light) ── */}
       {isDark ? (
-        /* ── Moon Hotspot in Dark Theme (Center: 73.37% x, 30.49% y) ── */
+        /* ── Moon Hotspot in Dark Theme (Center: 73.37% x, 25.80% y) ── */
         <button
           onClick={() => setTheme('light')}
-          style={{ left: '73.37%', top: '30.49%' }}
+          style={{ left: '73.37%', top: '25.80%' }}
           title="சந்திர தரிசனம் (Moon) • Press to change to Light Theme"
           aria-label="Moon image point. Press to change into Light Theme."
           className="absolute -translate-x-1/2 -translate-y-1/2 w-[5.5vw] h-[5.5vw] max-w-16 max-h-16 min-w-8 min-h-8 rounded-full cursor-pointer z-20 group focus:outline-none"
@@ -104,10 +104,10 @@ export function TirupatiHeaderBanner({ onMenuClick, showMenuButton = true }: Tir
           <span className="sr-only">Switch to Light Theme</span>
         </button>
       ) : (
-        /* ── Sun Hotspot in Light Theme (Center: 75.92% x, 56.49% y) ── */
+        /* ── Sun Hotspot in Light Theme (Center: 75.90% x, 53.62% y) ── */
         <button
           onClick={() => setTheme('dark')}
-          style={{ left: '75.92%', top: '56.49%' }}
+          style={{ left: '75.90%', top: '53.62%' }}
           title="சூரிய தரிசனம் (Sun) • Press to change to Dark Theme"
           aria-label="Sun image point. Press to change into Dark Theme."
           className="absolute -translate-x-1/2 -translate-y-1/2 w-[5.5vw] h-[5.5vw] max-w-16 max-h-16 min-w-8 min-h-8 rounded-full cursor-pointer z-20 group focus:outline-none"
